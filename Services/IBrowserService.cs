@@ -1,5 +1,3 @@
-
-
 using System.Collections.Generic;
 using PowerBrowser.Common;
 using PowerBrowser.Transport;

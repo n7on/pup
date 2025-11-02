@@ -1,8 +1,6 @@
 using System;
-using System.IO;
 using System.Management.Automation;
 using PowerBrowser.Transport;
-using PowerBrowser.Services;
 using PowerBrowser.Common;
 
 namespace PowerBrowser.Commands.Browser

@@ -1,7 +1,6 @@
 using System;
 using System.Management.Automation;
 using PowerBrowser.Transport;
-using PowerBrowser.Services;
 using PowerBrowser.Completers;
 using PowerBrowser.Common;
 
@@ -36,7 +35,7 @@ namespace PowerBrowser.Commands.Browser
                 BrowserTypeValidator.Validate(BrowserType);
                 var browserService = ServiceFactory.CreateBrowserService(SessionState);
                 var browser = browserService.StartBrowser(
-                    BrowserType.ToSupportedPBrowser(),
+                    BrowserType.ToPBSupportedBrowser(),
                     Headless.IsPresent,
                     Width,
                     Height

@@ -1,4 +1,3 @@
-using System;
 using PuppeteerSharp;
 
 namespace PowerBrowser.Common

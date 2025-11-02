@@ -1,7 +1,6 @@
 using System;
 using System.Management.Automation;
 using PowerBrowser.Transport;
-using PowerBrowser.Services;
 
 namespace PowerBrowser.Commands.Browser
 {

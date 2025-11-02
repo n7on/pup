@@ -2,9 +2,6 @@ using System;
 using System.Management.Automation;
 using PowerBrowser.Transport;
 using PowerBrowser.Services;
-using PowerBrowser.Common;
-using PowerBrowser.Completers;
-using PuppeteerSharp;
 public abstract class PageBaseCommand : PSCmdlet
 {
     [Parameter(

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using PuppeteerSharp;
 
 namespace PowerBrowser.Transport

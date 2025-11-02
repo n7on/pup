@@ -1,6 +1,5 @@
 using System.Management.Automation;
 using PowerBrowser.Services;
-using PowerBrowser.Transport;
 
 public static class ServiceFactory
 {

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using PuppeteerSharp;
 using System.Management.Automation;
 using PowerBrowser.Common;
@@ -26,7 +25,7 @@ namespace PowerBrowser.Transport
         public PBBrowser(IBrowser browser, bool headless, string windowSize, string path)
         {
             Browser = browser;
-            BrowserType = browser?.BrowserType.ToSupportedPBrowser() ?? PBSupportedBrowser.Chrome;
+            BrowserType = browser?.BrowserType.ToPBSupportedBrowser() ?? PBSupportedBrowser.Chrome;
             StartTime = DateTime.Now;
             Headless = headless;
             WindowSize = windowSize;

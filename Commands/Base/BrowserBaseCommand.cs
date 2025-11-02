@@ -1,7 +1,6 @@
 using System;
 using System.Management.Automation;
 using PowerBrowser.Transport;
-using PowerBrowser.Services;
 using PowerBrowser.Common;
 using PowerBrowser.Completers;
 public abstract class BrowserBaseCommand : PSCmdlet
@@ -33,7 +32,7 @@ public abstract class BrowserBaseCommand : PSCmdlet
         if (Browser == null)
         {
             BrowserTypeValidator.Validate(BrowserType);
-            Browser = BrowserService.GetBrowser(BrowserType.ToSupportedPBrowser());
+            Browser = BrowserService.GetBrowser(BrowserType.ToPBSupportedBrowser());
         }
 
         return Browser;

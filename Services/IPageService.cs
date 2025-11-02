@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using PowerBrowser.Transport;
 
@@ -16,5 +15,9 @@ namespace PowerBrowser.Services
 
         PBElement FindElementBySelector(PBPage browserPage, string selector, bool waitForLoad, int timeout);
         void NavigatePage(PBPage browserPage, string url, bool waitForLoad);
+
+        List<PBCookie> GetCookies(PBPage browserPage);
+        void DeleteCookies(PBPage browserPage, PBCookie[] cookies);
+        void SetCookies(PBPage browserPage, PBCookie[] cookies);
     }
 }

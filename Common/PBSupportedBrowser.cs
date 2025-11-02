@@ -29,7 +29,7 @@ namespace PowerBrowser.Common
     public static class PBSupportedBrowserExtensions
     {
 
-        public static PBSupportedBrowser ToSupportedPBrowser(this SupportedBrowser browserType)
+        public static PBSupportedBrowser ToPBSupportedBrowser(this SupportedBrowser browserType)
         {
             if (Enum.TryParse<PBSupportedBrowser>(browserType.ToString(), out var result))
             {
@@ -37,7 +37,7 @@ namespace PowerBrowser.Common
             }
             throw new ArgumentException($"Invalid browser type: {browserType}");
         }
-        public static PBSupportedBrowser ToSupportedPBrowser(this string browserType)
+        public static PBSupportedBrowser ToPBSupportedBrowser(this string browserType)
         {
             if (Enum.TryParse<PBSupportedBrowser>(browserType, true, out var result))
             {

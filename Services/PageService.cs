@@ -132,7 +132,7 @@ namespace PowerBrowser.Services
         }
 
 
-        public void DeleteCookies(PBPage browserPage, CookieParam[] cookies)
+        public void DeleteCookies(PBPage browserPage, PBCookie[] cookies)
         {
             var puppeteerCookies = new List<CookieParam>();
             foreach (var c in cookies)

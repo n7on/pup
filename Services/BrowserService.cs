@@ -6,7 +6,6 @@ using PowerBrowser.Transport;
 using System.Management.Automation;
 using System.Collections.Generic;
 using PowerBrowser.Common;
-using System.Runtime.CompilerServices;
 
 namespace PowerBrowser.Services
 {
@@ -83,7 +82,7 @@ namespace PowerBrowser.Services
                 .Select(dir => {
                     var key = Path.GetFileName(dir);
                     var browser = _sessionStateService.Get(key);
-                    return browser ?? new PBBrowser(Path.GetFileName(dir).ToSupportedPBrowser(), dir);
+                    return browser ?? new PBBrowser(Path.GetFileName(dir).ToPBSupportedBrowser(), dir);
                 }).ToList();
             
             return browsers;
