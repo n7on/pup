@@ -19,9 +19,9 @@ public abstract class BrowserBaseCommand : PSCmdlet
     [ArgumentCompleter(typeof(InstalledBrowserCompleter))]
     public string BrowserType { get; set; }
     protected IBrowserService BrowserService => ServiceFactory.CreateBrowserService(SessionState);
-    protected PBrowser ResolveBrowserOrThrow(PBrowser browser, string browserType)
+    protected PBrowser ResolveBrowserOrThrow()
     {
-        if (browser == null && string.IsNullOrEmpty(browserType))
+        if (Browser == null && string.IsNullOrEmpty(BrowserType))
         {
             ThrowTerminatingError(new ErrorRecord(
                 new ArgumentException("Either Browser or BrowserType parameter must be provided."),
@@ -30,12 +30,12 @@ public abstract class BrowserBaseCommand : PSCmdlet
                 null));
         }
 
-        if (browser == null)
+        if (Browser == null)
         {
-            BrowserTypeValidator.Validate(browserType);
-            browser = BrowserService.GetPBrowser(browserType.ToSupportedPBrowser());
+            BrowserTypeValidator.Validate(BrowserType);
+            Browser = BrowserService.GetBrowser(BrowserType.ToSupportedPBrowser());
         }
 
-        return browser;
+        return Browser;
     }
 }

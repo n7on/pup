@@ -17,15 +17,15 @@ namespace PowerBrowser.Transport
         public int Index { get; set; }
         public DateTime FoundTime { get; set; }
 
-        public PBrowserElement(string elementId, string pageName, IElementHandle element, string selector, int index, IPage page = null)
+        public PBrowserElement(IElementHandle element, IPage page, string elementId, string pageName,  string selector, int index)
         {
+            Element = element;
+            Page = page;
             ElementId = elementId;
             PageName = pageName;
-            Element = element;
             Selector = selector;
             Index = index;
             FoundTime = DateTime.Now;
-            Page = page;
         }
 
         // Properties for PowerShell display

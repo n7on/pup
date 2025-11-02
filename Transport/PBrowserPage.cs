@@ -49,6 +49,21 @@ namespace PowerBrowser.Transport
             }
         }
 
+        public string Content
+        {
+            get
+            {
+                try
+                {
+                    return Page?.GetContentAsync().GetAwaiter().GetResult() ?? "";
+                }
+                catch
+                {
+                    return "";
+                }
+            }
+        }
+
         public string Title
         {
             get

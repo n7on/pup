@@ -32,17 +32,17 @@ namespace PowerBrowser.Services
             _sessionState.PSVariable.Set(_key, store);
         }
 
-        public Dictionary<string, T> GetAll()
-        {
-            return GetStore();
-        }
-
         public T Get(string name)
         {
             var store = GetStore();
             return store.TryGetValue(name, out var value) ? value : default;
         }
 
+        public List<T> GetAll()
+        {
+            var store = GetStore();
+            return new List<T>(store.Values);
+        }
         public bool Remove(string name)
         {
             var store = GetStore();

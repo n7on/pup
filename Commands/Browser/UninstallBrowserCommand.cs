@@ -14,10 +14,10 @@ namespace PowerBrowser.Commands.Browser
         {
             try
             {
-                var browser = ResolveBrowserOrThrow(Browser, BrowserType);
-                BrowserService.RemoveBrowser(browser);
+                Browser = ResolveBrowserOrThrow();
+                BrowserService.RemoveBrowser(Browser);
 
-                WriteVerbose($"Removed browser: {browser.BrowserType} from path: {browser.Path}");
+                WriteVerbose($"Removed browser: {Browser.BrowserType} from path: {Browser.Path}");
             }
             catch (Exception ex)
             {

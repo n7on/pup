@@ -8,7 +8,7 @@ public interface IBrowserService
 {
 
     bool IsBrowserTypeInstalled(SupportedPBrowser browserType);
-    PBrowser GetPBrowser(SupportedPBrowser browserType);
+    PBrowser GetBrowser(SupportedPBrowser browserType);
     List<PBrowser> GetBrowsers();
 
     bool RemoveBrowser(PBrowser browser);

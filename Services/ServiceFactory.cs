@@ -10,9 +10,9 @@ public static class ServiceFactory
         return browserService;
     }
 
-    public static IBrowserPageService CreateBrowserPageService(SessionState sessionState)
+    public static IPageService CreatePageService(SessionState sessionState)
     {
-        var browserPageService = new BrowserPageService(sessionState);
-        return browserPageService;
+        var pageService = new PageService(sessionState);
+        return pageService;
     }
 }

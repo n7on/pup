@@ -6,6 +6,7 @@ using PowerBrowser.Transport;
 using System.Management.Automation;
 using System.Collections.Generic;
 using PowerBrowser.Common;
+using System.Runtime.CompilerServices;
 
 namespace PowerBrowser.Services
 {
@@ -61,7 +62,7 @@ namespace PowerBrowser.Services
                 .Select(dir => Path.GetFileName(dir))
                 .ToArray();
         }
-        public PBrowser GetPBrowser(SupportedPBrowser browserType)
+        public PBrowser GetBrowser(SupportedPBrowser browserType)
         {
             return GetBrowsers().FirstOrDefault(b => b.BrowserType == browserType);
         }
@@ -76,13 +77,12 @@ namespace PowerBrowser.Services
             {
                 return new List<PBrowser>();
             }
-            var runningBrowsers = _sessionStateService.GetAll();
             var supportedBrowserNames = Enum.GetNames(typeof(SupportedPBrowser));
             var browsers = Directory.GetDirectories(storagePath)
                 .Where(dir => supportedBrowserNames.Contains(Path.GetFileName(dir)))
                 .Select(dir => {
                     var key = Path.GetFileName(dir);
-                    runningBrowsers.TryGetValue(key, out var browser);
+                    var browser = _sessionStateService.Get(key);
                     return browser ?? new PBrowser(Path.GetFileName(dir).ToSupportedPBrowser(), dir);
                 }).ToList();
             
@@ -130,6 +130,12 @@ namespace PowerBrowser.Services
         }
         public PBrowser StartBrowser(SupportedPBrowser browserType, bool headless, int width, int height)
         {
+            var installedBrowser = GetBrowser(browserType);
+            if (installedBrowser != null && installedBrowser.Running)
+            {
+                StopBrowser(installedBrowser);
+            }
+
             var path = GetBrowserTypeInstallPath(browserType);
             var browserTypeName = browserType.ToString();
             var launchOptions = new LaunchOptions

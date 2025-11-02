@@ -37,7 +37,7 @@ namespace PowerBrowser.Commands.Browser
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "BrowserInstallFailed", ErrorCategory.OperationStopped, null));
+                WriteError(new ErrorRecord(ex, "InstallBrowserFailed", ErrorCategory.OperationStopped, null));
             }
         }
     }

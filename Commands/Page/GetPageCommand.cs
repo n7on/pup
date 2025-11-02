@@ -2,11 +2,11 @@ using System;
 using System.Management.Automation;
 using PowerBrowser.Transport;
 
-namespace PowerBrowser.Commands.BrowserPage
+namespace PowerBrowser.Commands.Page
 {
-    [Cmdlet(VerbsCommon.Get, "BrowserPage")]
+    [Cmdlet(VerbsCommon.Get, "Page")]
     [OutputType(typeof(PBrowserPage))]
-    public class GetBrowserPageCommand : PSCmdlet
+    public class GetPageCommand : PSCmdlet
     {
 
         [Parameter(
@@ -19,8 +19,8 @@ namespace PowerBrowser.Commands.BrowserPage
         {
             try
             {
-                var pageService = ServiceFactory.CreateBrowserPageService(SessionState);
-                var pages = Browser != null ? pageService.GetBrowserPagesByBrowser(Browser) : pageService.GetBrowserPages();
+                var pageService = ServiceFactory.CreatePageService(SessionState);
+                var pages = Browser != null ? pageService.GetPagesByBrowser(Browser) : pageService.GetPages();
 
                 if (pages.Count == 0)
                 {
@@ -35,7 +35,7 @@ namespace PowerBrowser.Commands.BrowserPage
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "GetBrowserPageFailed", ErrorCategory.OperationStopped, null));
+                WriteError(new ErrorRecord(ex, "GetPageFailed", ErrorCategory.OperationStopped, null));
             }
         }
     }

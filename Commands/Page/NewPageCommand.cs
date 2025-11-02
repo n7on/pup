@@ -2,11 +2,11 @@ using System;
 using System.Management.Automation;
 using PowerBrowser.Transport;
 
-namespace PowerBrowser.Commands.BrowserPage
+namespace PowerBrowser.Commands.Page
 {
-    [Cmdlet(VerbsCommon.New, "BrowserPage")]
+    [Cmdlet(VerbsCommon.New, "Page")]
     [OutputType(typeof(PBrowserPage))]
-    public class NewBrowserPageCommand : BrowserBaseCommand
+    public class NewPageCommand : BrowserBaseCommand
     {
 
         [Parameter(HelpMessage = "Custom name for the page (if not specified, will be Page1, Page2, etc.)")]
@@ -28,10 +28,10 @@ namespace PowerBrowser.Commands.BrowserPage
         {
             try
             {
-                var browser = ResolveBrowserOrThrow(Browser, BrowserType);
-                
-                var pageService = ServiceFactory.CreateBrowserPageService(SessionState);
-                var browserPage = pageService.CreateBrowserPage(
+                var browser = ResolveBrowserOrThrow();
+
+                var pageService = ServiceFactory.CreatePageService(SessionState);
+                var browserPage = pageService.CreatePage(
                     browser,
                     Name,
                     Width,
@@ -43,7 +43,7 @@ namespace PowerBrowser.Commands.BrowserPage
             }            
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "UninstallBrowserFailed", ErrorCategory.OperationStopped, null));
+                WriteError(new ErrorRecord(ex, "NewPageFailed", ErrorCategory.OperationStopped, null));
             }
         }
     }

@@ -20,10 +20,10 @@ namespace PowerBrowser.Commands.Browser
         {
             try
             {
-                var browser = ResolveBrowserOrThrow(Browser, BrowserType);
-                BrowserService.StopBrowser(browser);
+                Browser = ResolveBrowserOrThrow();
+                BrowserService.StopBrowser(Browser);
 
-                WriteVerbose($"Browser '{browser.BrowserType}' stopped successfully!");
+                WriteVerbose($"Browser '{Browser.BrowserType}' stopped successfully!");
             }
             catch (PowerBrowserException ex)
             {

@@ -5,23 +5,23 @@ using PowerBrowser.Services;
 using PowerBrowser.Common;
 using PowerBrowser.Completers;
 using PuppeteerSharp;
-public abstract class BrowserPageBaseCommand : PSCmdlet
+public abstract class PageBaseCommand : PSCmdlet
 {
     [Parameter(
         Position = 0,
         Mandatory = false,
         ValueFromPipeline = true,
         ValueFromPipelineByPropertyName = true)]
-    public PBrowserPage BrowserPage { get; set; }
+    public PBrowserPage Page { get; set; }
 
     [Parameter(
         Position = 1,
         Mandatory = false)]
     public string PageId { get; set; }
-    protected IBrowserPageService BrowserPageService => ServiceFactory.CreateBrowserPageService(SessionState);
-    protected PBrowserPage ResolveBrowserPageOrThrow(PBrowserPage browserPage, string pageId)
+    protected IPageService PageService => ServiceFactory.CreatePageService(SessionState);
+    protected PBrowserPage ResolvePageOrThrow()
     {
-        if(BrowserPage == null && string.IsNullOrEmpty(PageId))
+        if(Page == null && string.IsNullOrEmpty(PageId))
         {
             ThrowTerminatingError(new ErrorRecord(
                 new ArgumentException(
@@ -32,12 +32,12 @@ public abstract class BrowserPageBaseCommand : PSCmdlet
                 )
             );
         }
-        else if(BrowserPage == null)
+        else if(Page == null)
         {
-            BrowserPage = BrowserPageService.GetBrowserPages()
+            Page = PageService.GetPages()
                 .Find(page => page.PageId.Equals(PageId, StringComparison.OrdinalIgnoreCase));
 
-            if(BrowserPage == null)
+            if(Page == null)
             {
                 ThrowTerminatingError(new ErrorRecord(
                     new ArgumentException(
@@ -49,6 +49,6 @@ public abstract class BrowserPageBaseCommand : PSCmdlet
                 );
             } 
         }
-        return BrowserPage;
+        return Page;
     }
 }
