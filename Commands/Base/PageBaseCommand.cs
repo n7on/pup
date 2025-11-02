@@ -12,14 +12,14 @@ public abstract class PageBaseCommand : PSCmdlet
         Mandatory = false,
         ValueFromPipeline = true,
         ValueFromPipelineByPropertyName = true)]
-    public PBrowserPage Page { get; set; }
+    public PBPage Page { get; set; }
 
     [Parameter(
         Position = 1,
         Mandatory = false)]
     public string PageId { get; set; }
     protected IPageService PageService => ServiceFactory.CreatePageService(SessionState);
-    protected PBrowserPage ResolvePageOrThrow()
+    protected PBPage ResolvePageOrThrow()
     {
         if(Page == null && string.IsNullOrEmpty(PageId))
         {

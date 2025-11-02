@@ -1,6 +1,7 @@
 using System;
 using PuppeteerSharp;
 using PowerBrowser.Transport;
+using PowerBrowser.Common;
 using System.Management.Automation;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,23 +13,23 @@ namespace PowerBrowser.Services
     {
         private const string RunningPagesKey = "RunningPages";
 
-        private readonly SessionStateService<PBrowserPage> _sessionStateService;
+        private readonly SessionStateService<PBPage> _sessionStateService;
 
         public PageService(SessionState sessionState)
         {
-            _sessionStateService = new SessionStateService<PBrowserPage>(sessionState, RunningPagesKey);
+            _sessionStateService = new SessionStateService<PBPage>(sessionState, RunningPagesKey);
         }
-
-        public List<PBrowserPage> GetPagesByBrowser(PBrowser pBrowser)
+    
+        public List<PBPage> GetPagesByBrowser(PBBrowser pBrowser)
         {
             return _sessionStateService.GetAll().Where(s => s.Browser == pBrowser).ToList();
         }
-        public List<PBrowserPage> GetPages()
+        public List<PBPage> GetPages()
         {
             return _sessionStateService.GetAll();
         }
 
-        public PBrowserPage CreatePage(PBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad)
+        public PBPage CreatePage(PBBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad)
         {
             var pages = pBrowser.Browser.PagesAsync().GetAwaiter().GetResult();
             string pageName = string.IsNullOrEmpty(name) ? $"Page{pages.Length + 1}" : name;
@@ -58,7 +59,7 @@ namespace PowerBrowser.Services
                 }
             }
 
-            var browserPage = new PBrowserPage(
+            var browserPage = new PBPage(
                 pBrowser,
                 page,
                 pageName,
@@ -69,13 +70,13 @@ namespace PowerBrowser.Services
             _sessionStateService.Save(browserPage.PageId, browserPage);
             return browserPage;
         }
-        public void RemovePage(PBrowserPage browserPage)
+        public void RemovePage(PBPage browserPage)
         {
             browserPage.Page.CloseAsync().GetAwaiter().GetResult();
             _sessionStateService.Remove(browserPage.PageId);
         }
 
-        public void NavigatePage(PBrowserPage browserPage, string url, bool waitForLoad)
+        public void NavigatePage(PBPage browserPage, string url, bool waitForLoad)
         {
             if (waitForLoad)
             {
@@ -90,7 +91,7 @@ namespace PowerBrowser.Services
             }
         }
 
-        public PBrowserElement FindElementBySelector(PBrowserPage browserPage, string selector, bool waitForLoad = false, int timeout = 30000)
+        public PBElement FindElementBySelector(PBPage browserPage, string selector, bool waitForLoad = false, int timeout = 30000)
         {
             IElementHandle element;
             if (waitForLoad)
@@ -106,9 +107,72 @@ namespace PowerBrowser.Services
             {
                 return null;
             }
-            return new PBrowserElement(element, browserPage.Page, Guid.NewGuid().ToString(), browserPage.PageName, selector, 0);
-        }   
+            return new PBElement(element, browserPage.Page, Guid.NewGuid().ToString(), browserPage.PageName, selector, 0);
+        }
 
+        public List<PBCookie> GetCookies(PBPage browserPage)
+        {
+            var puppeteerCookies = browserPage.Page.GetCookiesAsync().GetAwaiter().GetResult();
+            var cookies = new List<PBCookie>();
+            foreach (var c in puppeteerCookies)
+            {
+                cookies.Add(new PBCookie
+                {
+                    Name = c.Name,
+                    Value = c.Value,
+                    Domain = c.Domain,
+                    Path = c.Path,
+                    Expires = DateTimeOffset.FromUnixTimeSeconds((long)c.Expires).DateTime,
+                    HttpOnly = c.HttpOnly,
+                    Secure = c.Secure,
+                    SameSite = c.SameSite.ToSupportedPBSameSite()
+                });
+            }
+            return cookies;
+        }
+
+
+        public void DeleteCookies(PBPage browserPage, CookieParam[] cookies)
+        {
+            var puppeteerCookies = new List<CookieParam>();
+            foreach (var c in cookies)
+            {
+                puppeteerCookies.Add(new CookieParam
+                {
+                    Name = c.Name,
+                    Domain = c.Domain,
+                    Path = c.Path,
+                    Url = c.Url
+                });
+            }
+            browserPage.Page.DeleteCookieAsync(puppeteerCookies.ToArray()).GetAwaiter().GetResult();
+        }
+
+
+        public void SetCookies(PBPage browserPage, PBCookie[] cookies)
+        {
+            var puppeteerCookies = new List<CookieParam>();
+            foreach (var c in cookies)
+            {
+                double? expires = null;
+                if (c.Expires.HasValue)
+                {
+                    expires = ((DateTimeOffset)c.Expires.Value).ToUnixTimeSeconds();
+                }
+                puppeteerCookies.Add(new CookieParam
+                {
+                    Name = c.Name,
+                    Value = c.Value,
+                    Domain = c.Domain,
+                    Path = c.Path,
+                    Expires = expires,
+                    HttpOnly = c.HttpOnly,
+                    Secure = c.Secure,
+                    SameSite = c.SameSite.ToPuppeteerSameSiteMode()
+                });
+            }
+            browserPage.Page.SetCookieAsync(puppeteerCookies.ToArray()).GetAwaiter().GetResult();
+        }   
 
     }
 }

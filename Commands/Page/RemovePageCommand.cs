@@ -5,7 +5,7 @@ using PowerBrowser.Transport;
 namespace PowerBrowser.Commands.Page
 {
     [Cmdlet(VerbsCommon.Remove, "Page")]
-    [OutputType(typeof(PBrowserPage))]
+    [OutputType(typeof(PBPage))]
     public class RemovePageCommand : PageBaseCommand
     {
         protected override void ProcessRecord()

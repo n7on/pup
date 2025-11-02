@@ -4,7 +4,7 @@ using PuppeteerSharp;
 namespace PowerBrowser.Common
 {
 
-    public enum SupportedPBrowser
+    public enum PBSupportedBrowser
     {
         /// <summary>
         /// Chrome.
@@ -26,33 +26,33 @@ namespace PowerBrowser.Common
         /// </summary>
         ChromeHeadlessShell,
     }
-    public static class SupportedPBrowserExtensions
+    public static class PBSupportedBrowserExtensions
     {
 
-        public static SupportedPBrowser ToSupportedPBrowser(this SupportedBrowser browserType)
+        public static PBSupportedBrowser ToSupportedPBrowser(this SupportedBrowser browserType)
         {
-            if (Enum.TryParse<SupportedPBrowser>(browserType.ToString(), out var result))
-            {   
-                return result;
-            }
-            throw new ArgumentException($"Invalid browser type: {browserType}");
-        }
-        public static SupportedPBrowser ToSupportedPBrowser(this string browserType)
-        {
-            if (Enum.TryParse<SupportedPBrowser>(browserType, true, out var result))
+            if (Enum.TryParse<PBSupportedBrowser>(browserType.ToString(), out var result))
             {
                 return result;
             }
             throw new ArgumentException($"Invalid browser type: {browserType}");
         }
-        public static string GetFriendlyName(this SupportedPBrowser browser)
+        public static PBSupportedBrowser ToSupportedPBrowser(this string browserType)
+        {
+            if (Enum.TryParse<PBSupportedBrowser>(browserType, true, out var result))
+            {
+                return result;
+            }
+            throw new ArgumentException($"Invalid browser type: {browserType}");
+        }
+        public static string GetFriendlyName(this PBSupportedBrowser browser)
         {
             return browser switch
             {
-                SupportedPBrowser.Chrome => "Google Chrome",
-                SupportedPBrowser.Firefox => "Mozilla Firefox",
-                SupportedPBrowser.Chromium => "Chromium",
-                SupportedPBrowser.ChromeHeadlessShell => "Chrome Headless Shell",
+                PBSupportedBrowser.Chrome => "Google Chrome",
+                PBSupportedBrowser.Firefox => "Mozilla Firefox",
+                PBSupportedBrowser.Chromium => "Chromium",
+                PBSupportedBrowser.ChromeHeadlessShell => "Chrome Headless Shell",
                 _ => "Unknown Browser"
             };
         }

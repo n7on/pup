@@ -8,13 +8,13 @@ using PowerBrowser.Common;
 namespace PowerBrowser.Commands.Browser
 {
     [Cmdlet(VerbsLifecycle.Install, "Browser")]
-    [OutputType(typeof(PBrowser))]
+    [OutputType(typeof(PBBrowser))]
     public class InstallBrowserCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
             HelpMessage = "Browser type to install (Chrome, Firefox, or Chromium - use -Headless flag with Start-Browser instead of ChromeHeadlessShell)")]
-        public SupportedPBrowser BrowserType { get; set; }
+        public PBSupportedBrowser BrowserType { get; set; }
 
         protected override void ProcessRecord()
         {

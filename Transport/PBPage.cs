@@ -8,11 +8,11 @@ namespace PowerBrowser.Transport
     /// <summary>
     /// PowerShell-friendly wrapper for IPage with additional metadata
     /// </summary>
-    public class PBrowserPage
+    public class PBPage
     {
         public string PageId => $"{Browser.BrowserType}_{PageName}";
         public string PageName { get; set; }
-        public PBrowser Browser { get; set; }
+        public PBBrowser Browser { get; set; }
         [Hidden]
         public IPage Page { get; set; }
         public DateTime CreatedTime { get; set; }
@@ -20,7 +20,7 @@ namespace PowerBrowser.Transport
         public int ViewportHeight { get; set; }
 
 
-        public PBrowserPage(PBrowser browser, IPage page, string pageName, int width, int height)
+        public PBPage(PBBrowser browser, IPage page, string pageName, int width, int height)
         {
             PageName = pageName;
             Browser = browser;

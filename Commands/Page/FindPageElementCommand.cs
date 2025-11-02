@@ -5,7 +5,7 @@ using PowerBrowser.Transport;
 namespace PowerBrowser.Commands.Page
 {
     [Cmdlet(VerbsCommon.Find, "PageElement")]
-    [OutputType(typeof(PBrowserElement))]
+    [OutputType(typeof(PBElement))]
     public class FindPageElementCommand : PageBaseCommand
     {
         [Parameter(HelpMessage = "CSS selector to find the element", Mandatory = true)]

@@ -7,16 +7,16 @@ using PowerBrowser.Transport;
 public interface IBrowserService
 {
 
-    bool IsBrowserTypeInstalled(SupportedPBrowser browserType);
-    PBrowser GetBrowser(SupportedPBrowser browserType);
-    List<PBrowser> GetBrowsers();
+    bool IsBrowserTypeInstalled(PBSupportedBrowser browserType);
+    PBBrowser GetBrowser(PBSupportedBrowser browserType);
+    List<PBBrowser> GetBrowsers();
 
-    bool RemoveBrowser(PBrowser browser);
+    bool RemoveBrowser(PBBrowser browser);
 
-    void DownloadBrowser(SupportedPBrowser browserType);
+    void DownloadBrowser(PBSupportedBrowser browserType);
 
-    bool StopBrowser(PBrowser browser);
+    bool StopBrowser(PBBrowser browser);
 
-    PBrowser StartBrowser(SupportedPBrowser browserType, bool headless, int width, int height);
+    PBBrowser StartBrowser(PBSupportedBrowser browserType, bool headless, int width, int height);
 
 }

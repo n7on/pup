@@ -5,7 +5,7 @@ using PowerBrowser.Transport;
 namespace PowerBrowser.Commands.Page
 {
     [Cmdlet(VerbsCommon.Get, "Page")]
-    [OutputType(typeof(PBrowserPage))]
+    [OutputType(typeof(PBPage))]
     public class GetPageCommand : PSCmdlet
     {
 
@@ -14,7 +14,7 @@ namespace PowerBrowser.Commands.Page
             Mandatory = false,
             ValueFromPipeline = true,
             ValueFromPipelineByPropertyName = true)]
-        public PBrowser Browser { get; set; }
+        public PBBrowser Browser { get; set; }
         protected override void ProcessRecord()
         {
             try

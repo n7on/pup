@@ -7,7 +7,7 @@ namespace PowerBrowser.Transport
     /// <summary>
     /// PowerShell-friendly wrapper for IElementHandle with additional metadata
     /// </summary>
-    public class PBrowserElement
+    public class PBElement
     {
         public string ElementId { get; set; }
         public string PageName { get; set; }
@@ -17,7 +17,7 @@ namespace PowerBrowser.Transport
         public int Index { get; set; }
         public DateTime FoundTime { get; set; }
 
-        public PBrowserElement(IElementHandle element, IPage page, string elementId, string pageName,  string selector, int index)
+        public PBElement(IElementHandle element, IPage page, string elementId, string pageName,  string selector, int index)
         {
             Element = element;
             Page = page;

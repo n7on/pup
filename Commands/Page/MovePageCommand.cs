@@ -5,7 +5,7 @@ using PowerBrowser.Transport;
 namespace PowerBrowser.Commands.Page
 {
     [Cmdlet(VerbsCommon.Move, "Page")]
-    [OutputType(typeof(PBrowserPage))]
+    [OutputType(typeof(PBPage))]
     public class MovePageCommand : PageBaseCommand
     {
         [Parameter(HelpMessage = "URL to navigate", Mandatory = true)]

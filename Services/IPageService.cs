@@ -6,16 +6,15 @@ namespace PowerBrowser.Services
 {
     public interface IPageService
     {
-        PBrowserPage CreatePage(PBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad);
+        PBPage CreatePage(PBBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad);
 
-        List<PBrowserPage> GetPages();
+        List<PBPage> GetPages();
 
-        List<PBrowserPage> GetPagesByBrowser(PBrowser pBrowser);
+        List<PBPage> GetPagesByBrowser(PBBrowser pBrowser);
 
-        void RemovePage(PBrowserPage browserPage);
+        void RemovePage(PBPage browserPage);
 
-        PBrowserElement FindElementBySelector(PBrowserPage browserPage, string selector, bool waitForLoad, int timeout);
-        void NavigatePage(PBrowserPage browserPage, string url, bool waitForLoad);
+        PBElement FindElementBySelector(PBPage browserPage, string selector, bool waitForLoad, int timeout);
+        void NavigatePage(PBPage browserPage, string url, bool waitForLoad);
     }
-
 }

@@ -11,7 +11,7 @@ public abstract class BrowserBaseCommand : PSCmdlet
         Mandatory = false,
         ValueFromPipeline = true,
         ValueFromPipelineByPropertyName = true)]
-    public PBrowser Browser { get; set; }
+    public PBBrowser Browser { get; set; }
 
     [Parameter(
         HelpMessage = "Name of the browser to stop (used when Browser parameter is not provided)",
@@ -19,7 +19,7 @@ public abstract class BrowserBaseCommand : PSCmdlet
     [ArgumentCompleter(typeof(InstalledBrowserCompleter))]
     public string BrowserType { get; set; }
     protected IBrowserService BrowserService => ServiceFactory.CreateBrowserService(SessionState);
-    protected PBrowser ResolveBrowserOrThrow()
+    protected PBBrowser ResolveBrowserOrThrow()
     {
         if (Browser == null && string.IsNullOrEmpty(BrowserType))
         {

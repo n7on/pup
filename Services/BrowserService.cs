@@ -15,20 +15,20 @@ namespace PowerBrowser.Services
     {
         private const string RunningBrowsersKey = "RunningBrowsers";
 
-        public bool IsBrowserTypeInstalled(SupportedPBrowser browserType)
+        public bool IsBrowserTypeInstalled(PBSupportedBrowser browserType)
         {
             var path = GetBrowserTypeInstallPath(browserType);
             return Directory.Exists(path);
         }
-        private readonly SessionStateService<PBrowser> _sessionStateService;
+        private readonly SessionStateService<PBBrowser> _sessionStateService;
 
         public BrowserService(SessionState sessionState)
         {
-            _sessionStateService = new SessionStateService<PBrowser>(sessionState, RunningBrowsersKey);
+            _sessionStateService = new SessionStateService<PBBrowser>(sessionState, RunningBrowsersKey);
             AppDomain.CurrentDomain.ProcessExit += (s, e) => Cleanup();
         }
 
-        private string GetBrowserTypeInstallPath(SupportedPBrowser supportedBrowser)
+        private string GetBrowserTypeInstallPath(PBSupportedBrowser supportedBrowser)
         {
             var storagePath = GetBrowserInstallPath();
             return Path.Combine(storagePath, supportedBrowser.ToString());
@@ -56,17 +56,17 @@ namespace PowerBrowser.Services
             {
                 return Array.Empty<string>();
             }
-            var supportedBrowserNames = Enum.GetNames(typeof(SupportedPBrowser));
+            var supportedBrowserNames = Enum.GetNames(typeof(PBSupportedBrowser));
             return Directory.GetDirectories(storagePath)
                 .Where(dir => supportedBrowserNames.Contains(Path.GetFileName(dir)))
                 .Select(dir => Path.GetFileName(dir))
                 .ToArray();
         }
-        public PBrowser GetBrowser(SupportedPBrowser browserType)
+        public PBBrowser GetBrowser(PBSupportedBrowser browserType)
         {
             return GetBrowsers().FirstOrDefault(b => b.BrowserType == browserType);
         }
-        public List<PBrowser> GetBrowsers()
+        public List<PBBrowser> GetBrowsers()
         {
             var storagePath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -75,21 +75,21 @@ namespace PowerBrowser.Services
 
             if (!Directory.Exists(storagePath))
             {
-                return new List<PBrowser>();
+                return new List<PBBrowser>();
             }
-            var supportedBrowserNames = Enum.GetNames(typeof(SupportedPBrowser));
+            var supportedBrowserNames = Enum.GetNames(typeof(PBSupportedBrowser));
             var browsers = Directory.GetDirectories(storagePath)
                 .Where(dir => supportedBrowserNames.Contains(Path.GetFileName(dir)))
                 .Select(dir => {
                     var key = Path.GetFileName(dir);
                     var browser = _sessionStateService.Get(key);
-                    return browser ?? new PBrowser(Path.GetFileName(dir).ToSupportedPBrowser(), dir);
+                    return browser ?? new PBBrowser(Path.GetFileName(dir).ToSupportedPBrowser(), dir);
                 }).ToList();
             
             return browsers;
         }
 
-        public bool RemoveBrowser(PBrowser browser)
+        public bool RemoveBrowser(PBBrowser browser)
         {
             if (Directory.Exists(browser.Path))
             {
@@ -100,7 +100,7 @@ namespace PowerBrowser.Services
         }
 
 
-        public void DownloadBrowser(SupportedPBrowser browserType)
+        public void DownloadBrowser(PBSupportedBrowser browserType)
         {
             var namedBrowserPath = GetBrowserTypeInstallPath(browserType);
             Directory.CreateDirectory(namedBrowserPath);
@@ -114,7 +114,7 @@ namespace PowerBrowser.Services
             browserFetcher.DownloadAsync().GetAwaiter().GetResult();
         }
 
-        public bool StopBrowser(PBrowser browser)
+        public bool StopBrowser(PBBrowser browser)
         {
 
             if (!browser.Running)
@@ -128,7 +128,7 @@ namespace PowerBrowser.Services
 
             return true;
         }
-        public PBrowser StartBrowser(SupportedPBrowser browserType, bool headless, int width, int height)
+        public PBBrowser StartBrowser(PBSupportedBrowser browserType, bool headless, int width, int height)
         {
             var installedBrowser = GetBrowser(browserType);
             if (installedBrowser != null && installedBrowser.Running)
@@ -171,7 +171,7 @@ namespace PowerBrowser.Services
             if (defaultPage != null && defaultPage.Url == "about:blank")
                 defaultPage.CloseAsync().GetAwaiter().GetResult();
 
-            var pbrowser = new PBrowser(
+            var pbrowser = new PBBrowser(
                 browser,
                 headless,
                 $"{width}x{height}",

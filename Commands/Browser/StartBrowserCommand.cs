@@ -8,7 +8,7 @@ using PowerBrowser.Common;
 namespace PowerBrowser.Commands.Browser
 {
     [Cmdlet(VerbsLifecycle.Start, "Browser")]
-    [OutputType(typeof(PBrowser))]
+    [OutputType(typeof(PBBrowser))]
     public class StartBrowserCommand : PSCmdlet
     {
         [Parameter(

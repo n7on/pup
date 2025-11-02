@@ -6,7 +6,7 @@ using PowerBrowser.Services;
 namespace PowerBrowser.Commands.Browser
 {
     [Cmdlet(VerbsCommon.Get, "Browser")]
-    [OutputType(typeof(PBrowser))]
+    [OutputType(typeof(PBBrowser))]
     public class GetBrowserCommand : PSCmdlet
     {
         protected override void ProcessRecord()

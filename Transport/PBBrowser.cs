@@ -9,12 +9,12 @@ namespace PowerBrowser.Transport
     /// <summary>
     /// PowerShell-friendly wrapper for IBrowser with additional metadata
     /// </summary>
-    public class PBrowser
+    public class PBBrowser
     {
     
         [Hidden]
         public IBrowser Browser { get; set; }
-        public SupportedPBrowser BrowserType { get; set; }
+        public PBSupportedBrowser BrowserType { get; set; }
         public DateTime StartTime { get; set; }
         public bool Headless { get; set; }
         public string WindowSize { get; set; }
@@ -23,17 +23,17 @@ namespace PowerBrowser.Transport
         public string Size { get; set; }
         public string Path { get; set; }
 
-        public PBrowser(IBrowser browser, bool headless, string windowSize, string path)
+        public PBBrowser(IBrowser browser, bool headless, string windowSize, string path)
         {
             Browser = browser;
-            BrowserType = browser?.BrowserType.ToSupportedPBrowser() ?? SupportedPBrowser.Chrome;   
+            BrowserType = browser?.BrowserType.ToSupportedPBrowser() ?? PBSupportedBrowser.Chrome;
             StartTime = DateTime.Now;
             Headless = headless;
             WindowSize = windowSize;
             Path = path;
         }
 
-        public PBrowser(SupportedPBrowser browserType, string path)
+        public PBBrowser(PBSupportedBrowser browserType, string path)
         {
             Browser = null;
             BrowserType = browserType;
