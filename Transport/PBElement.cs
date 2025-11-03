@@ -1,12 +1,12 @@
 using System;
 using PuppeteerSharp;
 
-namespace PowerBrowser.Models
+namespace PowerBrowser.Transport
 {
     /// <summary>
     /// PowerShell-friendly wrapper for IElementHandle with additional metadata
     /// </summary>
-    public class PowerBrowserElement
+    public class PBElement
     {
         public string ElementId { get; set; }
         public string PageName { get; set; }
@@ -16,15 +16,15 @@ namespace PowerBrowser.Models
         public int Index { get; set; }
         public DateTime FoundTime { get; set; }
 
-        public PowerBrowserElement(string elementId, string pageName, IElementHandle element, string selector, int index, IPage page = null)
+        public PBElement(IElementHandle element, IPage page, string elementId, string pageName,  string selector, int index)
         {
+            Element = element;
+            Page = page;
             ElementId = elementId;
             PageName = pageName;
-            Element = element;
             Selector = selector;
             Index = index;
             FoundTime = DateTime.Now;
-            Page = page;
         }
 
         // Properties for PowerShell display

@@ -1,45 +1,57 @@
 using System;
-using System.Collections.Generic;
 using PuppeteerSharp;
+using System.Management.Automation;
+using PowerBrowser.Common;
 
-namespace PowerBrowser.Models
+namespace PowerBrowser.Transport
 {
     /// <summary>
     /// PowerShell-friendly wrapper for IBrowser with additional metadata
     /// </summary>
-    public class PowerBrowserInstance
+    public class PBBrowser
     {
-        public string Name { get; set; }
+    
+        [Hidden]
         public IBrowser Browser { get; set; }
+        public PBSupportedBrowser BrowserType { get; set; }
         public DateTime StartTime { get; set; }
         public bool Headless { get; set; }
         public string WindowSize { get; set; }
-        public List<PowerBrowserPage> Pages { get; set; }
-        
+
         // Additional properties for Get-Browser display
         public string Size { get; set; }
         public string Path { get; set; }
 
-        public PowerBrowserInstance(string name, IBrowser browser, bool headless, string windowSize)
+        public PBBrowser(IBrowser browser, bool headless, string windowSize, string path)
         {
-            Name = name;
             Browser = browser;
+            BrowserType = browser?.BrowserType.ToPBSupportedBrowser() ?? PBSupportedBrowser.Chrome;
             StartTime = DateTime.Now;
             Headless = headless;
             WindowSize = windowSize;
-            Pages = new List<PowerBrowserPage>();
+            Path = path;
+        }
+
+        public PBBrowser(PBSupportedBrowser browserType, string path)
+        {
+            Browser = null;
+            BrowserType = browserType;
+            StartTime = DateTime.MinValue;
+            Headless = false;
+            WindowSize = "Unknown"; // Default size
+            Path = path;
+            Size = "Unknown"; // Default size
         }
 
         // Properties for PowerShell display
         public int ProcessId => Browser?.Process?.Id ?? -1;
         public string WebSocketEndpoint => Browser?.WebSocketEndpoint ?? "Unknown";
-        public bool IsConnected => Browser?.IsConnected ?? false;
         public bool Running => Browser?.IsConnected ?? false;  // User-friendly alias
-        public int PageCount => Pages.Count;
+        public int PageCount => Browser?.PagesAsync().GetAwaiter().GetResult().Length ?? 0;
 
         public override string ToString()
         {
-            return $"{Name} (PID: {ProcessId}, Pages: {PageCount}, Connected: {IsConnected})";
+            return $"(PID: {ProcessId}, Pages: {PageCount}, Running: {Running})";
         }
     }
 }
