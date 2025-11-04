@@ -2,9 +2,9 @@ using System;
 using System.Management.Automation;
 using PowerBrowser.Transport;
 
-namespace PowerBrowser.Commands.Page
+namespace PowerBrowser.Commands.Element
 {
-    [Cmdlet(VerbsCommon.Find, "PageElement")]
+    [Cmdlet(VerbsCommon.Find, "Element")]
     [OutputType(typeof(PBElement))]
     public class FindPageElementCommand : PageBaseCommand
     {
@@ -21,7 +21,8 @@ namespace PowerBrowser.Commands.Page
             try
             {
                 Page = ResolvePageOrThrow();
-                var element = PageService.FindElementBySelector(Page, Selector, WaitForLoad.IsPresent, Timeout);
+                var elementService = ServiceFactory.CreateElementService();
+                var element = elementService.FindElementBySelectorAsync(Page, Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
                 WriteObject(element);
             }
             catch (Exception ex)

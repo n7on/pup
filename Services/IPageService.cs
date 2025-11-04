@@ -1,23 +1,28 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using PowerBrowser.Transport;
 
 namespace PowerBrowser.Services
 {
     public interface IPageService
     {
-        PBPage CreatePage(PBBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad);
+        Task<PBPage> CreatePageAsync(PBBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad);
 
         List<PBPage> GetPages();
 
         List<PBPage> GetPagesByBrowser(PBBrowser pBrowser);
 
-        void RemovePage(PBPage browserPage);
+        Task RemovePageAsync(PBPage browserPage);
 
-        PBElement FindElementBySelector(PBPage browserPage, string selector, bool waitForLoad, int timeout);
-        void NavigatePage(PBPage browserPage, string url, bool waitForLoad);
+        Task NavigatePageAsync(PBPage browserPage, string url, bool waitForLoad);
 
-        List<PBCookie> GetCookies(PBPage browserPage);
-        void DeleteCookies(PBPage browserPage, PBCookie[] cookies);
-        void SetCookies(PBPage browserPage, PBCookie[] cookies);
+        Task<byte[]> GetPageScreenshotAsync(PBPage browserPage, string filePath = null, bool fullPage = false);
+
+        Task<T> ExecuteScriptAsync<T>(PBPage browserPage, string script, params object[] args);
+        Task ExecuteScriptAsync(PBPage browserPage, string script, params object[] args);
+
+        Task<List<PBCookie>> GetCookiesAsync(PBPage browserPage);
+        Task DeleteCookiesAsync(PBPage browserPage, PBCookie[] cookies);
+        Task SetCookiesAsync(PBPage browserPage, PBCookie[] cookies);
     }
 }

@@ -5,6 +5,7 @@ using PowerBrowser.Common;
 using System.Management.Automation;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PowerBrowser.Services
 {
@@ -29,33 +30,33 @@ namespace PowerBrowser.Services
             return _sessionStateService.GetAll();
         }
 
-        public PBPage CreatePage(PBBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad)
+        public async Task<PBPage> CreatePageAsync(PBBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad)
         {
-            var pages = pBrowser.Browser.PagesAsync().GetAwaiter().GetResult();
+            var pages = await pBrowser.Browser.PagesAsync().ConfigureAwait(false);
             string pageName = string.IsNullOrEmpty(name) ? $"Page{pages.Length + 1}" : name;
 
-            var page = pBrowser.Browser.NewPageAsync().GetAwaiter().GetResult();
+            var page = await pBrowser.Browser.NewPageAsync().ConfigureAwait(false);
 
             // Set viewport size
-            page.SetViewportAsync(new ViewPortOptions
+            await page.SetViewportAsync(new ViewPortOptions
             {
                 Width = width,
                 Height = height
-            }).GetAwaiter().GetResult();
+            }).ConfigureAwait(false);
 
             // Navigate to URL if specified
             if (!string.IsNullOrEmpty(url) && url != "about:blank")
             {
                 if (waitForLoad)
                 {
-                    page.GoToAsync(url, new NavigationOptions
+                    await page.GoToAsync(url, new NavigationOptions
                     {
                         WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
-                    }).GetAwaiter().GetResult();
+                    }).ConfigureAwait(false);
                 }
                 else
                 {
-                    page.GoToAsync(url).GetAwaiter().GetResult();
+                    await page.GoToAsync(url).ConfigureAwait(false);
                 }
             }
 
@@ -64,75 +65,92 @@ namespace PowerBrowser.Services
                 page,
                 pageName,
                 width,
-                height
+                height,
+                page.Url,
+                await page.GetContentAsync().ConfigureAwait(false),
+                await page.GetTitleAsync().ConfigureAwait(false)
             );
 
             _sessionStateService.Save(browserPage.PageId, browserPage);
             return browserPage;
         }
-        public void RemovePage(PBPage browserPage)
+        public async Task RemovePageAsync(PBPage browserPage)
         {
-            browserPage.Page.CloseAsync().GetAwaiter().GetResult();
+            await browserPage.Page.CloseAsync().ConfigureAwait(false);
             _sessionStateService.Remove(browserPage.PageId);
         }
 
-        public void NavigatePage(PBPage browserPage, string url, bool waitForLoad)
+        public async Task NavigatePageAsync(PBPage browserPage, string url, bool waitForLoad)
         {
             if (waitForLoad)
             {
-                browserPage.Page.GoToAsync(url, new NavigationOptions
+                await browserPage.Page.GoToAsync(url, new NavigationOptions
                 {
                     WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
-                }).GetAwaiter().GetResult();
+                }).ConfigureAwait(false);
             }
             else
             {
-                browserPage.Page.GoToAsync(url).GetAwaiter().GetResult();
+                await browserPage.Page.GoToAsync(url).ConfigureAwait(false);
             }
         }
 
-        public PBElement FindElementBySelector(PBPage browserPage, string selector, bool waitForLoad = false, int timeout = 30000)
+        public async Task<byte[]> GetPageScreenshotAsync(PBPage browserPage, string filePath = null, bool fullPage = false)
         {
-            IElementHandle element;
-            if (waitForLoad)
+            var screenshotOptions = new ScreenshotOptions
             {
-                element = browserPage.Page.WaitForSelectorAsync(selector, new WaitForSelectorOptions { Timeout = timeout }).GetAwaiter().GetResult();
-            }
-            else
+                FullPage = fullPage,
+                Type = ScreenshotType.Png
+            };
+
+            if (!string.IsNullOrEmpty(filePath))
             {
-                var cookies = browserPage.Page.GetCookiesAsync().GetAwaiter().GetResult(); // Dummy call to ensure page is responsive
-                element = browserPage.Page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
+                // Save screenshot to file if path is provided
+                await browserPage.Page.ScreenshotAsync(filePath, screenshotOptions).ConfigureAwait(false);
             }
-            if (element == null)
-            {
-                return null;
-            }
-            return new PBElement(element, browserPage.Page, Guid.NewGuid().ToString(), browserPage.PageName, selector, 0);
+
+            // Always return the screenshot data
+            return await browserPage.Page.ScreenshotDataAsync(screenshotOptions).ConfigureAwait(false);
         }
 
-        public List<PBCookie> GetCookies(PBPage browserPage)
+        public async Task<T> ExecuteScriptAsync<T>(PBPage browserPage, string script, params object[] args)
         {
-            var puppeteerCookies = browserPage.Page.GetCookiesAsync().GetAwaiter().GetResult();
+            return await browserPage.Page.EvaluateFunctionAsync<T>(script, args).ConfigureAwait(false);
+        }
+
+        public async Task ExecuteScriptAsync(PBPage browserPage, string script, params object[] args)
+        {
+            await browserPage.Page.EvaluateFunctionAsync(script, args).ConfigureAwait(false);
+        }
+
+        public async Task<List<PBCookie>> GetCookiesAsync(PBPage browserPage)
+        {
+            var puppeteerCookies = await browserPage.Page.GetCookiesAsync().ConfigureAwait(false);
             var cookies = new List<PBCookie>();
             foreach (var c in puppeteerCookies)
             {
-                cookies.Add(new PBCookie
+                DateTime? expires = null;
+                if (c.Expires.HasValue)
                 {
-                    Name = c.Name,
-                    Value = c.Value,
-                    Domain = c.Domain,
-                    Path = c.Path,
-                    Expires = DateTimeOffset.FromUnixTimeSeconds((long)c.Expires).DateTime,
-                    HttpOnly = c.HttpOnly,
-                    Secure = c.Secure,
-                    SameSite = c.SameSite.ToSupportedPBSameSite()
-                });
+                    expires = DateTimeOffset.FromUnixTimeSeconds((long)c.Expires.Value).DateTime;
+                }
+                cookies.Add(new PBCookie(
+                    name:c.Name,
+                    value: c.Value,
+                    domain: c.Domain,
+                    path: c.Path,
+                    expires: expires,
+                    httpOnly: c.HttpOnly,
+                    secure: c.Secure,
+                    sameSite: c.SameSite.ToSupportedPBSameSite(),
+                    url: c.Url
+                ));
             }
             return cookies;
         }
 
 
-        public void DeleteCookies(PBPage browserPage, PBCookie[] cookies)
+        public async Task DeleteCookiesAsync(PBPage browserPage, PBCookie[] cookies)
         {
             var puppeteerCookies = new List<CookieParam>();
             foreach (var c in cookies)
@@ -145,11 +163,11 @@ namespace PowerBrowser.Services
                     Url = c.Url
                 });
             }
-            browserPage.Page.DeleteCookieAsync(puppeteerCookies.ToArray()).GetAwaiter().GetResult();
+            await browserPage.Page.DeleteCookieAsync(puppeteerCookies.ToArray()).ConfigureAwait(false);
         }
 
 
-        public void SetCookies(PBPage browserPage, PBCookie[] cookies)
+        public async Task SetCookiesAsync(PBPage browserPage, PBCookie[] cookies)
         {
             var puppeteerCookies = new List<CookieParam>();
             foreach (var c in cookies)
@@ -171,7 +189,7 @@ namespace PowerBrowser.Services
                     SameSite = c.SameSite.ToPuppeteerSameSiteMode()
                 });
             }
-            browserPage.Page.SetCookieAsync(puppeteerCookies.ToArray()).GetAwaiter().GetResult();
+            await browserPage.Page.SetCookieAsync(puppeteerCookies.ToArray()).ConfigureAwait(false);
         }   
 
     }

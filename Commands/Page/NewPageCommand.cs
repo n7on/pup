@@ -31,14 +31,14 @@ namespace PowerBrowser.Commands.Page
                 var browser = ResolveBrowserOrThrow();
 
                 var pageService = ServiceFactory.CreatePageService(SessionState);
-                var browserPage = pageService.CreatePage(
+                var browserPage = pageService.CreatePageAsync(
                     browser,
                     Name,
                     Width,
                     Height,
                     Url,
                     WaitForLoad.IsPresent
-                );
+                ).GetAwaiter().GetResult();
                 WriteObject(browserPage);
             }            
             catch (Exception ex)

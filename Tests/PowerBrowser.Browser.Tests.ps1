@@ -57,7 +57,7 @@ Describe "PowerBrowser Browser Management" -Tags @("BrowserManagement", "Core") 
             # Start browser
             $browser = Start-Browser -BrowserType $TestBrowserName -Headless
             $browser | Should -Not -BeNullOrEmpty
-            $browser.GetType().Name | Should -Be "PBrowser"
+            $browser.GetType().Name | Should -Be "PBBrowser"
             
             # Verify browser is running
             $runningBrowsers = Get-Browser | Where-Object { $_.Running -eq $true }
@@ -112,10 +112,10 @@ Describe "PowerBrowser Browser Management" -Tags @("BrowserManagement", "Core") 
 
         It "Should create pages with automatic naming" {
             # Create pages without specifying names
-            $page1 = $script:TestBrowser | New-BrowserPage -Url "about:blank"
-            $page2 = $script:TestBrowser | New-BrowserPage -Url "about:blank"
-            $page3 = $script:TestBrowser | New-BrowserPage -Url "about:blank"
-            
+            $page1 = $script:TestBrowser | New-Page -Url "about:blank"
+            $page2 = $script:TestBrowser | New-Page -Url "about:blank"
+            $page3 = $script:TestBrowser | New-Page -Url "about:blank"
+
             # Should have sequential names
             $page1.PageName | Should -Be 'Page1'
             $page2.PageName | Should -Be 'Page2'
@@ -123,18 +123,18 @@ Describe "PowerBrowser Browser Management" -Tags @("BrowserManagement", "Core") 
         }
         
         It "Should create pages with custom names" {
-            $customPage = $script:TestBrowser | New-BrowserPage -Url "about:blank" -Name 'CustomTest'
-            
+            $customPage = $script:TestBrowser | New-Page -Url "about:blank" -Name 'CustomTest'
+
             $customPage.PageName | Should -Be 'CustomTest'
         }
         
         It "Should list all pages in browser" {
             # Create some pages
-            $page1 = $script:TestBrowser | New-BrowserPage -Url "about:blank" -Name "TestPage1"
-            $page2 = $script:TestBrowser | New-BrowserPage -Url "about:blank" -Name "TestPage2"
-            
+            $page1 = $script:TestBrowser | New-Page -Url "about:blank" -Name "TestPage1"
+            $page2 = $script:TestBrowser | New-Page -Url "about:blank" -Name "TestPage2"
+
             # Get all pages
-            $allPages = $script:TestBrowser | Get-BrowserPage
+            $allPages = $script:TestBrowser | Get-Page
             $allPages.Count | Should -BeGreaterOrEqual 2
             
             # Should contain our test pages
@@ -145,14 +145,14 @@ Describe "PowerBrowser Browser Management" -Tags @("BrowserManagement", "Core") 
         
         It "Should remove pages correctly" {
             # Create a page to remove
-            $pageToRemove = $script:TestBrowser | New-BrowserPage -Url "about:blank" -Name "ToRemove"
+            $pageToRemove = $script:TestBrowser | New-Page -Url "about:blank" -Name "ToRemove"
             $pageToRemove | Should -Not -BeNullOrEmpty
             
             # Remove the page
-            Remove-BrowserPage -PageId $pageToRemove.PageId
+            Remove-Page -PageId $pageToRemove.PageId
             
             # Verify page is removed
-            $remainingPages = $script:TestBrowser | Get-BrowserPage
+            $remainingPages = $script:TestBrowser | Get-Page
             $removedPage = $remainingPages | Where-Object { $_.PageName -eq "ToRemove" }
             $removedPage | Should -BeNullOrEmpty
         }
@@ -189,11 +189,11 @@ Describe "PowerBrowser Browser Management" -Tags @("BrowserManagement", "Core") 
             $browser.PageCount | Should -Be 0
             
             # Add a page
-            $page = $browser | New-BrowserPage -Url "about:blank" -Name "CountTest"
-            
+            $page = $browser | New-Page -Url "about:blank" -Name "CountTest"
+
             # Page count should increase
             # Note: PageCount might not update immediately, so let's test the page exists instead
-            $allPages = $browser | Get-BrowserPage
+            $allPages = $browser | Get-Page
             $allPages.Count | Should -BeGreaterOrEqual 1
             $allPages | Where-Object { $_.PageName -eq "CountTest" } | Should -Not -BeNullOrEmpty
         }

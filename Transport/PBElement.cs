@@ -16,7 +16,24 @@ namespace PowerBrowser.Transport
         public int Index { get; set; }
         public DateTime FoundTime { get; set; }
 
-        public PBElement(IElementHandle element, IPage page, string elementId, string pageName,  string selector, int index)
+        private string _tagName;
+        private string _innerText;
+        private string _innerHTML;
+        private string _id;
+        private bool? _isVisible;
+        public PBElement(
+            IElementHandle element,
+            IPage page,
+            string elementId,
+            string pageName,
+            string selector,
+            int index,
+            string tagName,
+            string innerText,
+            string innerHTML,
+            string id,
+            bool? isVisible
+        )
         {
             Element = element;
             Page = page;
@@ -25,82 +42,38 @@ namespace PowerBrowser.Transport
             Selector = selector;
             Index = index;
             FoundTime = DateTime.Now;
+            _tagName = tagName;
+            _innerText = innerText;
+            _innerHTML = innerHTML;
+            _id = id;
+            _isVisible = isVisible;
         }
 
         // Properties for PowerShell display
         public string TagName
         {
             get
-            {
-                try
-                {
-                    return Element?.EvaluateFunctionAsync<string>("el => el.tagName").GetAwaiter().GetResult()?.ToLower() ?? "unknown";
-                }
-                catch
-                {
-                    return "unknown";
-                }
-            }
+            {return _tagName;}
         }
 
         public string InnerText
         {
-            get
-            {
-                try
-                {
-                    return Element?.EvaluateFunctionAsync<string>("el => el.innerText").GetAwaiter().GetResult() ?? "";
-                }
-                catch
-                {
-                    return "";
-                }
-            }
+            get{return _innerText;}
         }
 
         public string InnerHTML
         {
-            get
-            {
-                try
-                {
-                    return Element?.EvaluateFunctionAsync<string>("el => el.innerHTML").GetAwaiter().GetResult() ?? "";
-                }
-                catch
-                {
-                    return "";
-                }
-            }
+            get{return _innerHTML;}
         }
 
         public string Id
         {
-            get
-            {
-                try
-                {
-                    return Element?.EvaluateFunctionAsync<string>("el => el.id").GetAwaiter().GetResult() ?? "";
-                }
-                catch
-                {
-                    return "";
-                }
-            }
+            get{ return _id;}
         }
 
         public bool IsVisible
         {
-            get
-            {
-                try
-                {
-                    return Element?.IsIntersectingViewportAsync().GetAwaiter().GetResult() ?? false;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
+            get { return _isVisible ?? false; }
         }
 
         public override string ToString()

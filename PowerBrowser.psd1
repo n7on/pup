@@ -17,14 +17,17 @@
         'Get-Browser',
         'Start-Browser',
         'Stop-Browser',
-        'New-BrowserPage',
-        'Get-BrowserPage',
-        'Remove-BrowserPage',
-        'Find-BrowserElement',
-        'Invoke-BrowserElementClick',
-        'Set-BrowserElementText',
-        'Get-BrowserElementAttribute',
-        'Wait-BrowserElement'
+        'New-Page',
+        'Get-Page',
+        'Move-Page',
+        'Get-PageCookie',
+        'Set-PageCookie',
+        'Get-PageScreenshot',
+        'Remove-Page',
+        'Find-Element',
+        'Invoke-ElementClick',
+        'Set-Element',
+        'Wait-Element'
     )
     VariablesToExport = @()
     AliasesToExport = @('Navigate-Browser', 'Export-BrowserScreenshot')

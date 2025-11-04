@@ -14,4 +14,10 @@ public static class ServiceFactory
         var pageService = new PageService(sessionState);
         return pageService;
     }
+
+    public static IElementService CreateElementService()
+    {
+        var elementService = new ElementService();
+        return elementService;
+    }
 }

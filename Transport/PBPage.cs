@@ -17,9 +17,21 @@ namespace PowerBrowser.Transport
         public DateTime CreatedTime { get; set; }
         public int ViewportWidth { get; set; }
         public int ViewportHeight { get; set; }
+        private string _url;
+        private string _content;
 
+        private string _title;
 
-        public PBPage(PBBrowser browser, IPage page, string pageName, int width, int height)
+        public PBPage(
+            PBBrowser browser,
+            IPage page,
+            string pageName,
+            int width,
+            int height,
+            string url,
+            string content,
+            string title
+        )
         {
             PageName = pageName;
             Browser = browser;
@@ -27,6 +39,9 @@ namespace PowerBrowser.Transport
             CreatedTime = DateTime.Now;
             ViewportWidth = width;
             ViewportHeight = height;
+            _url = url;
+            _content = content;
+            _title = title; 
         }
 
         // Properties for PowerShell display
@@ -35,47 +50,17 @@ namespace PowerBrowser.Transport
 
         public string Url
         {
-            get
-            {
-                try
-                {
-                    return Page?.Url ?? "about:blank";
-                }
-                catch
-                {
-                    return "about:blank";
-                }
-            }
+            get{ return _url; }
         }
 
         public string Content
         {
-            get
-            {
-                try
-                {
-                    return Page?.GetContentAsync().GetAwaiter().GetResult() ?? "";
-                }
-                catch
-                {
-                    return "";
-                }
-            }
+            get{return _content; }
         }
 
         public string Title
         {
-            get
-            {
-                try
-                {
-                    return Page?.GetTitleAsync().GetAwaiter().GetResult() ?? "";
-                }
-                catch
-                {
-                    return "Unknown";
-                }
-            }
+            get{return _title; }
         }
 
         public override string ToString()

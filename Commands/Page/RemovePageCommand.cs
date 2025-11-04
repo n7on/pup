@@ -13,7 +13,7 @@ namespace PowerBrowser.Commands.Page
             try
             {
                 Page = ResolvePageOrThrow();
-                PageService.RemovePage(Page);
+                PageService.RemovePageAsync(Page).GetAwaiter().GetResult();
 
                 WriteVerbose($"Removed browser page: {Page.PageName} (ID: {Page.PageId})");
             }
