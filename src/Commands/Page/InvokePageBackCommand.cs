@@ -1,6 +1,7 @@
 using System;
 using System.Management.Automation;
 using PowerBrowser.Transport;
+using PowerBrowser.Services;
 
 namespace PowerBrowser.Commands.Page
 {
@@ -15,21 +16,12 @@ namespace PowerBrowser.Commands.Page
         {
             try
             {
-                var page = ResolvePageOrThrow();
-                
-                if (WaitForLoad.IsPresent)
-                {
-                    page.Page.GoBackAsync(new PuppeteerSharp.NavigationOptions
-                    {
-                        WaitUntil = new[] { PuppeteerSharp.WaitUntilNavigation.Load, PuppeteerSharp.WaitUntilNavigation.DOMContentLoaded }
-                    }).GetAwaiter().GetResult();
-                }
-                else
-                {
-                    page.Page.GoBackAsync().GetAwaiter().GetResult();
-                }
+                Page = ResolvePageOrThrow();
 
-                WriteVerbose($"Navigated back to: {page.Page.Url}");
+                var pageService = ServiceFactory.CreatePageService(SessionState);
+                Page = pageService.NavigateBackAsync(Page, WaitForLoad.IsPresent).GetAwaiter().GetResult();
+
+                WriteObject(Page);
             }
             catch (Exception ex)
             {
@@ -37,4 +29,4 @@ namespace PowerBrowser.Commands.Page
             }
         }
     }
-}
+}   

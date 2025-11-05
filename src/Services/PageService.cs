@@ -30,6 +30,14 @@ namespace PowerBrowser.Services
             return _sessionStateService.GetAll();
         }
 
+        public PBPage Save(PBPage page)
+        {
+            page.Url = page.Page.Url;
+            page.Content = page.Page.GetContentAsync().GetAwaiter().GetResult();
+            page.Title = page.Page.GetTitleAsync().GetAwaiter().GetResult();
+            _sessionStateService.Save(page.PageId, page);
+            return page;
+        }
         public async Task<PBPage> CreatePageAsync(PBBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad)
         {
             var pages = await pBrowser.Browser.PagesAsync().ConfigureAwait(false);
@@ -60,19 +68,13 @@ namespace PowerBrowser.Services
                 }
             }
 
-            var browserPage = new PBPage(
+            return Save(new PBPage(
                 pBrowser,
                 page,
                 pageName,
                 width,
-                height,
-                page.Url,
-                await page.GetContentAsync().ConfigureAwait(false),
-                await page.GetTitleAsync().ConfigureAwait(false)
-            );
-
-            _sessionStateService.Save(browserPage.PageId, browserPage);
-            return browserPage;
+                height
+            ));
         }
         public async Task RemovePageAsync(PBPage browserPage)
         {
@@ -80,7 +82,7 @@ namespace PowerBrowser.Services
             _sessionStateService.Remove(browserPage.PageId);
         }
 
-        public async Task NavigatePageAsync(PBPage browserPage, string url, bool waitForLoad)
+        public async Task<PBPage> NavigatePageAsync(PBPage browserPage, string url, bool waitForLoad)
         {
             if (waitForLoad)
             {
@@ -93,6 +95,7 @@ namespace PowerBrowser.Services
             {
                 await browserPage.Page.GoToAsync(url).ConfigureAwait(false);
             }
+            return Save(browserPage);
         }
 
         public async Task<byte[]> GetPageScreenshotAsync(PBPage browserPage, string filePath = null, bool fullPage = false)
@@ -190,7 +193,55 @@ namespace PowerBrowser.Services
                 });
             }
             await browserPage.Page.SetCookieAsync(puppeteerCookies.ToArray()).ConfigureAwait(false);
-        }   
+        }
 
+        public async Task<PBPage> NavigateBackAsync(PBPage browserPage, bool waitForLoad)
+        {
+            if (waitForLoad)
+            {
+                await browserPage.Page.GoBackAsync(new NavigationOptions
+                {
+                    WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
+                }).ConfigureAwait(false);
+            }
+            else
+            {
+                await browserPage.Page.GoBackAsync().ConfigureAwait(false);
+            }
+
+            return Save(browserPage);
+        }
+
+        public async Task<PBPage> NavigateForwardAsync(PBPage browserPage, bool waitForLoad)
+        {
+            if (waitForLoad)
+            {
+                await browserPage.Page.GoForwardAsync(new NavigationOptions
+                {
+                    WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
+                }).ConfigureAwait(false);
+            }
+            else
+            {
+                await browserPage.Page.GoForwardAsync().ConfigureAwait(false);
+            }
+
+            return Save(browserPage);
+        }
+        public async Task<PBPage> ReloadPageAsync(PBPage browserPage, bool waitForLoad)
+        {
+            if (waitForLoad)
+            {
+                await browserPage.Page.ReloadAsync(new NavigationOptions
+                {
+                    WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
+                }).ConfigureAwait(false);
+            }
+            else
+            {
+                await browserPage.Page.ReloadAsync().ConfigureAwait(false);
+            }
+            return Save(browserPage);
+        }
     }
 }

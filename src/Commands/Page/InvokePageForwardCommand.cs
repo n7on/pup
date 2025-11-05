@@ -15,21 +15,12 @@ namespace PowerBrowser.Commands.Page
         {
             try
             {
-                var page = ResolvePageOrThrow();
-                
-                if (WaitForLoad.IsPresent)
-                {
-                    page.Page.GoForwardAsync(new PuppeteerSharp.NavigationOptions
-                    {
-                        WaitUntil = new[] { PuppeteerSharp.WaitUntilNavigation.Load, PuppeteerSharp.WaitUntilNavigation.DOMContentLoaded }
-                    }).GetAwaiter().GetResult();
-                }
-                else
-                {
-                    page.Page.GoForwardAsync().GetAwaiter().GetResult();
-                }
+                Page = ResolvePageOrThrow();
 
-                WriteVerbose($"Navigated forward to: {page.Page.Url}");
+                var pageService = ServiceFactory.CreatePageService(SessionState);
+                Page = pageService.NavigateForwardAsync(Page, WaitForLoad.IsPresent).GetAwaiter().GetResult();
+
+                WriteObject(Page);
             }
             catch (Exception ex)
             {

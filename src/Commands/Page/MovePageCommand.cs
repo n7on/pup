@@ -18,9 +18,8 @@ namespace PowerBrowser.Commands.Page
             try
             {
                 Page = ResolvePageOrThrow();
-                PageService.NavigatePageAsync(Page, Url, WaitForLoad.IsPresent).GetAwaiter().GetResult();
+                Page = PageService.NavigatePageAsync(Page, Url, WaitForLoad.IsPresent).GetAwaiter().GetResult();
 
-                WriteVerbose($"Navigated browser to: {Url}");
                 WriteObject(Page);
             }
             catch (Exception ex)

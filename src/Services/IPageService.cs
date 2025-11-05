@@ -14,7 +14,7 @@ namespace PowerBrowser.Services
 
         Task RemovePageAsync(PBPage browserPage);
 
-        Task NavigatePageAsync(PBPage browserPage, string url, bool waitForLoad);
+        Task<PBPage> NavigatePageAsync(PBPage browserPage, string url, bool waitForLoad);
 
         Task<byte[]> GetPageScreenshotAsync(PBPage browserPage, string filePath = null, bool fullPage = false);
 
@@ -24,5 +24,9 @@ namespace PowerBrowser.Services
         Task<List<PBCookie>> GetCookiesAsync(PBPage browserPage);
         Task DeleteCookiesAsync(PBPage browserPage, PBCookie[] cookies);
         Task SetCookiesAsync(PBPage browserPage, PBCookie[] cookies);
+
+        Task<PBPage> NavigateBackAsync(PBPage browserPage, bool waitForLoad);
+        Task<PBPage> NavigateForwardAsync(PBPage browserPage, bool waitForLoad);
+        Task<PBPage> ReloadPageAsync(PBPage browserPage, bool waitForLoad);
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Exceptions;
 
 namespace PowerBrowser.Commands.Browser
 {
@@ -20,11 +19,6 @@ namespace PowerBrowser.Commands.Browser
                 BrowserService.StopBrowser(Browser);
 
                 WriteVerbose($"Browser '{Browser.BrowserType}' stopped successfully!");
-            }
-            catch (PowerBrowserException ex)
-            {
-                // Handle custom PowerBrowser exceptions with their built-in error information
-                WriteError(new ErrorRecord(ex, ex.ErrorId, ex.Category, null));
             }
             catch (Exception ex)
             {

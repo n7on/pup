@@ -26,7 +26,7 @@
             "args": [
                 "-NoProfile",
                 "-Command",
-                "${workspaceFolder}/Tests/PowerBrowser.BrowserManagement.Tests.ps1",
+                "${workspaceFolder}/tests/PowerBrowser.Integration.Tests.ps1",
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
