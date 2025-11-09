@@ -5,7 +5,7 @@
             "type": "PowerShell",
             "request": "launch",
             "name": "Debug Pester Tests in New Session",
-            "script": "${workspaceFolder}/Tests/PowerBrowser.BrowserManagement.Tests.ps1",
+            "script": "${workspaceFolder}/Tests/Pup.Integration.Tests.ps1",
             "args": [],
             "cwd": "${workspaceFolder}",
             "createTemporaryIntegratedConsole": true
@@ -26,7 +26,7 @@
             "args": [
                 "-NoProfile",
                 "-Command",
-                "${workspaceFolder}/tests/PowerBrowser.Integration.Tests.ps1",
+                "${workspaceFolder}/tests/Pup.Integration.Tests.ps1",
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

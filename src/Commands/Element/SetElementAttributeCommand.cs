@@ -1,19 +1,19 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Element
+namespace Pup.Commands.Element
 {
-    [Cmdlet(VerbsCommon.Set, "ElementAttribute")]
+    [Cmdlet(VerbsCommon.Set, "PupElementAttribute")]
     [OutputType(typeof(void))]
-    public class SetElementAttributeCommand : PageBaseCommand
+    public class SetElementAttributeCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
             HelpMessage = "Element to set attribute on")]
-        public PBElement Element { get; set; }
+        public PupElement Element { get; set; }
 
         [Parameter(
             Position = 1,

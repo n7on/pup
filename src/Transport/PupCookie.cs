@@ -1,11 +1,11 @@
 using System;
-using PowerBrowser.Common;
+using Pup.Common;
 
-namespace PowerBrowser.Transport
+namespace Pup.Transport
 {
-    public class PBCookie
+    public class PupCookie
     {
-        public PBCookie(string name, string url, string value, string domain, string path, DateTime? expires, bool? httpOnly, bool? secure, PBSameSite? sameSite)
+        public PupCookie(string name, string url, string value, string domain, string path, DateTime? expires, bool? httpOnly, bool? secure, PupSameSite? sameSite)
         {
             Name = name;
             Url = url;
@@ -26,6 +26,6 @@ namespace PowerBrowser.Transport
         public bool? HttpOnly { get; set; }
 
         public bool? Secure { get; set; }
-        public PBSameSite? SameSite { get; set; }
+        public PupSameSite? SameSite { get; set; }
     }
 }   

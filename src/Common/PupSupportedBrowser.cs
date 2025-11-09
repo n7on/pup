@@ -1,10 +1,10 @@
 using System;
 using PuppeteerSharp;
 
-namespace PowerBrowser.Common
+namespace Pup.Common
 {
 
-    public enum PBSupportedBrowser
+    public enum PupSupportedBrowser
     {
         /// <summary>
         /// Chrome.
@@ -29,30 +29,30 @@ namespace PowerBrowser.Common
     public static class PBSupportedBrowserExtensions
     {
 
-        public static PBSupportedBrowser ToPBSupportedBrowser(this SupportedBrowser browserType)
+        public static PupSupportedBrowser ToPBSupportedBrowser(this SupportedBrowser browserType)
         {
-            if (Enum.TryParse<PBSupportedBrowser>(browserType.ToString(), out var result))
+            if (Enum.TryParse<PupSupportedBrowser>(browserType.ToString(), out var result))
             {
                 return result;
             }
             throw new ArgumentException($"Invalid browser type: {browserType}");
         }
-        public static PBSupportedBrowser ToPBSupportedBrowser(this string browserType)
+        public static PupSupportedBrowser ToPBSupportedBrowser(this string browserType)
         {
-            if (Enum.TryParse<PBSupportedBrowser>(browserType, true, out var result))
+            if (Enum.TryParse<PupSupportedBrowser>(browserType, true, out var result))
             {
                 return result;
             }
             throw new ArgumentException($"Invalid browser type: {browserType}");
         }
-        public static string GetFriendlyName(this PBSupportedBrowser browser)
+        public static string GetFriendlyName(this PupSupportedBrowser browser)
         {
             return browser switch
             {
-                PBSupportedBrowser.Chrome => "Google Chrome",
-                PBSupportedBrowser.Firefox => "Mozilla Firefox",
-                PBSupportedBrowser.Chromium => "Chromium",
-                PBSupportedBrowser.ChromeHeadlessShell => "Chrome Headless Shell",
+                PupSupportedBrowser.Chrome => "Google Chrome",
+                PupSupportedBrowser.Firefox => "Mozilla Firefox",
+                PupSupportedBrowser.Chromium => "Chromium",
+                PupSupportedBrowser.ChromeHeadlessShell => "Chrome Headless Shell",
                 _ => "Unknown Browser"
             };
         }

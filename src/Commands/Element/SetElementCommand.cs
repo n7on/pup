@@ -1,19 +1,19 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Element
+namespace Pup.Commands.Element
 {
-    [Cmdlet(VerbsCommon.Set, "Element")]
+    [Cmdlet(VerbsCommon.Set, "PupElement")]
     [OutputType(typeof(void))]
-    public class SetElementCommand : PageBaseCommand
+    public class SetElementCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
             HelpMessage = "Element to modify")]
-        public PBElement Element { get; set; }
+        public PupElement Element { get; set; }
 
         [Parameter(HelpMessage = "Set the text content of the element (using TypeAsync)")]
         public string Text { get; set; }
@@ -34,26 +34,26 @@ namespace PowerBrowser.Commands.Element
         {
             try
             {
-                var elementService = ServiceFactory.CreateElementService();
+                var elementService = ServiceFactory.CreateElementService(Element);
 
                 // Clear element content if requested
                 if (Clear.IsPresent)
                 {
                     // Clear by selecting all and deleting (works for most input types)
-                    elementService.FocusElementAsync(Element).GetAwaiter().GetResult();
+                    elementService.FocusElementAsync().GetAwaiter().GetResult();
                     Element.Element.EvaluateFunctionAsync("el => { el.select && el.select(); el.value = ''; }").GetAwaiter().GetResult();
                 }
 
                 // Set text content (typing)
                 if (!string.IsNullOrEmpty(Text))
                 {
-                    elementService.SetElementTextAsync(Element, Text).GetAwaiter().GetResult();
+                    elementService.SetElementTextAsync(Text).GetAwaiter().GetResult();
                 }
 
                 // Set value property
                 if (!string.IsNullOrEmpty(Value))
                 {
-                    elementService.SetElementValueAsync(Element, Value).GetAwaiter().GetResult();
+                    elementService.SetElementValueAsync(Value).GetAwaiter().GetResult();
                 }
 
                 // Set innerHTML
@@ -65,7 +65,7 @@ namespace PowerBrowser.Commands.Element
                 // Focus element if requested
                 if (Focus.IsPresent)
                 {
-                    elementService.FocusElementAsync(Element).GetAwaiter().GetResult();
+                    elementService.FocusElementAsync().GetAwaiter().GetResult();
                 }
 
                 WriteVerbose($"Element properties set successfully");

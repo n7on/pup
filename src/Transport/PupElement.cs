@@ -1,15 +1,14 @@
 using System;
 using PuppeteerSharp;
 
-namespace PowerBrowser.Transport
+namespace Pup.Transport
 {
     /// <summary>
     /// PowerShell-friendly wrapper for IElementHandle with additional metadata
     /// </summary>
-    public class PBElement
+    public class PupElement
     {
         public string ElementId { get; set; }
-        public string PageName { get; set; }
         public IElementHandle Element { get; set; }
         public IPage Page { get; set; }
         public string Selector { get; set; }
@@ -21,11 +20,10 @@ namespace PowerBrowser.Transport
         private string _innerHTML;
         private string _id;
         private bool? _isVisible;
-        public PBElement(
+        public PupElement(
             IElementHandle element,
             IPage page,
             string elementId,
-            string pageName,
             string selector,
             int index,
             string tagName,
@@ -38,7 +36,6 @@ namespace PowerBrowser.Transport
             Element = element;
             Page = page;
             ElementId = elementId;
-            PageName = pageName;
             Selector = selector;
             Index = index;
             FoundTime = DateTime.Now;

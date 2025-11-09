@@ -1,14 +1,14 @@
-# PowerBrowser TODO - Missing Features & Enhancements
+# Pup TODO - Missing Features & Enhancements
 
-This document outlines missing functionality and potential enhancements for the PowerBrowser module, organized by priority and category.
+This document outlines missing functionality and potential enhancements for the Pup module, organized by priority and category.
 
 ## 🔥 Phase 1 - Core Navigation & Debugging (High Priority)
 
 ### Navigation Commands
 - [x] **Move-BrowserPage** - Navigate to URLs with wait options ✅ **COMPLETED**
   - Parameters: `-Url`, `-WaitForLoad`, `-Timeout`, `-WaitUntil` (Load, DOMContentLoaded, NetworkIdle)
-  - Pipeline support: Accept PowerBrowserPage objects via `-Page` or page names via `-PageName`
-  - Return: Updated PowerBrowserPage object
+  - Pipeline support: Accept PupPage objects via `-Page` or page names via `-PageName`
+  - Return: Updated PupBrowser object
   - Features: Auto URL prefixing, comprehensive error handling, timeout support
 
 - [ ] **Invoke-BrowserScript** - Execute JavaScript in page context
@@ -222,4 +222,4 @@ This document outlines missing functionality and potential enhancements for the 
 ---
 
 *Last Updated: October 26, 2025*
-*PowerBrowser Version: Current Development*
+*Pup Version: Current Development*

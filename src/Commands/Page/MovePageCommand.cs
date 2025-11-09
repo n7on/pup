@@ -1,13 +1,20 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Page
+namespace Pup.Commands.Page
 {
-    [Cmdlet(VerbsCommon.Move, "Page")]
-    [OutputType(typeof(PBPage))]
-    public class MovePageCommand : PageBaseCommand
+    [Cmdlet(VerbsCommon.Move, "PupPage")]
+    [OutputType(typeof(PupPage))]
+    public class MovePageCommand : PSCmdlet
     {
+        [Parameter(
+            Position = 0,
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true)]
+        public PupPage Page { get; set; }
+
         [Parameter(HelpMessage = "URL to navigate", Mandatory = true)]
         public string Url { get; set; }
 
@@ -17,8 +24,8 @@ namespace PowerBrowser.Commands.Page
         {
             try
             {
-                Page = ResolvePageOrThrow();
-                Page = PageService.NavigatePageAsync(Page, Url, WaitForLoad.IsPresent).GetAwaiter().GetResult();
+                var pageService = ServiceFactory.CreatePageService(Page);
+                Page = pageService.NavigatePageAsync(Url, WaitForLoad.IsPresent).GetAwaiter().GetResult();
 
                 WriteObject(Page);
             }

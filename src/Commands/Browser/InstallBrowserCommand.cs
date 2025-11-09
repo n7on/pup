@@ -1,24 +1,24 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
-using PowerBrowser.Common;
+using Pup.Transport;
+using Pup.Common;
 
-namespace PowerBrowser.Commands.Browser
+namespace Pup.Commands.Browser
 {
     [Cmdlet(VerbsLifecycle.Install, "Browser")]
-    [OutputType(typeof(PBBrowser))]
+    [OutputType(typeof(PupBrowser))]
     public class InstallBrowserCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
             HelpMessage = "Browser type to install (Chrome, Firefox, or Chromium - use -Headless flag with Start-Browser instead of ChromeHeadlessShell)")]
-        public PBSupportedBrowser BrowserType { get; set; }
+        public PupSupportedBrowser BrowserType { get; set; }
 
         protected override void ProcessRecord()
         {
             try
             {
-                var browserService = ServiceFactory.CreateBrowserService(SessionState);
+                var browserService = ServiceFactory.CreateSupportedBrowserService(SessionState);
 
                 
                 // Check if browser is already installed

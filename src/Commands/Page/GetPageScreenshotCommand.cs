@@ -1,14 +1,21 @@
 using System;
 using System.IO;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Page
+namespace Pup.Commands.Page
 {
-    [Cmdlet(VerbsCommon.Get, "PageScreenshot")]
+    [Cmdlet(VerbsCommon.Get, "PupPageScreenshot")]
     [OutputType(typeof(byte[]))]
-    public class GetPageScreenshotCommand : PageBaseCommand
+    public class GetPageScreenshotCommand : PSCmdlet
     {
+        [Parameter(
+            Position = 0,
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true)]
+        public PupPage Page { get; set; }
+
         [Parameter(HelpMessage = "Path to save the screenshot file (optional)")]
         public string FilePath { get; set; }
 
@@ -22,8 +29,7 @@ namespace PowerBrowser.Commands.Page
         {
             try
             {
-                var page = ResolvePageOrThrow();
-                
+                var pageService = ServiceFactory.CreatePageService(Page); 
                 // Validate file path if provided
                 if (!string.IsNullOrEmpty(FilePath))
                 {
@@ -34,7 +40,7 @@ namespace PowerBrowser.Commands.Page
                     }
                 }
 
-                var screenshotData = PageService.GetPageScreenshotAsync(page, FilePath, FullPage.IsPresent).GetAwaiter().GetResult();
+                var screenshotData = pageService.GetPageScreenshotAsync(FilePath, FullPage.IsPresent).GetAwaiter().GetResult();
 
                 if (PassThru.IsPresent)
                 {

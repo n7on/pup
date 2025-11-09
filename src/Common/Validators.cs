@@ -1,11 +1,11 @@
 using System;
-using PowerBrowser.Common;
+using Pup.Common;
 
 public static class BrowserTypeValidator
 {
     public static bool IsValid(string browserType)
     {
-        return Enum.TryParse<PBSupportedBrowser>(browserType, true, out var _);
+        return Enum.TryParse<PupSupportedBrowser>(browserType, true, out var _);
     }
     public static void Validate(string browserType)
     {

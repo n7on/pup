@@ -1,7 +1,7 @@
 using System;
 using System.Management.Automation;
 
-namespace PowerBrowser.Commands.Browser
+namespace Pup.Commands.Browser
 {
     [Cmdlet(VerbsLifecycle.Uninstall, "Browser")]
     [OutputType(typeof(string))]
@@ -15,7 +15,7 @@ namespace PowerBrowser.Commands.Browser
             try
             {
                 Browser = ResolveBrowserOrThrow();
-                BrowserService.RemoveBrowser(Browser);
+                BrowserService.RemoveBrowser();
 
                 WriteVerbose($"Removed browser: {Browser.BrowserType} from path: {Browser.Path}");
             }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Management.Automation;
 
-namespace PowerBrowser.Services
+namespace Pup.Services
 {
     public class SessionStateService<T> : ISessionStateService<T>
     {

@@ -1,18 +1,18 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Browser
+namespace Pup.Commands.Browser
 {
     [Cmdlet(VerbsCommon.Get, "Browser")]
-    [OutputType(typeof(PBBrowser))]
+    [OutputType(typeof(PupBrowser))]
     public class GetBrowserCommand : PSCmdlet
     {
         protected override void ProcessRecord()
         {
             try
             {
-                var browsers = ServiceFactory.CreateBrowserService(SessionState).GetBrowsers();
+                var browsers = ServiceFactory.CreateSupportedBrowserService(SessionState).GetBrowsers();
 
                 if (browsers.Count == 0)
                 {

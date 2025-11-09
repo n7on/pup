@@ -1,12 +1,12 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Element
+namespace Pup.Commands.Element
 {
-    [Cmdlet(VerbsLifecycle.Invoke, "ElementHover")]
+    [Cmdlet(VerbsLifecycle.Invoke, "PupElementHover")]
     [OutputType(typeof(void))]
-    public class InvokeElementHoverCommand : PageBaseCommand
+    public class InvokeElementHoverCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
@@ -14,7 +14,7 @@ namespace PowerBrowser.Commands.Element
             Mandatory = true,
             ValueFromPipeline = true,
             HelpMessage = "Element to hover over")]
-        public PBElement Element { get; set; }
+        public PupElement Element { get; set; }
 
         [Parameter(
             Position = 0,
@@ -27,21 +27,9 @@ namespace PowerBrowser.Commands.Element
         {
             try
             {
-                var elementService = ServiceFactory.CreateElementService();
+                var elementService = ServiceFactory.CreateElementService(Element);
 
-                switch (ParameterSetName)
-                {
-                    case "Element":
-                        elementService.HoverElementAsync(Element).GetAwaiter().GetResult();
-                        WriteVerbose($"Hovered over element");
-                        break;
-
-                    case "Selector":
-                        var page = ResolvePageOrThrow();
-                        elementService.HoverElementBySelectorAsync(page, Selector).GetAwaiter().GetResult();
-                        WriteVerbose($"Hovered over element with selector '{Selector}'");
-                        break;
-                }
+                elementService.HoverElementAsync().GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {

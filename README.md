@@ -1,5 +1,5 @@
-# PowerBrowser
-PowerBrowser is a native PowerShell module made for browser automation. It's build upon PuppeteerSharp, which is a .net library using DevTools API in order to automate the browser. It targets the netstandard 2.0, so it's fully supported on all powershell versions. 
+# Pup
+Pup is a native PowerShell module made for browser automation. It's build upon PuppeteerSharp, which is a .net library using DevTools API in order to automate the browser. It targets the netstandard 2.0, so it's fully supported on all powershell versions. 
 
 
 

@@ -1,5 +1,5 @@
 @{
-    RootModule = 'bin/Debug/netstandard2.0/PowerBrowser.dll'
+    RootModule = 'bin/Debug/netstandard2.0/Pup.dll'
     ModuleVersion = '1.0.0'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
@@ -11,35 +11,18 @@
     DotNetFrameworkVersion = '4.6.1'
     
     FunctionsToExport = @()
-    CmdletsToExport = @(
-        'Install-Browser',
-        'Uninstall-Browser',
-        'Get-Browser',
-        'Start-Browser',
-        'Stop-Browser',
-        'New-Page',
-        'Get-Page',
-        'Move-Page',
-        'Get-PageCookie',
-        'Set-PageCookie',
-        'Get-PageScreenshot',
-        'Remove-Page',
-        'Find-Element',
-        'Invoke-ElementClick',
-        'Set-Element',
-        'Wait-Element'
-    )
+    CmdletsToExport = @('*')
     VariablesToExport = @()
-    AliasesToExport = @('Navigate-Browser', 'Export-BrowserScreenshot')
+    AliasesToExport = @('*')
     
     PrivateData = @{
         PSData = @{
             Tags = @('Browser', 'Automation', 'PowerShell', 'WebScraping', 'Testing', 'Puppeteer', 'Chrome')
-            LicenseUri = 'https://github.com/yourusername/PowerBrowser/blob/main/LICENSE'
-            ProjectUri = 'https://github.com/yourusername/PowerBrowser'
+            LicenseUri = 'https://github.com/yourusername/Pup/blob/main/LICENSE'
+            ProjectUri = 'https://github.com/yourusername/Pup'
             IconUri = ''
             ReleaseNotes = @'
-Initial release of PowerBrowser v1.0.0
+Initial release of Pup v1.0.0
 
 Features:
 - Install and launch Chrome/Chromium browsers

@@ -1,104 +1,145 @@
 using System;
 using PuppeteerSharp;
-using PowerBrowser.Transport;
-using PowerBrowser.Common;
+using Pup.Transport;
+using Pup.Common;
 using System.Management.Automation;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PowerBrowser.Services
+namespace Pup.Services
 {
 
     public class PageService : IPageService
     {
-        private const string RunningPagesKey = "RunningPages";
 
-        private readonly SessionStateService<PBPage> _sessionStateService;
-
-        public PageService(SessionState sessionState)
+        private readonly PupPage _page;
+        public PageService(PupPage page)
         {
-            _sessionStateService = new SessionStateService<PBPage>(sessionState, RunningPagesKey);
+            _page = page;
         }
-    
-        public List<PBPage> GetPagesByBrowser(PBBrowser pBrowser)
+        public async Task RemovePageAsync()
         {
-            return _sessionStateService.GetAll().Where(s => s.Browser == pBrowser).ToList();
-        }
-        public List<PBPage> GetPages()
-        {
-            return _sessionStateService.GetAll();
+            await _page.Page.CloseAsync().ConfigureAwait(false);
         }
 
-        public PBPage Save(PBPage page)
+        public async Task<PupElement> FindElementBySelectorAsync(string selector, bool waitForLoad = false, int timeout = 30000)
         {
-            page.Url = page.Page.Url;
-            page.Content = page.Page.GetContentAsync().GetAwaiter().GetResult();
-            page.Title = page.Page.GetTitleAsync().GetAwaiter().GetResult();
-            _sessionStateService.Save(page.PageId, page);
-            return page;
-        }
-        public async Task<PBPage> CreatePageAsync(PBBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad)
-        {
-            var pages = await pBrowser.Browser.PagesAsync().ConfigureAwait(false);
-            string pageName = string.IsNullOrEmpty(name) ? $"Page{pages.Length + 1}" : name;
-
-            var page = await pBrowser.Browser.NewPageAsync().ConfigureAwait(false);
-
-            // Set viewport size
-            await page.SetViewportAsync(new ViewPortOptions
+            IElementHandle element;
+            if (waitForLoad)
             {
-                Width = width,
-                Height = height
-            }).ConfigureAwait(false);
-
-            // Navigate to URL if specified
-            if (!string.IsNullOrEmpty(url) && url != "about:blank")
+                element = await _page.Page.WaitForSelectorAsync(selector, new WaitForSelectorOptions { Timeout = timeout }).ConfigureAwait(false);
+            }
+            else
             {
-                if (waitForLoad)
-                {
-                    await page.GoToAsync(url, new NavigationOptions
-                    {
-                        WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
-                    }).ConfigureAwait(false);
-                }
-                else
-                {
-                    await page.GoToAsync(url).ConfigureAwait(false);
-                }
+                element = await _page.Page.QuerySelectorAsync(selector).ConfigureAwait(false);
+            }
+            if (element == null)
+            {
+                return null;
+            }
+            return new PupElement(
+                element: element,
+                page: _page.Page,
+                elementId: Guid.NewGuid().ToString(),
+                selector: selector,
+                index: 0,
+                tagName: await element.EvaluateFunctionAsync<string>("el => el.tagName").ConfigureAwait(false),
+                innerText: await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
+                innerHTML: await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
+                id: await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
+                isVisible: await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+            );
+        }
+
+        public async Task<List<PupElement>> FindElementsBySelectorAsync(string selector, bool waitForLoad = false, int timeout = 30000)
+        {
+            IElementHandle[] elements;
+            if (waitForLoad)
+            {
+                await _page.Page.WaitForSelectorAsync(selector, new WaitForSelectorOptions { Timeout = timeout }).ConfigureAwait(false);
+                elements = await _page.Page.QuerySelectorAllAsync(selector).ConfigureAwait(false);
+            }
+            else
+            {
+                elements = await _page.Page.QuerySelectorAllAsync(selector).ConfigureAwait(false);
             }
 
-            return Save(new PBPage(
-                pBrowser,
-                page,
-                pageName,
-                width,
-                height
-            ));
+            var pbElements = new List<PupElement>();
+            for (int i = 0; i < elements.Length; i++)
+            {
+                var element = elements[i];
+                pbElements.Add(new PupElement(
+                    element,
+                    _page.Page,
+                    Guid.NewGuid().ToString(),
+                    selector,
+                    i,
+                    await element.EvaluateFunctionAsync<string>("el => el.tagName").ConfigureAwait(false),
+                    await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
+                    await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
+                    await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
+                    await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                ));
+            }
+            return pbElements;
         }
-        public async Task RemovePageAsync(PBPage browserPage)
+        public async Task ClickElementBySelectorAsync(string selector)
         {
-            await browserPage.Page.CloseAsync().ConfigureAwait(false);
-            _sessionStateService.Remove(browserPage.PageId);
+            await _page.Page.ClickAsync(selector).ConfigureAwait(false);
         }
 
-        public async Task<PBPage> NavigatePageAsync(PBPage browserPage, string url, bool waitForLoad)
+        public async Task ClickElementByCoordinatesAsync(double x, double y)
+        {
+            await _page.Page.Mouse.ClickAsync((decimal)x, (decimal)y).ConfigureAwait(false);
+        }
+        public async Task HoverElementBySelectorAsync(string selector)
+        {
+            await _page.Page.HoverAsync(selector).ConfigureAwait(false);
+        }
+        public async Task FocusElementBySelectorAsync(string selector)
+        {
+            await _page.Page.FocusAsync(selector).ConfigureAwait(false);
+        }
+        public async Task WaitForElementAsync(string selector, int timeout = 30000)
+        {
+            await _page.Page.WaitForSelectorAsync(selector, new WaitForSelectorOptions { Timeout = timeout }).ConfigureAwait(false);
+        }
+
+        public async Task WaitForElementToBeVisibleAsync(string selector, int timeout = 30000)
+        {
+            await _page.Page.WaitForSelectorAsync(selector, new WaitForSelectorOptions 
+            { 
+                Timeout = timeout,
+                Visible = true 
+            }).ConfigureAwait(false);
+        }
+
+        public async Task WaitForElementToBeHiddenAsync(string selector, int timeout = 30000)
+        {
+            await _page.Page.WaitForSelectorAsync(selector, new WaitForSelectorOptions 
+            { 
+                Timeout = timeout,
+                Hidden = true 
+            }).ConfigureAwait(false);
+        }
+        public async Task<PupPage> NavigatePageAsync(string url, bool waitForLoad)
         {
             if (waitForLoad)
             {
-                await browserPage.Page.GoToAsync(url, new NavigationOptions
+                await _page.Page.GoToAsync(url, new NavigationOptions
                 {
                     WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
                 }).ConfigureAwait(false);
             }
             else
             {
-                await browserPage.Page.GoToAsync(url).ConfigureAwait(false);
+                await _page.Page.GoToAsync(url).ConfigureAwait(false);
             }
-            return Save(browserPage);
+            return _page;
         }
 
-        public async Task<byte[]> GetPageScreenshotAsync(PBPage browserPage, string filePath = null, bool fullPage = false)
+        public async Task<byte[]> GetPageScreenshotAsync(string filePath = null, bool fullPage = false)
         {
             var screenshotOptions = new ScreenshotOptions
             {
@@ -109,27 +150,27 @@ namespace PowerBrowser.Services
             if (!string.IsNullOrEmpty(filePath))
             {
                 // Save screenshot to file if path is provided
-                await browserPage.Page.ScreenshotAsync(filePath, screenshotOptions).ConfigureAwait(false);
+                await _page.Page.ScreenshotAsync(filePath, screenshotOptions).ConfigureAwait(false);
             }
 
             // Always return the screenshot data
-            return await browserPage.Page.ScreenshotDataAsync(screenshotOptions).ConfigureAwait(false);
+            return await _page.Page.ScreenshotDataAsync(screenshotOptions).ConfigureAwait(false);
         }
 
-        public async Task<T> ExecuteScriptAsync<T>(PBPage browserPage, string script, params object[] args)
+        public async Task<T> ExecuteScriptAsync<T>(string script, params object[] args)
         {
-            return await browserPage.Page.EvaluateFunctionAsync<T>(script, args).ConfigureAwait(false);
+            return await _page.Page.EvaluateFunctionAsync<T>(script, args).ConfigureAwait(false);
         }
 
-        public async Task ExecuteScriptAsync(PBPage browserPage, string script, params object[] args)
+        public async Task ExecuteScriptAsync(string script, params object[] args)
         {
-            await browserPage.Page.EvaluateFunctionAsync(script, args).ConfigureAwait(false);
+            await _page.Page.EvaluateFunctionAsync(script, args).ConfigureAwait(false);
         }
 
-        public async Task<List<PBCookie>> GetCookiesAsync(PBPage browserPage)
+        public async Task<List<PupCookie>> GetCookiesAsync()
         {
-            var puppeteerCookies = await browserPage.Page.GetCookiesAsync().ConfigureAwait(false);
-            var cookies = new List<PBCookie>();
+            var puppeteerCookies = await _page.Page.GetCookiesAsync().ConfigureAwait(false);
+            var cookies = new List<PupCookie>();
             foreach (var c in puppeteerCookies)
             {
                 DateTime? expires = null;
@@ -137,7 +178,7 @@ namespace PowerBrowser.Services
                 {
                     expires = DateTimeOffset.FromUnixTimeSeconds((long)c.Expires.Value).DateTime;
                 }
-                cookies.Add(new PBCookie(
+                cookies.Add(new PupCookie(
                     name:c.Name,
                     value: c.Value,
                     domain: c.Domain,
@@ -145,7 +186,7 @@ namespace PowerBrowser.Services
                     expires: expires,
                     httpOnly: c.HttpOnly,
                     secure: c.Secure,
-                    sameSite: c.SameSite.ToSupportedPBSameSite(),
+                    sameSite: c.SameSite.ToPupSameSite(),
                     url: c.Url
                 ));
             }
@@ -153,7 +194,7 @@ namespace PowerBrowser.Services
         }
 
 
-        public async Task DeleteCookiesAsync(PBPage browserPage, PBCookie[] cookies)
+        public async Task DeleteCookiesAsync(PupCookie[] cookies)
         {
             var puppeteerCookies = new List<CookieParam>();
             foreach (var c in cookies)
@@ -166,11 +207,11 @@ namespace PowerBrowser.Services
                     Url = c.Url
                 });
             }
-            await browserPage.Page.DeleteCookieAsync(puppeteerCookies.ToArray()).ConfigureAwait(false);
+            await _page.Page.DeleteCookieAsync(puppeteerCookies.ToArray()).ConfigureAwait(false);
         }
 
 
-        public async Task SetCookiesAsync(PBPage browserPage, PBCookie[] cookies)
+        public async Task SetCookiesAsync(PupCookie[] cookies)
         {
             var puppeteerCookies = new List<CookieParam>();
             foreach (var c in cookies)
@@ -192,56 +233,56 @@ namespace PowerBrowser.Services
                     SameSite = c.SameSite.ToPuppeteerSameSiteMode()
                 });
             }
-            await browserPage.Page.SetCookieAsync(puppeteerCookies.ToArray()).ConfigureAwait(false);
+            await _page.Page.SetCookieAsync(puppeteerCookies.ToArray()).ConfigureAwait(false);
         }
 
-        public async Task<PBPage> NavigateBackAsync(PBPage browserPage, bool waitForLoad)
+        public async Task<PupPage> NavigateBackAsync(bool waitForLoad)
         {
             if (waitForLoad)
             {
-                await browserPage.Page.GoBackAsync(new NavigationOptions
+                await _page.Page.GoBackAsync(new NavigationOptions
                 {
                     WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
                 }).ConfigureAwait(false);
             }
             else
             {
-                await browserPage.Page.GoBackAsync().ConfigureAwait(false);
+                await _page.Page.GoBackAsync().ConfigureAwait(false);
             }
 
-            return Save(browserPage);
+            return _page;
         }
 
-        public async Task<PBPage> NavigateForwardAsync(PBPage browserPage, bool waitForLoad)
+        public async Task<PupPage> NavigateForwardAsync(bool waitForLoad)
         {
             if (waitForLoad)
             {
-                await browserPage.Page.GoForwardAsync(new NavigationOptions
+                await _page.Page.GoForwardAsync(new NavigationOptions
                 {
                     WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
                 }).ConfigureAwait(false);
             }
             else
             {
-                await browserPage.Page.GoForwardAsync().ConfigureAwait(false);
+                await _page.Page.GoForwardAsync().ConfigureAwait(false);
             }
 
-            return Save(browserPage);
+            return _page;
         }
-        public async Task<PBPage> ReloadPageAsync(PBPage browserPage, bool waitForLoad)
+        public async Task<PupPage> ReloadPageAsync(bool waitForLoad)
         {
             if (waitForLoad)
             {
-                await browserPage.Page.ReloadAsync(new NavigationOptions
+                await _page.Page.ReloadAsync(new NavigationOptions
                 {
                     WaitUntil = new[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded }
                 }).ConfigureAwait(false);
             }
             else
             {
-                await browserPage.Page.ReloadAsync().ConfigureAwait(false);
+                await _page.Page.ReloadAsync().ConfigureAwait(false);
             }
-            return Save(browserPage);
+            return _page;
         }
     }
 }

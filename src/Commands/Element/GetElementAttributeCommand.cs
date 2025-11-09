@@ -1,19 +1,19 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Element
+namespace Pup.Commands.Element
 {
-    [Cmdlet(VerbsCommon.Get, "ElementAttribute")]
+    [Cmdlet(VerbsCommon.Get, "PupElementAttribute")]
     [OutputType(typeof(string))]
-    public class GetElementAttributeCommand : PageBaseCommand
+    public class GetElementAttributeCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
             HelpMessage = "Element to get attribute from")]
-        public PBElement Element { get; set; }
+        public PupElement Element { get; set; }
 
         [Parameter(
             Position = 1,
@@ -25,9 +25,9 @@ namespace PowerBrowser.Commands.Element
         {
             try
             {
-                var elementService = ServiceFactory.CreateElementService();
-                var attributeValue = elementService.GetElementAttributeAsync(Element, Name).GetAwaiter().GetResult();
-                
+                var elementService = ServiceFactory.CreateElementService(Element);
+                var attributeValue = elementService.GetElementAttributeAsync(Name).GetAwaiter().GetResult();
+
                 WriteObject(attributeValue);
             }
             catch (Exception ex)

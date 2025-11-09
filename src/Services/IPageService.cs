@@ -1,32 +1,37 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Services
+namespace Pup.Services
 {
     public interface IPageService
     {
-        Task<PBPage> CreatePageAsync(PBBrowser pBrowser, string name, int width, int height, string url, bool waitForLoad);
+        Task RemovePageAsync();
 
-        List<PBPage> GetPages();
+        Task<PupElement> FindElementBySelectorAsync(string selector, bool waitForLoad, int timeout);
+        Task<List<PupElement>> FindElementsBySelectorAsync(string selector, bool waitForLoad, int timeout);
+        Task ClickElementBySelectorAsync(string selector);
+        Task ClickElementByCoordinatesAsync(double x, double y);
+        Task FocusElementBySelectorAsync(string selector);
+        
+        Task HoverElementBySelectorAsync(string selector);
+        
+        Task WaitForElementAsync(string selector, int timeout);
+        Task WaitForElementToBeVisibleAsync(string selector, int timeout);
+        Task WaitForElementToBeHiddenAsync(string selector, int timeout);
+        Task<PupPage> NavigatePageAsync(string url, bool waitForLoad);
 
-        List<PBPage> GetPagesByBrowser(PBBrowser pBrowser);
+        Task<byte[]> GetPageScreenshotAsync(string filePath = null, bool fullPage = false);
 
-        Task RemovePageAsync(PBPage browserPage);
+        Task<T> ExecuteScriptAsync<T>(string script, params object[] args);
+        Task ExecuteScriptAsync(string script, params object[] args);
 
-        Task<PBPage> NavigatePageAsync(PBPage browserPage, string url, bool waitForLoad);
+        Task<List<PupCookie>> GetCookiesAsync();
+        Task DeleteCookiesAsync(PupCookie[] cookies);
+        Task SetCookiesAsync(PupCookie[] cookies);
 
-        Task<byte[]> GetPageScreenshotAsync(PBPage browserPage, string filePath = null, bool fullPage = false);
-
-        Task<T> ExecuteScriptAsync<T>(PBPage browserPage, string script, params object[] args);
-        Task ExecuteScriptAsync(PBPage browserPage, string script, params object[] args);
-
-        Task<List<PBCookie>> GetCookiesAsync(PBPage browserPage);
-        Task DeleteCookiesAsync(PBPage browserPage, PBCookie[] cookies);
-        Task SetCookiesAsync(PBPage browserPage, PBCookie[] cookies);
-
-        Task<PBPage> NavigateBackAsync(PBPage browserPage, bool waitForLoad);
-        Task<PBPage> NavigateForwardAsync(PBPage browserPage, bool waitForLoad);
-        Task<PBPage> ReloadPageAsync(PBPage browserPage, bool waitForLoad);
+        Task<PupPage> NavigateBackAsync(bool waitForLoad);
+        Task<PupPage> NavigateForwardAsync(bool waitForLoad);
+        Task<PupPage> ReloadPageAsync(bool waitForLoad);
     }
 }

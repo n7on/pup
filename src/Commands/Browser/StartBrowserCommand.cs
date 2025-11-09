@@ -1,13 +1,13 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
-using PowerBrowser.Completers;
-using PowerBrowser.Common;
+using Pup.Transport;
+using Pup.Completers;
+using Pup.Common;
 
-namespace PowerBrowser.Commands.Browser
+namespace Pup.Commands.Browser
 {
     [Cmdlet(VerbsLifecycle.Start, "Browser")]
-    [OutputType(typeof(PBBrowser))]
+    [OutputType(typeof(PupBrowser))]
     public class StartBrowserCommand : PSCmdlet
     {
         [Parameter(
@@ -33,8 +33,8 @@ namespace PowerBrowser.Commands.Browser
             try
             {
                 BrowserTypeValidator.Validate(BrowserType);
-                var browserService = ServiceFactory.CreateBrowserService(SessionState);
-                var browser = browserService.StartBrowser(
+                var supportedBrowserService = ServiceFactory.CreateSupportedBrowserService(SessionState);
+                var browser = supportedBrowserService.StartBrowser(
                     BrowserType.ToPBSupportedBrowser(),
                     Headless.IsPresent,
                     Width,

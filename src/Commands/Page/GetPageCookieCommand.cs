@@ -1,14 +1,22 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 
-namespace PowerBrowser.Commands.Page
+namespace Pup.Commands.Page
 {
-    [Cmdlet(VerbsCommon.Get, "PageCookie")]
-    [OutputType(typeof(PBCookie[]))]
-    public class GetPageCookieCommand : PageBaseCommand
+    [Cmdlet(VerbsCommon.Get, "PupPageCookie")]
+    [OutputType(typeof(PupCookie[]))]
+    public class GetPageCookieCommand : PSCmdlet
     {
+        [Parameter(
+            Position = 0,
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true)]
+        public PupPage Page { get; set; }
+
         [Parameter(HelpMessage = "Filter cookies by name (supports wildcards)")]
         public string Name { get; set; }
 
@@ -19,8 +27,8 @@ namespace PowerBrowser.Commands.Page
         {
             try
             {
-                var page = ResolvePageOrThrow();
-                var cookies = PageService.GetCookiesAsync(page).GetAwaiter().GetResult();
+                var pageService = ServiceFactory.CreatePageService(Page);
+                var cookies = pageService.GetCookiesAsync().GetAwaiter().GetResult();
 
                 // Apply filters if provided
                 if (!string.IsNullOrEmpty(Name))

@@ -1,21 +1,26 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Page
+namespace Pup.Commands.Page
 {
-    [Cmdlet(VerbsCommon.Remove, "Page")]
-    [OutputType(typeof(PBPage))]
-    public class RemovePageCommand : PageBaseCommand
+    [Cmdlet(VerbsCommon.Remove, "PupPage")]
+    [OutputType(typeof(PupPage))]
+    public class RemovePageCommand : PSCmdlet
     {
+        [Parameter(
+            Position = 0,
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true)]
+        public PupPage Page { get; set; }
         protected override void ProcessRecord()
         {
             try
             {
-                Page = ResolvePageOrThrow();
-                PageService.RemovePageAsync(Page).GetAwaiter().GetResult();
+                var pageService = ServiceFactory.CreatePageService(Page);
+                pageService.RemovePageAsync().GetAwaiter().GetResult();
 
-                WriteVerbose($"Removed browser page: {Page.PageName} (ID: {Page.PageId})");
             }
             catch (Exception ex)
             {

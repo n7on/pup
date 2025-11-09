@@ -1,20 +1,11 @@
 using System.Collections.Generic;
-using PowerBrowser.Common;
-using PowerBrowser.Transport;
+using System.Threading.Tasks;
+using Pup.Transport;
 
 public interface IBrowserService
 {
-
-    bool IsBrowserTypeInstalled(PBSupportedBrowser browserType);
-    PBBrowser GetBrowser(PBSupportedBrowser browserType);
-    List<PBBrowser> GetBrowsers();
-
-    bool RemoveBrowser(PBBrowser browser);
-
-    void DownloadBrowser(PBSupportedBrowser browserType);
-
-    bool StopBrowser(PBBrowser browser);
-
-    PBBrowser StartBrowser(PBSupportedBrowser browserType, bool headless, int width, int height);
-
+    Task<PupPage> CreatePageAsync(string name, int width, int height, string url, bool waitForLoad);
+    Task<List<PupPage>> GetPagesAsync();
+    bool RemoveBrowser();
+    bool StopBrowser();
 }

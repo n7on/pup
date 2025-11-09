@@ -1,22 +1,29 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
-using PowerBrowser.Common;
+using Pup.Transport;
+using Pup.Common;
 
-namespace PowerBrowser.Commands.Page
+namespace Pup.Commands.Page
 {
-    [Cmdlet(VerbsCommon.Set, "PageCookie")]
+    [Cmdlet(VerbsCommon.Set, "PupPageCookie")]
     [OutputType(typeof(void))]
-    public class SetPageCookieCommand : PageBaseCommand
+    public class SetPageCookieCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true)]
+        public PupPage Page { get; set; }
+
+        [Parameter(
+            Position = 1,
             Mandatory = true,
             HelpMessage = "Name of the cookie")]
         public string Name { get; set; }
 
         [Parameter(
-            Position = 1,
+            Position = 2,
             Mandatory = true,
             HelpMessage = "Value of the cookie")]
         public string Value { get; set; }
@@ -37,23 +44,22 @@ namespace PowerBrowser.Commands.Page
         public SwitchParameter Secure { get; set; }
 
         [Parameter(HelpMessage = "SameSite policy for the cookie")]
-        public PBSameSite? SameSite { get; set; }
+        public PupSameSite? SameSite { get; set; }
 
         [Parameter(
             ValueFromPipeline = true,
             HelpMessage = "Cookie object(s) to set")]
-        public PBCookie[] Cookies { get; set; }
+        public PupCookie[] Cookies { get; set; }
 
         protected override void ProcessRecord()
         {
             try
             {
-                var page = ResolvePageOrThrow();
-
+                var pageService = ServiceFactory.CreatePageService(Page);
                 if (Cookies != null && Cookies.Length > 0)
                 {
                     // Set multiple cookies from pipeline
-                    PageService.SetCookiesAsync(page, Cookies).GetAwaiter().GetResult();
+                    pageService.SetCookiesAsync(Cookies).GetAwaiter().GetResult();
                 }
                 else if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Value))
                 {
@@ -70,7 +76,7 @@ namespace PowerBrowser.Commands.Page
                         secureValue = Secure.ToBool();
                     }
 
-                    var cookie = new PBCookie(
+                    var cookie = new PupCookie(
                         name: Name,
                         url: null,
                         value: Value,
@@ -81,7 +87,7 @@ namespace PowerBrowser.Commands.Page
                         secure: secureValue,
                         sameSite: SameSite
                     );
-                    PageService.SetCookiesAsync(page, new[] { cookie }).GetAwaiter().GetResult();
+                    pageService.SetCookiesAsync(new[] { cookie }).GetAwaiter().GetResult();
                 }
                 else
                 {

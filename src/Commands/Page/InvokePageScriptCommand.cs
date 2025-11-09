@@ -1,15 +1,22 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Page
+namespace Pup.Commands.Page
 {
-    [Cmdlet(VerbsLifecycle.Invoke, "PageScript")]
+    [Cmdlet(VerbsLifecycle.Invoke, "PupPageScript")]
     [OutputType(typeof(object))]
-    public class InvokePageScriptCommand : PageBaseCommand
+    public class InvokePageScriptCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true)]
+        public PupPage Page { get; set; }
+
+        [Parameter(
+            Position = 1,
             Mandatory = true,
             HelpMessage = "JavaScript code to execute")]
         public string Script { get; set; }
@@ -35,38 +42,38 @@ namespace PowerBrowser.Commands.Page
         {
             try
             {
-                var page = ResolvePageOrThrow();
+                var pageService = ServiceFactory.CreatePageService(Page);
                 object result = null;
 
                 if (AsVoid.IsPresent)
                 {
                     // Execute without return value
-                    PageService.ExecuteScriptAsync(page, Script, Arguments).GetAwaiter().GetResult();
+                    pageService.ExecuteScriptAsync(Script, Arguments).GetAwaiter().GetResult();
                     WriteVerbose("JavaScript executed successfully (void)");
                 }
                 else if (AsString.IsPresent)
                 {
-                    result = PageService.ExecuteScriptAsync<string>(page, Script, Arguments).GetAwaiter().GetResult();
+                    result = pageService.ExecuteScriptAsync<string>(Script, Arguments).GetAwaiter().GetResult();
                 }
                 else if (AsNumber.IsPresent)
                 {
-                    result = PageService.ExecuteScriptAsync<double>(page, Script, Arguments).GetAwaiter().GetResult();
+                    result = pageService.ExecuteScriptAsync<double>(Script, Arguments).GetAwaiter().GetResult();
                 }
                 else if (AsBoolean.IsPresent)
                 {
-                    result = PageService.ExecuteScriptAsync<bool>(page, Script, Arguments).GetAwaiter().GetResult();
+                    result = pageService.ExecuteScriptAsync<bool>(Script, Arguments).GetAwaiter().GetResult();
                 }
                 else
                 {
                     // Default: try to get result as object
                     try
                     {
-                        result = PageService.ExecuteScriptAsync<object>(page, Script, Arguments).GetAwaiter().GetResult();
+                        result = pageService.ExecuteScriptAsync<object>(Script, Arguments).GetAwaiter().GetResult();
                     }
                     catch
                     {
                         // If that fails, execute as void
-                        PageService.ExecuteScriptAsync(page, Script, Arguments).GetAwaiter().GetResult();
+                        pageService.ExecuteScriptAsync(Script, Arguments).GetAwaiter().GetResult();
                         result = null;
                     }
                 }

@@ -1,11 +1,11 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Page
+namespace Pup.Commands.Page
 {
-    [Cmdlet(VerbsCommon.New, "Page")]
-    [OutputType(typeof(PBPage))]
+    [Cmdlet(VerbsCommon.New, "PupPage")]
+    [OutputType(typeof(PupPage))]
     public class NewPageCommand : BrowserBaseCommand
     {
 
@@ -30,9 +30,8 @@ namespace PowerBrowser.Commands.Page
             {
                 var browser = ResolveBrowserOrThrow();
 
-                var pageService = ServiceFactory.CreatePageService(SessionState);
-                var browserPage = pageService.CreatePageAsync(
-                    browser,
+                var browserService = ServiceFactory.CreateBrowserService(browser, SessionState);
+                var browserPage = browserService.CreatePageAsync(
                     Name,
                     Width,
                     Height,

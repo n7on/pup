@@ -1,14 +1,21 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
-using PowerBrowser.Services;
+using Pup.Transport;
+using Pup.Services;
 
-namespace PowerBrowser.Commands.Page
+namespace Pup.Commands.Page
 {
-    [Cmdlet(VerbsLifecycle.Invoke, "PageBack")]
+    [Cmdlet(VerbsLifecycle.Invoke, "PupPageBack")]
     [OutputType(typeof(void))]
-    public class InvokePageBackCommand : PageBaseCommand
+    public class InvokePageBackCommand : PSCmdlet
     {
+        [Parameter(
+            Position = 0,
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true)]
+        public PupPage Page { get; set; }
+
         [Parameter(HelpMessage = "Wait for page to load after navigation")]
         public SwitchParameter WaitForLoad { get; set; }
 
@@ -16,10 +23,8 @@ namespace PowerBrowser.Commands.Page
         {
             try
             {
-                Page = ResolvePageOrThrow();
-
-                var pageService = ServiceFactory.CreatePageService(SessionState);
-                Page = pageService.NavigateBackAsync(Page, WaitForLoad.IsPresent).GetAwaiter().GetResult();
+                var pageService = ServiceFactory.CreatePageService(Page);
+                Page = pageService.NavigateBackAsync(WaitForLoad.IsPresent).GetAwaiter().GetResult();
 
                 WriteObject(Page);
             }

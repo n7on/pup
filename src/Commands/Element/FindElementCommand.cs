@@ -1,13 +1,20 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Element
+namespace Pup.Commands.Element
 {
-    [Cmdlet(VerbsCommon.Find, "Element")]
-    [OutputType(typeof(PBElement))]
-    public class FindPageElementCommand : PageBaseCommand
+    [Cmdlet(VerbsCommon.Find, "PupElement")]
+    [OutputType(typeof(PupElement))]
+    public class FindPageElementCommand : PSCmdlet
     {
+        [Parameter(
+            Position = 0,
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true)]
+        public PupPage Page { get; set; }
+
         [Parameter(HelpMessage = "CSS selector to find the element", Mandatory = true)]
         public string Selector { get; set; }
 
@@ -20,9 +27,8 @@ namespace PowerBrowser.Commands.Element
         {
             try
             {
-                Page = ResolvePageOrThrow();
-                var elementService = ServiceFactory.CreateElementService();
-                var element = elementService.FindElementBySelectorAsync(Page, Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
+                var pageService = ServiceFactory.CreatePageService(Page);
+                var element = pageService.FindElementBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
                 WriteObject(element);
             }
             catch (Exception ex)

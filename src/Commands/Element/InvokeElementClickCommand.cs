@@ -1,12 +1,12 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Element
+namespace Pup.Commands.Element
 {
-    [Cmdlet(VerbsLifecycle.Invoke, "ElementClick")]
+    [Cmdlet(VerbsLifecycle.Invoke, "PupElementClick")]
     [OutputType(typeof(void))]
-    public class InvokeElementClickCommand : PageBaseCommand
+    public class InvokeElementClickCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
@@ -14,49 +14,16 @@ namespace PowerBrowser.Commands.Element
             Mandatory = true,
             ValueFromPipeline = true,
             HelpMessage = "Element to click")]
-        public PBElement Element { get; set; }
+        public PupElement Element { get; set; }
 
-        [Parameter(
-            Position = 0,
-            ParameterSetName = "Selector", 
-            Mandatory = true,
-            HelpMessage = "CSS selector of element to click")]
-        public string Selector { get; set; }
-
-        [Parameter(
-            ParameterSetName = "Coordinates",
-            Mandatory = true,
-            HelpMessage = "X coordinate to click")]
-        public double X { get; set; }
-
-        [Parameter(
-            ParameterSetName = "Coordinates",
-            Mandatory = true, 
-            HelpMessage = "Y coordinate to click")]
-        public double Y { get; set; }
 
         protected override void ProcessRecord()
         {
             try
             {
-                var elementService = ServiceFactory.CreateElementService();
+                var elementService = ServiceFactory.CreateElementService(Element);
 
-                switch (ParameterSetName)
-                {
-                    case "Element":
-                        elementService.ClickElementAsync(Element).GetAwaiter().GetResult();
-                        break;
-
-                    case "Selector":
-                        var page = ResolvePageOrThrow();
-                        elementService.ClickElementBySelectorAsync(page, Selector).GetAwaiter().GetResult();
-                        break;
-
-                    case "Coordinates":
-                        var coordPage = ResolvePageOrThrow();
-                        elementService.ClickElementByCoordinatesAsync(coordPage, X, Y).GetAwaiter().GetResult();
-                        break;
-                }
+                elementService.ClickElementAsync().GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {

@@ -1,7 +1,7 @@
 using System;
 using System.Management.Automation;
 
-namespace PowerBrowser.Commands.Browser
+namespace Pup.Commands.Browser
 {
     [Cmdlet(VerbsLifecycle.Stop, "Browser")]
     [OutputType(typeof(string))]
@@ -16,7 +16,7 @@ namespace PowerBrowser.Commands.Browser
             try
             {
                 Browser = ResolveBrowserOrThrow();
-                BrowserService.StopBrowser(Browser);
+                BrowserService.StopBrowser();
 
                 WriteVerbose($"Browser '{Browser.BrowserType}' stopped successfully!");
             }

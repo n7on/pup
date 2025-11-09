@@ -1,15 +1,23 @@
 using System;
 using System.Management.Automation;
-using PowerBrowser.Transport;
+using System.Runtime.InteropServices.ComTypes;
+using Pup.Transport;
 
-namespace PowerBrowser.Commands.Element
+namespace Pup.Commands.Element
 {
-    [Cmdlet(VerbsLifecycle.Wait, "Element")]
-    [OutputType(typeof(PBElement))]
-    public class WaitElementCommand : PageBaseCommand
+    [Cmdlet(VerbsLifecycle.Wait, "PupElement")]
+    [OutputType(typeof(PupElement))]
+    public class WaitElementCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true)]
+        public PupPage Page { get; set; }
+
+        [Parameter(
+            Position = 1,
             Mandatory = true,
             HelpMessage = "CSS selector to wait for")]
         public string Selector { get; set; }
@@ -30,13 +38,11 @@ namespace PowerBrowser.Commands.Element
         {
             try
             {
-                var page = ResolvePageOrThrow();
-                var elementService = ServiceFactory.CreateElementService();
-
+                var pageService = ServiceFactory.CreatePageService(Page);
                 if (Hidden.IsPresent)
                 {
                     // Wait for element to be hidden/removed
-                    elementService.WaitForElementToBeHiddenAsync(page, Selector, Timeout).GetAwaiter().GetResult();
+                    pageService.WaitForElementToBeHiddenAsync(Selector, Timeout).GetAwaiter().GetResult();
                     WriteVerbose($"Element with selector '{Selector}' is now hidden");
                     
                     if (PassThru.IsPresent)
@@ -46,19 +52,19 @@ namespace PowerBrowser.Commands.Element
                 }
                 else
                 {
-                    PBElement element;
+                    PupElement element;
                     
                     if (Visible.IsPresent)
                     {
                         // Wait for element to be visible, then find it
-                        elementService.WaitForElementToBeVisibleAsync(page, Selector, Timeout).GetAwaiter().GetResult();
-                        element = elementService.FindElementBySelectorAsync(page, Selector, waitForLoad: false, Timeout).GetAwaiter().GetResult();
+                        pageService.WaitForElementToBeVisibleAsync(Selector, Timeout).GetAwaiter().GetResult();
+                        element = pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout).GetAwaiter().GetResult();
                         WriteVerbose($"Element with selector '{Selector}' is now visible");
                     }
                     else
                     {
                         // Use FindElementBySelector with waitForLoad=true for DOM presence
-                        element = elementService.FindElementBySelectorAsync(page, Selector, waitForLoad: true, Timeout).GetAwaiter().GetResult();
+                        element = pageService.FindElementBySelectorAsync(Selector, waitForLoad: true, Timeout).GetAwaiter().GetResult();
                         WriteVerbose($"Element with selector '{Selector}' is now present in DOM");
                     }
                     

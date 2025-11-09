@@ -1,19 +1,19 @@
 using System;
 using PuppeteerSharp;
 using System.Management.Automation;
-using PowerBrowser.Common;
+using Pup.Common;
 
-namespace PowerBrowser.Transport
+namespace Pup.Transport
 {
     /// <summary>
     /// PowerShell-friendly wrapper for IBrowser with additional metadata
     /// </summary>
-    public class PBBrowser
+    public class PupBrowser
     {
     
         [Hidden]
         public IBrowser Browser { get; set; }
-        public PBSupportedBrowser BrowserType { get; set; }
+        public PupSupportedBrowser BrowserType { get; set; }
         public DateTime StartTime { get; set; }
         public bool Headless { get; set; }
         public string WindowSize { get; set; }
@@ -22,17 +22,17 @@ namespace PowerBrowser.Transport
         public string Size { get; set; }
         public string Path { get; set; }
 
-        public PBBrowser(IBrowser browser, bool headless, string windowSize, string path)
+        public PupBrowser(IBrowser browser, bool headless, string windowSize, string path)
         {
             Browser = browser;
-            BrowserType = browser?.BrowserType.ToPBSupportedBrowser() ?? PBSupportedBrowser.Chrome;
+            BrowserType = browser?.BrowserType.ToPBSupportedBrowser() ?? PupSupportedBrowser.Chrome;
             StartTime = DateTime.Now;
             Headless = headless;
             WindowSize = windowSize;
             Path = path;
         }
 
-        public PBBrowser(PBSupportedBrowser browserType, string path)
+        public PupBrowser(PupSupportedBrowser browserType, string path)
         {
             Browser = null;
             BrowserType = browserType;
