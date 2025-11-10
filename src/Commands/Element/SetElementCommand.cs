@@ -15,7 +15,7 @@ namespace Pup.Commands.Element
             HelpMessage = "Element to modify")]
         public PupElement Element { get; set; }
 
-        [Parameter(HelpMessage = "Set the text content of the element (using TypeAsync)")]
+        [Parameter(HelpMessage = "Set the text content of the element (clears existing text first unless -Append is used)")]
         public string Text { get; set; }
 
         [Parameter(HelpMessage = "Set the value property of the element (for form inputs)")]
@@ -26,6 +26,9 @@ namespace Pup.Commands.Element
 
         [Parameter(HelpMessage = "Clear the element before setting new content")]
         public SwitchParameter Clear { get; set; }
+
+        [Parameter(HelpMessage = "Append text instead of replacing existing content")]
+        public SwitchParameter Append { get; set; }
 
         [Parameter(HelpMessage = "Focus the element after setting values")]
         public SwitchParameter Focus { get; set; }
@@ -47,6 +50,12 @@ namespace Pup.Commands.Element
                 // Set text content (typing)
                 if (!string.IsNullOrEmpty(Text))
                 {
+                    // Clear existing text first unless -Append is specified
+                    if (!Append.IsPresent && !Clear.IsPresent)
+                    {
+                        elementService.FocusElementAsync().GetAwaiter().GetResult();
+                        Element.Element.EvaluateFunctionAsync("el => { if (el.select) el.select(); else el.setSelectionRange(0, el.value.length); }").GetAwaiter().GetResult();
+                    }
                     elementService.SetElementTextAsync(Text).GetAwaiter().GetResult();
                 }
 

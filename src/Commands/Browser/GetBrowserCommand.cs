@@ -4,7 +4,7 @@ using Pup.Transport;
 
 namespace Pup.Commands.Browser
 {
-    [Cmdlet(VerbsCommon.Get, "Browser")]
+    [Cmdlet(VerbsCommon.Get, "PupBrowser")]
     [OutputType(typeof(PupBrowser))]
     public class GetBrowserCommand : PSCmdlet
     {

@@ -90,7 +90,7 @@ namespace Pup.Services
             return browsers;
         }
 
-        public void DownloadBrowser(PupSupportedBrowser browserType)
+        public PupBrowser DownloadBrowser(PupSupportedBrowser browserType)
         {
             var namedBrowserPath = GetBrowserTypeInstallPath(browserType);
             Directory.CreateDirectory(namedBrowserPath);
@@ -102,6 +102,8 @@ namespace Pup.Services
             });
 
             browserFetcher.DownloadAsync().GetAwaiter().GetResult();
+
+            return GetBrowser(browserType);
         }
 
         public PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height)

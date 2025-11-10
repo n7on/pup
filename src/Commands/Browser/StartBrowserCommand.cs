@@ -6,16 +6,16 @@ using Pup.Common;
 
 namespace Pup.Commands.Browser
 {
-    [Cmdlet(VerbsLifecycle.Start, "Browser")]
+    [Cmdlet(VerbsLifecycle.Start, "PupBrowser")]
     [OutputType(typeof(PupBrowser))]
     public class StartBrowserCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
             HelpMessage = "Name of the browser to stop (used when Browser parameter is not provided)",
-            Mandatory = true)]
+            Mandatory = false)]
         [ArgumentCompleter(typeof(InstalledBrowserCompleter))]
-        public string BrowserType { get; set; }
+        public string BrowserType { get; set; } = "Chrome";
         [Parameter(HelpMessage = "Run browser in headless mode (no GUI)")]
         public SwitchParameter Headless { get; set; }
 

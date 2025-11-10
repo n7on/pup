@@ -3,7 +3,7 @@ using System.Management.Automation;
 
 namespace Pup.Commands.Browser
 {
-    [Cmdlet(VerbsLifecycle.Stop, "Browser")]
+    [Cmdlet(VerbsLifecycle.Stop, "PupBrowser")]
     [OutputType(typeof(string))]
     public class StopBrowserCommand : BrowserBaseCommand
     {

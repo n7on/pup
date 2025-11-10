@@ -3,7 +3,7 @@ using System.Management.Automation;
 
 namespace Pup.Commands.Browser
 {
-    [Cmdlet(VerbsLifecycle.Uninstall, "Browser")]
+    [Cmdlet(VerbsLifecycle.Uninstall, "PupBrowser", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.High)]
     [OutputType(typeof(string))]
     public class UninstallBrowserCommand : BrowserBaseCommand
     {
@@ -15,9 +15,12 @@ namespace Pup.Commands.Browser
             try
             {
                 Browser = ResolveBrowserOrThrow();
-                BrowserService.RemoveBrowser();
-
-                WriteVerbose($"Removed browser: {Browser.BrowserType} from path: {Browser.Path}");
+                
+                if (ShouldProcess($"Browser: {Browser.BrowserType}", "Uninstall"))
+                {
+                    BrowserService.RemoveBrowser();
+                    WriteVerbose($"Removed browser: {Browser.BrowserType} from path: {Browser.Path}");
+                }
             }
             catch (Exception ex)
             {

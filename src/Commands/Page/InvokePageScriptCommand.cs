@@ -45,35 +45,44 @@ namespace Pup.Commands.Page
                 var pageService = ServiceFactory.CreatePageService(Page);
                 object result = null;
 
+                // Auto-wrap simple expressions in arrow functions if needed
+                string scriptToExecute = Script;
+                if (!Script.TrimStart().StartsWith("(") && !Script.TrimStart().StartsWith("function") && 
+                    !Script.Contains("=>") && !Script.Contains("return") && !Script.Contains(";"))
+                {
+                    scriptToExecute = $"() => {Script}";
+                    WriteVerbose($"Auto-wrapped expression: {scriptToExecute}");
+                }
+
                 if (AsVoid.IsPresent)
                 {
                     // Execute without return value
-                    pageService.ExecuteScriptAsync(Script, Arguments).GetAwaiter().GetResult();
+                    pageService.ExecuteScriptAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
                     WriteVerbose("JavaScript executed successfully (void)");
                 }
                 else if (AsString.IsPresent)
                 {
-                    result = pageService.ExecuteScriptAsync<string>(Script, Arguments).GetAwaiter().GetResult();
+                    result = pageService.ExecuteScriptAsync<string>(scriptToExecute, Arguments).GetAwaiter().GetResult();
                 }
                 else if (AsNumber.IsPresent)
                 {
-                    result = pageService.ExecuteScriptAsync<double>(Script, Arguments).GetAwaiter().GetResult();
+                    result = pageService.ExecuteScriptAsync<double>(scriptToExecute, Arguments).GetAwaiter().GetResult();
                 }
                 else if (AsBoolean.IsPresent)
                 {
-                    result = pageService.ExecuteScriptAsync<bool>(Script, Arguments).GetAwaiter().GetResult();
+                    result = pageService.ExecuteScriptAsync<bool>(scriptToExecute, Arguments).GetAwaiter().GetResult();
                 }
                 else
                 {
                     // Default: try to get result as object
                     try
                     {
-                        result = pageService.ExecuteScriptAsync<object>(Script, Arguments).GetAwaiter().GetResult();
+                        result = pageService.ExecuteScriptAsync<object>(scriptToExecute, Arguments).GetAwaiter().GetResult();
                     }
                     catch
                     {
                         // If that fails, execute as void
-                        pageService.ExecuteScriptAsync(Script, Arguments).GetAwaiter().GetResult();
+                        pageService.ExecuteScriptAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
                         result = null;
                     }
                 }

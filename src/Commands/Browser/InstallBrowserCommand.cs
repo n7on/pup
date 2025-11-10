@@ -5,14 +5,14 @@ using Pup.Common;
 
 namespace Pup.Commands.Browser
 {
-    [Cmdlet(VerbsLifecycle.Install, "Browser")]
+    [Cmdlet(VerbsLifecycle.Install, "PupBrowser")]
     [OutputType(typeof(PupBrowser))]
     public class InstallBrowserCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
             HelpMessage = "Browser type to install (Chrome, Firefox, or Chromium - use -Headless flag with Start-Browser instead of ChromeHeadlessShell)")]
-        public PupSupportedBrowser BrowserType { get; set; }
+        public PupSupportedBrowser BrowserType { get; set; } = PupSupportedBrowser.Chrome;
 
         protected override void ProcessRecord()
         {

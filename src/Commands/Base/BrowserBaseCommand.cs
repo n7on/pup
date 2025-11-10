@@ -16,19 +16,11 @@ public abstract class BrowserBaseCommand : PSCmdlet
         HelpMessage = "Name of the browser to stop (used when Browser parameter is not provided)",
         Mandatory = false)]
     [ArgumentCompleter(typeof(InstalledBrowserCompleter))]
-    public string BrowserType { get; set; }
+    public string BrowserType { get; set; } = "Chrome";
     protected IBrowserService BrowserService => ServiceFactory.CreateBrowserService(Browser, SessionState);
     protected ISupportedBrowserService SupportedBrowserService => ServiceFactory.CreateSupportedBrowserService(SessionState);
     protected PupBrowser ResolveBrowserOrThrow()
     {
-        if (Browser == null && string.IsNullOrEmpty(BrowserType))
-        {
-            ThrowTerminatingError(new ErrorRecord(
-                new ArgumentException("Either Browser or BrowserType parameter must be provided."),
-                "InvalidParameters",
-                ErrorCategory.InvalidArgument,
-                null));
-        }
 
         if (Browser == null)
         {

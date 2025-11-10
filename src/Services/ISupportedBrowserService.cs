@@ -6,7 +6,7 @@ using Pup.Transport;
     public interface ISupportedBrowserService
     {
         void Cleanup();
-        void DownloadBrowser(PupSupportedBrowser browserType);
+        PupBrowser DownloadBrowser(PupSupportedBrowser browserType);
         PupBrowser GetBrowser(PupSupportedBrowser browserType);
         List<PupBrowser> GetBrowsers();
         bool IsBrowserTypeInstalled(PupSupportedBrowser browserType);
