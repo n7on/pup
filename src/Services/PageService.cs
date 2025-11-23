@@ -84,6 +84,69 @@ namespace Pup.Services
             }
             return pbElements;
         }
+
+        public async Task<PupElement> FindElementByXPathAsync(string xpath, bool waitForLoad = false, int timeout = 30000)
+        {
+            IElementHandle element;
+            if (waitForLoad)
+            {
+                element = await _page.Page.WaitForSelectorAsync($"xpath/{xpath}", new WaitForSelectorOptions { Timeout = timeout }).ConfigureAwait(false);
+            }
+            else
+            {
+                element = await _page.Page.QuerySelectorAsync($"xpath/{xpath}").ConfigureAwait(false);
+            }
+            if (element == null)
+            {
+                return null;
+            }
+            return new PupElement(
+                element: element,
+                page: _page.Page,
+                elementId: Guid.NewGuid().ToString(),
+                selector: xpath,
+                index: 0,
+                tagName: await element.EvaluateFunctionAsync<string>("el => el.tagName").ConfigureAwait(false),
+                innerText: await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
+                innerHTML: await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
+                id: await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
+                isVisible: await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+            );
+        }
+
+        public async Task<List<PupElement>> FindElementsByXPathAsync(string xpath, bool waitForLoad = false, int timeout = 30000)
+        {
+            IElementHandle[] elements;
+            if (waitForLoad)
+            {
+                await _page.Page.WaitForSelectorAsync($"xpath/{xpath}", new WaitForSelectorOptions { Timeout = timeout }).ConfigureAwait(false);
+                elements = await _page.Page.QuerySelectorAllAsync($"xpath/{xpath}").ConfigureAwait(false);
+            }
+            else
+            {
+                elements = await _page.Page.QuerySelectorAllAsync($"xpath/{xpath}").ConfigureAwait(false);
+            }
+
+            var pbElements = new List<PupElement>();
+            for (int i = 0; i < elements.Length; i++)
+            {
+                var element = elements[i];
+                pbElements.Add(new PupElement(
+                    element,
+                    _page.Page,
+                    Guid.NewGuid().ToString(),
+                    xpath,
+                    i,
+                    await element.EvaluateFunctionAsync<string>("el => el.tagName").ConfigureAwait(false),
+                    await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
+                    await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
+                    await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
+                    await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                ));
+            }
+            return pbElements;
+        }
+
         public async Task ClickElementBySelectorAsync(string selector)
         {
             await _page.Page.ClickAsync(selector).ConfigureAwait(false);

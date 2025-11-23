@@ -141,8 +141,8 @@ Describe "Pup Integration Tests" -Tags @("Integration", "Core") {
             }
         }
         
-        It "Find-PupElement should find single element by selector" {
-            $element = Find-PupElement -Page $script:TestPage -Selector "#header"
+        It "Find-PupElements should find single element by selector with -First" {
+            $element = Find-PupElements -Page $script:TestPage -Selector "#header" -First
             $element | Should -Not -BeNullOrEmpty
             $element.GetType().Name | Should -Be "PupElement"
             $element.TagName.ToLower() | Should -Be "h1"
@@ -176,22 +176,22 @@ Describe "Pup Integration Tests" -Tags @("Integration", "Core") {
         }
         
         It "Invoke-PupElementClick should click element" {
-            $button = Find-PupElement -Page $script:TestPage -Selector "#testButton"
+            $button = Find-PupElements -Page $script:TestPage -Selector "#testButton" -First
             { Invoke-PupElementClick -Element $button } | Should -Not -Throw
         }
         
         It "Invoke-PupElementHover should hover over element" {
-            $button = Find-PupElement -Page $script:TestPage -Selector "#testButton"
+            $button = Find-PupElements -Page $script:TestPage -Selector "#testButton" -First
             { Invoke-PupElementHover -Element $button } | Should -Not -Throw
         }
         
         It "Invoke-PupElementFocus should focus element" {
-            $inputElement = Find-PupElement -Page $script:TestPage -Selector "#textInput"
+            $inputElement = Find-PupElements -Page $script:TestPage -Selector "#textInput" -First
             { Invoke-PupElementFocus -Element $inputElement } | Should -Not -Throw
         }
         
         It "Set-PupElement should set element text value" {
-            $inputElement = Find-PupElement -Page $script:TestPage -Selector "#textInput"
+            $inputElement = Find-PupElements -Page $script:TestPage -Selector "#textInput" -First
             { Set-PupElement -Element $inputElement -Text "new value" } | Should -Not -Throw
         }
     }
@@ -210,13 +210,13 @@ Describe "Pup Integration Tests" -Tags @("Integration", "Core") {
         }
         
         It "Get-PupElementAttribute should retrieve element attribute" {
-            $inputElement = Find-PupElement -Page $script:TestPage -Selector "#textInput"
+            $inputElement = Find-PupElements -Page $script:TestPage -Selector "#textInput" -First
             $type = Get-PupElementAttribute -Element $inputElement -Name "type"
             $type | Should -Be "text"
         }
         
         It "Set-PupElementAttribute should set element attribute" {
-            $inputElement = Find-PupElement -Page $script:TestPage -Selector "#textInput"
+            $inputElement = Find-PupElements -Page $script:TestPage -Selector "#textInput" -First
             { Set-PupElementAttribute -Element $inputElement -Name "placeholder" -Value "Enter text here" } | Should -Not -Throw
             
             # Verify the attribute was set
@@ -296,7 +296,7 @@ Describe "Pup Integration Tests" -Tags @("Integration", "Core") {
                 $elements = Find-PupElements -Page $page -Selector "p"
                 $elements.Count | Should -Be 2
                 
-                $inputElement = Find-PupElement -Page $page -Selector "#textInput"
+                $inputElement = Find-PupElements -Page $page -Selector "#textInput" -First
                 $inputElement | Should -Not -BeNullOrEmpty
                 
                 # 4. Modify element (now clears by default)

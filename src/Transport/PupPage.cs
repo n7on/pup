@@ -9,7 +9,7 @@ namespace Pup.Transport
     /// </summary>
     public class PupPage
     {
-        public bool Running => Page?.IsClosed ?? true;
+        public bool Running => Page != null && !Page.IsClosed;
         [Hidden]
         public IPage Page { get; }
         public string Url { get; }

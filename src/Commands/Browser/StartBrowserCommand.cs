@@ -28,12 +28,32 @@ namespace Pup.Commands.Browser
         [Parameter(HelpMessage = "Window height (default: 720)")]
         public int Height { get; set; } = 720;
 
+        [Parameter(HelpMessage = "Force start a new browser even if one is already running")]
+        public SwitchParameter Force { get; set; }
+
         protected override void ProcessRecord()
         {
             try
             {
                 BrowserTypeValidator.Validate(BrowserType);
                 var supportedBrowserService = ServiceFactory.CreateSupportedBrowserService(SessionState);
+                
+                // Check if browser is already running
+                var existingBrowser = supportedBrowserService.GetBrowser(BrowserType.ToPBSupportedBrowser());
+                if (existingBrowser != null && existingBrowser.Running && !Force.IsPresent)
+                {
+                    WriteWarning($"Browser '{BrowserType}' is already running. Use -Force to start a new instance or use Stop-PupBrowser first.");
+                    WriteObject(existingBrowser);
+                    return;
+                }
+
+                // If Force is specified and browser exists, stop it first
+                if (existingBrowser != null && existingBrowser.Running && Force.IsPresent)
+                {
+                    WriteVerbose($"Stopping existing '{BrowserType}' browser instance...");
+                    existingBrowser.Browser.CloseAsync().GetAwaiter().GetResult();
+                }
+
                 var browser = supportedBrowserService.StartBrowser(
                     BrowserType.ToPBSupportedBrowser(),
                     Headless.IsPresent,

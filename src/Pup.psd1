@@ -10,7 +10,10 @@
     PowerShellVersion = '5.1'
     DotNetFrameworkVersion = '4.6.1'
     
-    FunctionsToExport = @()
+    # Include PowerShell script modules
+    NestedModules = @('Pup.Functions.psm1')
+    
+    FunctionsToExport = @('Invoke-PupPageSequence', 'Start-PupSession', 'Stop-PupSession', 'Get-PupElementText', 'Get-PupBestSelector', 'Find-PupSimilarElements')
     CmdletsToExport = @('*')
     VariablesToExport = @()
     AliasesToExport = @('*')

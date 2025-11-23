@@ -1,6 +1,7 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {

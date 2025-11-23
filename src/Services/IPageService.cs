@@ -10,6 +10,8 @@ namespace Pup.Services
 
         Task<PupElement> FindElementBySelectorAsync(string selector, bool waitForLoad, int timeout);
         Task<List<PupElement>> FindElementsBySelectorAsync(string selector, bool waitForLoad, int timeout);
+        Task<PupElement> FindElementByXPathAsync(string xpath, bool waitForLoad, int timeout);
+        Task<List<PupElement>> FindElementsByXPathAsync(string xpath, bool waitForLoad, int timeout);
         Task ClickElementBySelectorAsync(string selector);
         Task ClickElementByCoordinatesAsync(double x, double y);
         Task FocusElementBySelectorAsync(string selector);

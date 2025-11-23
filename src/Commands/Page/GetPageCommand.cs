@@ -1,6 +1,7 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
@@ -14,6 +15,10 @@ namespace Pup.Commands.Page
             try
             {
                 Browser = ResolveBrowserOrThrow();
+                if(Browser.Running == false)
+                {
+                    throw new InvalidOperationException("Browser is not running. Start the browser before retrieving pages.");
+                }
                 var pageService = ServiceFactory.CreateBrowserService(Browser, SessionState);
                 var pages = pageService.GetPagesAsync().GetAwaiter().GetResult();
 

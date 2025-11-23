@@ -1,5 +1,6 @@
 using System;
 using System.Management.Automation;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Browser
 {
