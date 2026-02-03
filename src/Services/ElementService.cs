@@ -1,7 +1,9 @@
 using Pup.Transport;
+using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Pup.Services
@@ -29,7 +31,7 @@ namespace Pup.Services
 
         public async Task SetElementValueAsync(string value)
         {
-            await _element.Element.EvaluateFunctionAsync("el => el.value = arguments[0]", value).ConfigureAwait(false);
+            await _element.Element.EvaluateFunctionAsync("(el, val) => el.value = val", value).ConfigureAwait(false);
         }
 
         public async Task<string> GetElementAttributeAsync(string attributeName)
@@ -377,6 +379,104 @@ namespace Pup.Services
                     return document.querySelectorAll(selector).length;
                 }", selector
             ).ConfigureAwait(false);
+        }
+
+        public async Task<string[]> SelectOptionByValueAsync(params string[] values)
+        {
+            return await _element.Element.SelectAsync(values).ConfigureAwait(false);
+        }
+
+        public async Task<string[]> SelectOptionByTextAsync(params string[] texts)
+        {
+            // Get values for options matching the given text labels
+            var values = await _element.Element.EvaluateFunctionAsync<string[]>(@"
+                (el, texts) => {
+                    const options = Array.from(el.options);
+                    const matchingValues = [];
+                    for (const text of texts) {
+                        const option = options.find(o => o.text === text || o.textContent.trim() === text);
+                        if (option) {
+                            matchingValues.push(option.value);
+                        }
+                    }
+                    return matchingValues;
+                }", (object)texts
+            ).ConfigureAwait(false);
+
+            if (values.Length == 0)
+            {
+                return values;
+            }
+
+            return await _element.Element.SelectAsync(values).ConfigureAwait(false);
+        }
+
+        public async Task<string[]> SelectOptionByIndexAsync(params int[] indices)
+        {
+            // Get values for options at the given indices
+            var values = await _element.Element.EvaluateFunctionAsync<string[]>(@"
+                (el, indices) => {
+                    const options = Array.from(el.options);
+                    const matchingValues = [];
+                    for (const index of indices) {
+                        if (index >= 0 && index < options.length) {
+                            matchingValues.push(options[index].value);
+                        }
+                    }
+                    return matchingValues;
+                }", (object)indices
+            ).ConfigureAwait(false);
+
+            if (values.Length == 0)
+            {
+                return values;
+            }
+
+            return await _element.Element.SelectAsync(values).ConfigureAwait(false);
+        }
+
+        public async Task<List<PupSelectOption>> GetSelectOptionsAsync()
+        {
+            var optionsData = await _element.Element.EvaluateFunctionAsync<JsonElement>(@"
+                (el) => {
+                    return Array.from(el.options).map((o, i) => ({
+                        value: o.value,
+                        text: o.text,
+                        index: i,
+                        selected: o.selected,
+                        disabled: o.disabled
+                    }));
+                }"
+            ).ConfigureAwait(false);
+
+            var options = new List<PupSelectOption>();
+            foreach (var item in optionsData.EnumerateArray())
+            {
+                options.Add(new PupSelectOption(
+                    value: item.GetProperty("value").GetString() ?? "",
+                    text: item.GetProperty("text").GetString() ?? "",
+                    index: item.GetProperty("index").GetInt32(),
+                    selected: item.GetProperty("selected").GetBoolean(),
+                    disabled: item.GetProperty("disabled").GetBoolean()
+                ));
+            }
+
+            return options;
+        }
+
+        public async Task<byte[]> GetScreenshotAsync(string filePath = null)
+        {
+            var options = new ElementScreenshotOptions
+            {
+                Type = ScreenshotType.Png
+            };
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                await _element.Element.ScreenshotAsync(filePath, options).ConfigureAwait(false);
+            }
+
+            return await _element.Element.ScreenshotDataAsync(options).ConfigureAwait(false);
         }
     }
 }

@@ -15,6 +15,9 @@ namespace Pup.Transport
         public string Url { get; }
         public string Title { get; }
 
+        [Hidden]
+        internal EventHandler<DialogEventArgs> DialogHandler { get; set; }
+
         public PupPage(IPage page, string title)
         {
             Page = page;

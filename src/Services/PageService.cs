@@ -1,5 +1,7 @@
 using System;
 using PuppeteerSharp;
+using PuppeteerSharp.Input;
+using PuppeteerSharp.Media;
 using Pup.Transport;
 using Pup.Common;
 using System.Management.Automation;
@@ -346,6 +348,96 @@ namespace Pup.Services
                 await _page.Page.ReloadAsync().ConfigureAwait(false);
             }
             return _page;
+        }
+
+        public async Task SendKeyAsync(string key, string[] modifiers = null)
+        {
+            if (modifiers != null && modifiers.Length > 0)
+            {
+                // Hold down modifier keys
+                foreach (var modifier in modifiers)
+                {
+                    await _page.Page.Keyboard.DownAsync(modifier).ConfigureAwait(false);
+                }
+            }
+
+            // Press the main key
+            await _page.Page.Keyboard.PressAsync(key).ConfigureAwait(false);
+
+            if (modifiers != null && modifiers.Length > 0)
+            {
+                // Release modifier keys in reverse order
+                for (int i = modifiers.Length - 1; i >= 0; i--)
+                {
+                    await _page.Page.Keyboard.UpAsync(modifiers[i]).ConfigureAwait(false);
+                }
+            }
+        }
+
+        public async Task SendKeysAsync(string text)
+        {
+            await _page.Page.Keyboard.TypeAsync(text).ConfigureAwait(false);
+        }
+
+        public void SetDialogHandler(PupDialogAction action, string promptText = null)
+        {
+            // Remove existing handler if any
+            RemoveDialogHandler();
+
+            _page.DialogHandler = async (sender, e) =>
+            {
+                if (action == PupDialogAction.Accept)
+                {
+                    await e.Dialog.Accept(promptText).ConfigureAwait(false);
+                }
+                else
+                {
+                    await e.Dialog.Dismiss().ConfigureAwait(false);
+                }
+            };
+
+            _page.Page.Dialog += _page.DialogHandler;
+        }
+
+        public void RemoveDialogHandler()
+        {
+            if (_page.DialogHandler != null)
+            {
+                _page.Page.Dialog -= _page.DialogHandler;
+                _page.DialogHandler = null;
+            }
+        }
+
+        public async Task<byte[]> ExportPdfAsync(string filePath = null, bool landscape = false, bool printBackground = true, string format = "A4", decimal scale = 1)
+        {
+            var options = new PdfOptions
+            {
+                Landscape = landscape,
+                PrintBackground = printBackground,
+                Scale = scale,
+                Format = format switch
+                {
+                    "Letter" => PaperFormat.Letter,
+                    "Legal" => PaperFormat.Legal,
+                    "Tabloid" => PaperFormat.Tabloid,
+                    "Ledger" => PaperFormat.Ledger,
+                    "A0" => PaperFormat.A0,
+                    "A1" => PaperFormat.A1,
+                    "A2" => PaperFormat.A2,
+                    "A3" => PaperFormat.A3,
+                    "A4" => PaperFormat.A4,
+                    "A5" => PaperFormat.A5,
+                    "A6" => PaperFormat.A6,
+                    _ => PaperFormat.A4
+                }
+            };
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                await _page.Page.PdfAsync(filePath, options).ConfigureAwait(false);
+            }
+
+            return await _page.Page.PdfDataAsync(options).ConfigureAwait(false);
         }
     }
 }

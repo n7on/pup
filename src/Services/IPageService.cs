@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Pup.Common;
 using Pup.Transport;
 
 namespace Pup.Services
@@ -35,5 +36,16 @@ namespace Pup.Services
         Task<PupPage> NavigateBackAsync(bool waitForLoad);
         Task<PupPage> NavigateForwardAsync(bool waitForLoad);
         Task<PupPage> ReloadPageAsync(bool waitForLoad);
+
+        // Keyboard
+        Task SendKeyAsync(string key, string[] modifiers = null);
+        Task SendKeysAsync(string text);
+
+        // Dialog handling
+        void SetDialogHandler(PupDialogAction action, string promptText = null);
+        void RemoveDialogHandler();
+
+        // PDF
+        Task<byte[]> ExportPdfAsync(string filePath = null, bool landscape = false, bool printBackground = true, string format = "A4", decimal scale = 1);
     }
 }

@@ -8,6 +8,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
 # Build results
+[Oo]utput/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -53,3 +54,4 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 .fake
+.claude

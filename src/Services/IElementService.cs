@@ -27,5 +27,14 @@ namespace Pup.Services
         Task<string> GetElementSelectorAsync(bool unique = false, bool shortest = false, bool fullPath = false);
         Task<string> GetSimilarElementsSelectorAsync(bool sameTag = false, bool sameClass = false);
         Task<int> CountElementsBySelectorAsync(string selector);
+
+        // Select/dropdown operations
+        Task<string[]> SelectOptionByValueAsync(params string[] values);
+        Task<string[]> SelectOptionByTextAsync(params string[] texts);
+        Task<string[]> SelectOptionByIndexAsync(params int[] indices);
+        Task<List<PupSelectOption>> GetSelectOptionsAsync();
+
+        // Screenshot
+        Task<byte[]> GetScreenshotAsync(string filePath = null);
     }
 }
