@@ -8,6 +8,41 @@ using System.Threading.Tasks;
 
 namespace Pup.Services
 {
+    public interface IElementService
+    {
+        Task ClickElementAsync();
+        Task SetElementTextAsync(string text);
+        Task SetElementValueAsync(string value);
+        
+        Task<string> GetElementAttributeAsync(string attributeName);
+        Task<string> GetElementTextAsync();
+        Task<object> GetElementValueAsync();
+        
+        Task HoverElementAsync();
+        Task FocusElementAsync();
+        Task<bool> IsElementVisibleAsync();
+        Task<bool> IsElementEnabledAsync();
+        Task SetElementFormValueAsync(object value, bool triggerChange = true);
+        
+        Task<PupElement> FindElementBySelectorAsync(string selector);
+        Task<List<PupElement>> FindElementsBySelectorAsync(string selector);
+        Task<PupElement> FindElementByXPathAsync(string xpath);
+        Task<List<PupElement>> FindElementsByXPathAsync(string xpath);
+        
+        Task<string> GetElementSelectorAsync(bool unique = false, bool shortest = false, bool fullPath = false);
+        Task<string> GetSimilarElementsSelectorAsync(bool sameTag = false, bool sameClass = false);
+        Task<int> CountElementsBySelectorAsync(string selector);
+
+        // Select/dropdown operations
+        Task<string[]> SelectOptionByValueAsync(params string[] values);
+        Task<string[]> SelectOptionByTextAsync(params string[] texts);
+        Task<string[]> SelectOptionByIndexAsync(params int[] indices);
+        Task<List<PupSelectOption>> GetSelectOptionsAsync();
+
+        // Screenshot
+        Task<byte[]> GetScreenshotAsync(string filePath = null);
+    }
+
     public class ElementService : IElementService
     {
 
@@ -34,6 +69,46 @@ namespace Pup.Services
             await _element.Element.EvaluateFunctionAsync("(el, val) => el.value = val", value).ConfigureAwait(false);
         }
 
+        public async Task SetElementFormValueAsync(object value, bool triggerChange = true)
+        {
+            await _element.Element.EvaluateFunctionAsync(@"(el, val, fire) => {
+                const dispatch = (type) => el.dispatchEvent(new Event(type, { bubbles: true }));
+                const tag = (el.tagName || '').toLowerCase();
+                const type = (el.type || '').toLowerCase();
+
+                const fireEvents = () => { if (fire) { dispatch('input'); dispatch('change'); } };
+
+                if (tag === 'input' && (type === 'checkbox' || type === 'radio')) {
+                    const desired = !!val;
+                    if (el.checked !== desired) {
+                        el.checked = desired;
+                        fireEvents();
+                    }
+                    return;
+                }
+
+                if (tag === 'select') {
+                    const values = Array.isArray(val) ? val.map(v => v != null ? String(v) : '') : [val != null ? String(val) : ''];
+                    let changed = false;
+                    for (const option of el.options) {
+                        const shouldSelect = values.includes(option.value) || values.includes(option.text);
+                        if (option.selected !== shouldSelect) {
+                            option.selected = shouldSelect;
+                            changed = true;
+                        }
+                    }
+                    if (changed) fireEvents();
+                    return;
+                }
+
+                const newValue = val == null ? '' : String(val);
+                if (el.value !== newValue) {
+                    el.value = newValue;
+                    fireEvents();
+                }
+            }", value, triggerChange).ConfigureAwait(false);
+        }
+
         public async Task<string> GetElementAttributeAsync(string attributeName)
         {
             return await _element.Element.EvaluateFunctionAsync<string>("(el, attr) => el.getAttribute(attr)", attributeName).ConfigureAwait(false);
@@ -44,9 +119,44 @@ namespace Pup.Services
             return await _element.Element.EvaluateFunctionAsync<string>("el => el.textContent").ConfigureAwait(false);
         }
 
-        public async Task<string> GetElementValueAsync()
+        public async Task<object> GetElementValueAsync()
         {
-            return await _element.Element.EvaluateFunctionAsync<string>("el => el.value").ConfigureAwait(false);
+            var result = await _element.Element.EvaluateFunctionAsync<JsonElement>(@"
+                (el) => {
+                    const tag = (el.tagName || '').toLowerCase();
+                    const type = (el.type || '').toLowerCase();
+
+                    if (tag === 'input' && (type === 'checkbox' || type === 'radio')) {
+                        return { kind: 'bool', value: el.checked };
+                    }
+
+                    if (tag === 'select' && el.multiple) {
+                        return { kind: 'array', value: Array.from(el.selectedOptions).map(o => o.value) };
+                    }
+
+                    return { kind: 'string', value: el.value };
+                }
+            ").ConfigureAwait(false);
+
+            if (!result.TryGetProperty("kind", out var kindProp) || !result.TryGetProperty("value", out var valueProp))
+            {
+                return null;
+            }
+
+            switch (kindProp.GetString())
+            {
+                case "bool":
+                    return valueProp.GetBoolean();
+                case "array":
+                    var values = new List<string>();
+                    foreach (var item in valueProp.EnumerateArray())
+                    {
+                        values.Add(item.GetString() ?? string.Empty);
+                    }
+                    return values.ToArray();
+                default:
+                    return valueProp.GetString();
+            }
         }
 
         public async Task HoverElementAsync()

@@ -10,6 +10,16 @@ using Pup.Common;
 namespace Pup.Services
 {
 
+    public interface ISupportedBrowserService
+    {
+        void Cleanup();
+        PupBrowser DownloadBrowser(PupSupportedBrowser browserType);
+        PupBrowser GetBrowser(PupSupportedBrowser browserType);
+        List<PupBrowser> GetBrowsers();
+        bool IsBrowserTypeInstalled(PupSupportedBrowser browserType);
+        PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height);
+    }
+
     public class SupportedBrowserService : ISupportedBrowserService
     {
         protected readonly SessionStateService<PupBrowser> _sessionStateService;
@@ -139,9 +149,15 @@ namespace Pup.Services
             var browser = Puppeteer.LaunchAsync(launchOptions).GetAwaiter().GetResult();
 
             //default page close
-            var defaultPage = browser.PagesAsync().GetAwaiter().GetResult().FirstOrDefault();
-            if (defaultPage != null && defaultPage.Url == "about:blank")
+            var pages = browser.PagesAsync().GetAwaiter().GetResult();
+            var defaultPage = pages.FirstOrDefault();
+
+            // Closing the only page in a headful browser will close the window/process.
+            // Only close the default about:blank tab when running headless or when other pages exist.
+            if (defaultPage != null && defaultPage.Url == "about:blank" && (headless || pages.Length > 1))
+            {
                 defaultPage.CloseAsync().GetAwaiter().GetResult();
+            }
 
             var pbrowser = new PupBrowser(
                 browser,

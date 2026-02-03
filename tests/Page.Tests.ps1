@@ -139,6 +139,62 @@ Describe "Page Cookies" {
         $cookies = Get-PupPageCookie -Page $script:page -Name "test"
         $cookies.Value | Should -Be "value123"
     }
+
+    It "Removes cookie" {
+        Set-PupPageCookie -Page $script:page -Name "toremove" -Value "value456" -Domain "example.com"
+        Get-PupPageCookie -Page $script:page -Name "toremove" | Should -Not -BeNullOrEmpty
+
+        Remove-PupPageCookie -Page $script:page -Name "toremove" -Domain "example.com"
+
+        $after = Get-PupPageCookie -Page $script:page -Name "toremove"
+        $after | Should -BeNullOrEmpty
+    }
+
+    It "Removes cookies by wildcard and domain" {
+        Set-PupPageCookie -Page $script:page -Name "session1" -Value "abc" -Domain "example.com"
+        Set-PupPageCookie -Page $script:page -Name "session2" -Value "def" -Domain "example.com"
+        Set-PupPageCookie -Page $script:page -Name "other" -Value "ghi" -Domain "example.com"
+
+        Remove-PupPageCookie -Page $script:page -Name "session*" -Domain "example.com"
+
+        (Get-PupPageCookie -Page $script:page -Name "session*").Count | Should -Be 0
+        (Get-PupPageCookie -Page $script:page -Name "other").Count | Should -Be 1
+    }
+}
+
+Describe "Page Storage" {
+    BeforeAll {
+        $script:page = New-PupPage -Browser $script:browser -Url $script:testUrl -WaitForLoad
+    }
+
+    AfterAll {
+        if ($script:page.Running) { Remove-PupPage -Page $script:page }
+    }
+
+    BeforeEach {
+        Invoke-PupPageReload -Page $script:page -WaitForLoad
+        Clear-PupPageStorage -Page $script:page -Type Local
+        Clear-PupPageStorage -Page $script:page -Type Session
+    }
+
+    It "Sets and gets local storage entry" {
+        Set-PupPageStorage -Page $script:page -Type Local -Key "foo" -Value "bar"
+        $entry = Get-PupPageStorage -Page $script:page -Type Local -Key "foo"
+        $entry.Value | Should -Be "bar"
+    }
+
+    It "Clears single local storage entry" {
+        Set-PupPageStorage -Page $script:page -Type Local -Key "foo" -Value "bar"
+        Clear-PupPageStorage -Page $script:page -Type Local -Key "foo"
+        Get-PupPageStorage -Page $script:page -Type Local -Key "foo" | Should -BeNullOrEmpty
+    }
+
+    It "Sets multiple session storage entries" {
+        Set-PupPageStorage -Page $script:page -Type Session -Items @{ a = "1"; b = "2" }
+        $all = Get-PupPageStorage -Page $script:page -Type Session
+        ($all | Where-Object { $_.Key -eq "a" }).Value | Should -Be "1"
+        ($all | Where-Object { $_.Key -eq "b" }).Value | Should -Be "2"
+    }
 }
 
 Describe "Page Keyboard" {

@@ -9,6 +9,15 @@
     <form id="form">
         <input type="text" id="username" placeholder="Username">
         <input type="password" id="password">
+        <input type="checkbox" id="subscribe" checked>
+
+        <div id="plans">
+            <input type="radio" id="plan-free" name="plan" value="free" checked>
+            <input type="radio" id="plan-pro" name="plan" value="pro">
+        </div>
+
+        <button type="button" id="delayed-btn" disabled>Delayed</button>
+        <button type="button" id="toggle-btn">Toggle</button>
 
         <select id="country">
             <option value="">Select</option>
@@ -22,6 +31,9 @@
             <option value="green">Green</option>
             <option value="blue">Blue</option>
         </select>
+
+        <div id="status"></div>
+        <div id="attr-target" data-state="idle"></div>
 
         <button type="button" id="btn-alert" onclick="alert('Hello!')">Alert</button>
         <button type="button" id="btn-confirm" onclick="confirm('Sure?')">Confirm</button>

@@ -114,7 +114,50 @@ Describe "Element Interaction" {
     }
 }
 
+Describe "Element Value Helpers" {
+    BeforeEach {
+        Invoke-PupPageReload -Page $script:page -WaitForLoad
+    }
+
+    It "Gets value from input" {
+        $el = Find-PupElements -Page $script:page -Selector "#username" -First
+        Set-PupElementValue -Element $el -Value "quick"
+        Get-PupElementValue -Element $el | Should -Be "quick"
+    }
+
+    It "Sets checkbox checked/unchecked" {
+        $el = Find-PupElements -Page $script:page -Selector "#subscribe" -First
+        Set-PupElementValue -Element $el -Uncheck
+        Get-PupElementValue -Element $el | Should -BeFalse
+
+        Set-PupElementValue -Element $el -Check
+        Get-PupElementValue -Element $el | Should -BeTrue
+    }
+
+    It "Sets multi-select values" {
+        $el = Find-PupElements -Page $script:page -Selector "#colors" -First
+        Set-PupElementValue -Element $el -Values "red","blue"
+        $vals = Get-PupElementValue -Element $el
+        $vals | Should -Contain "red"
+        $vals | Should -Contain "blue"
+    }
+
+    It "Switches radio option" {
+        $pro = Find-PupElements -Page $script:page -Selector "#plan-pro" -First
+        $free = Find-PupElements -Page $script:page -Selector "#plan-free" -First
+
+        Set-PupElementValue -Element $pro -Check
+
+        Get-PupElementValue -Element $pro | Should -BeTrue
+        Get-PupElementValue -Element $free | Should -BeFalse
+    }
+}
+
 Describe "Wait Element" {
+    BeforeEach {
+        Invoke-PupPageReload -Page $script:page -WaitForLoad
+    }
+
     It "Waits for existing element" {
         { Wait-PupElement -Page $script:page -Selector "#title" -Timeout 5000 } | Should -Not -Throw
     }
@@ -122,6 +165,32 @@ Describe "Wait Element" {
     It "Returns element with PassThru" {
         $el = Wait-PupElement -Page $script:page -Selector "#title" -PassThru
         $el | Should -Not -BeNullOrEmpty
+    }
+
+    It "Waits for element to become visible" {
+        Invoke-PupPageScript -Page $script:page -Script "() => { document.getElementById('status').style.display='none'; setTimeout(function(){ document.getElementById('status').style.display='block';}, 100); }" -AsVoid
+        { Wait-PupElement -Page $script:page -Selector "#status" -Visible -Timeout 2000 -PollingInterval 50 } | Should -Not -Throw
+    }
+
+    It "Waits for element to become enabled" {
+        Invoke-PupPageScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('delayed-btn').disabled=false;}, 100); }" -AsVoid
+        { Wait-PupElement -Page $script:page -Selector "#delayed-btn" -Enabled -Timeout 2000 -PollingInterval 50 } | Should -Not -Throw
+    }
+
+    It "Waits for element to become disabled" {
+        Invoke-PupPageScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('toggle-btn').disabled=true;}, 100); }" -AsVoid
+        { Wait-PupElement -Page $script:page -Selector "#toggle-btn" -Disabled -Timeout 2000 -PollingInterval 50 } | Should -Not -Throw
+    }
+
+    It "Waits for text to appear" {
+        Invoke-PupPageScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('status').innerText='ready';}, 100); }" -AsVoid
+        $el = Wait-PupElement -Page $script:page -Selector "#status" -TextContains "ready" -Timeout 2000 -PollingInterval 50 -PassThru
+        $el | Should -Not -BeNullOrEmpty
+    }
+
+    It "Waits for attribute value" {
+        Invoke-PupPageScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('attr-target').setAttribute('data-state','ready');}, 100); }" -AsVoid
+        { Wait-PupElement -Page $script:page -Selector "#attr-target" -AttributeName "data-state" -AttributeValue "ready" -Timeout 2000 -PollingInterval 50 } | Should -Not -Throw
     }
 }
 

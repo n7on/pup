@@ -1,5 +1,6 @@
 using System;
 using PuppeteerSharp;
+using System.Management.Automation;
 
 namespace Pup.Transport
 {
@@ -9,17 +10,19 @@ namespace Pup.Transport
     public class PupElement
     {
         public string ElementId { get; set; }
-        public IElementHandle Element { get; set; }
-        public IPage Page { get; set; }
+        [Hidden]
+        public IElementHandle Element { get; }
+        [Hidden]
+        public IPage Page { get; }
         public string Selector { get; set; }
         public int Index { get; set; }
         public DateTime FoundTime { get; set; }
 
-        private string _tagName;
-        private string _innerText;
-        private string _innerHTML;
-        private string _id;
-        private bool? _isVisible;
+        private readonly string _tagName;
+        private readonly string _innerText;
+        private readonly string _innerHTML;
+        private readonly string _id;
+        private readonly bool? _isVisible;
         public PupElement(
             IElementHandle element,
             IPage page,

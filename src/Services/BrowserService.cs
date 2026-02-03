@@ -10,6 +10,13 @@ using System.Threading.Tasks;
 
 namespace Pup.Services
 {
+    public interface IBrowserService
+    {
+        Task<PupPage> CreatePageAsync(string name, int width, int height, string url, bool waitForLoad);
+        Task<List<PupPage>> GetPagesAsync();
+        bool RemoveBrowser();
+        bool StopBrowser();
+    }
 
     public class BrowserService : SupportedBrowserService, IBrowserService
     {

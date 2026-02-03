@@ -3,6 +3,15 @@ using System.Management.Automation;
 
 namespace Pup.Services
 {
+    public interface ISessionStateService<T>
+    {
+        void Save(string name, T value);
+        T Get(string name);
+        List<T> GetAll();
+        bool Remove(string name);
+        void Clear();
+    }
+
     public class SessionStateService<T> : ISessionStateService<T>
     {
         private readonly SessionState _sessionState;

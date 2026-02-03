@@ -3,6 +3,7 @@ using System.Management.Automation;
 using Pup.Transport;
 using Pup.Common;
 using Pup.Completers;
+using Pup.Services;
 
 namespace Pup.Commands.Base
 {

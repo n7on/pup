@@ -12,6 +12,57 @@ using System.Threading.Tasks;
 namespace Pup.Services
 {
 
+    public interface IPageService
+    {
+        Task RemovePageAsync();
+
+        Task<PupElement> FindElementBySelectorAsync(string selector, bool waitForLoad, int timeout);
+        Task<List<PupElement>> FindElementsBySelectorAsync(string selector, bool waitForLoad, int timeout);
+        Task<PupElement> FindElementByXPathAsync(string xpath, bool waitForLoad, int timeout);
+        Task<List<PupElement>> FindElementsByXPathAsync(string xpath, bool waitForLoad, int timeout);
+        Task ClickElementBySelectorAsync(string selector);
+        Task ClickElementByCoordinatesAsync(double x, double y);
+        Task FocusElementBySelectorAsync(string selector);
+        
+        Task HoverElementBySelectorAsync(string selector);
+        
+        Task WaitForElementAsync(string selector, int timeout);
+        Task WaitForElementToBeVisibleAsync(string selector, int timeout);
+        Task WaitForElementToBeHiddenAsync(string selector, int timeout);
+        Task WaitForElementConditionAsync(string selector, string condition, string textArg, string attributeName, string attributeValue, int timeout, int pollingInterval);
+        Task<PupPage> NavigatePageAsync(string url, bool waitForLoad);
+
+        Task<byte[]> GetPageScreenshotAsync(string filePath = null, bool fullPage = false);
+
+        Task<T> ExecuteScriptAsync<T>(string script, params object[] args);
+        Task ExecuteScriptAsync(string script, params object[] args);
+
+        Task<List<PupCookie>> GetCookiesAsync();
+        Task DeleteCookiesAsync(PupCookie[] cookies);
+        Task SetCookiesAsync(PupCookie[] cookies);
+
+        Task<PupPage> NavigateBackAsync(bool waitForLoad);
+        Task<PupPage> NavigateForwardAsync(bool waitForLoad);
+        Task<PupPage> ReloadPageAsync(bool waitForLoad);
+
+        // Keyboard
+        Task SendKeyAsync(string key, string[] modifiers = null);
+        Task SendKeysAsync(string text);
+
+        // Dialog handling
+        void SetDialogHandler(PupDialogAction action, string promptText = null);
+        void RemoveDialogHandler();
+
+        // PDF
+        Task<byte[]> ExportPdfAsync(string filePath = null, bool landscape = false, bool printBackground = true, string format = "A4", decimal scale = 1);
+
+        // Storage
+        Task<Dictionary<string, string>> GetStorageAsync(string type);
+        Task SetStorageAsync(string type, Dictionary<string, string> items);
+        Task ClearStorageAsync(string type, string key = null);
+    }
+
+
     public class PageService : IPageService
     {
 
@@ -187,6 +238,41 @@ namespace Pup.Services
                 Timeout = timeout,
                 Hidden = true 
             }).ConfigureAwait(false);
+        }
+
+        public async Task WaitForElementConditionAsync(string selector, string condition, string textArg, string attributeName, string attributeValue, int timeout = 30000, int pollingInterval = 200)
+        {
+            string script = @"(selector, condition, textArg, attrName, attrValue) => {
+                const el = document.querySelector(selector);
+                const isVisible = (node) => !!(node && (node.offsetWidth || node.offsetHeight || node.getClientRects().length));
+
+                if (condition === 'hidden') {
+                    return !el || !isVisible(el);
+                }
+
+                if (!el) return false;
+
+                switch (condition) {
+                    case 'visible':
+                        return isVisible(el);
+                    case 'enabled':
+                        return !el.disabled;
+                    case 'disabled':
+                        return !!el.disabled;
+                    case 'textContains':
+                        return (el.innerText || '').toLowerCase().includes((textArg || '').toLowerCase());
+                    case 'attributeEquals':
+                        return (el.getAttribute(attrName) || '') === (attrValue || '');
+                    default:
+                        return false;
+                }
+            }";
+
+            await _page.Page.WaitForFunctionAsync(script, new WaitForFunctionOptions
+            {
+                Timeout = timeout,
+                PollingInterval = pollingInterval
+            }, selector, condition, textArg, attributeName, attributeValue).ConfigureAwait(false);
         }
         public async Task<PupPage> NavigatePageAsync(string url, bool waitForLoad)
         {
@@ -377,6 +463,41 @@ namespace Pup.Services
         public async Task SendKeysAsync(string text)
         {
             await _page.Page.Keyboard.TypeAsync(text).ConfigureAwait(false);
+        }
+
+        public async Task<Dictionary<string, string>> GetStorageAsync(string type)
+        {
+            return await _page.Page.EvaluateFunctionAsync<Dictionary<string, string>>(@"(storageType) => {
+                const storage = storageType === 'session' ? window.sessionStorage : window.localStorage;
+                const result = {};
+                for (let i = 0; i < storage.length; i++) {
+                    const key = storage.key(i);
+                    result[key] = storage.getItem(key);
+                }
+                return result;
+            }", type?.ToLowerInvariant() == "session" ? "session" : "local").ConfigureAwait(false);
+        }
+
+        public async Task SetStorageAsync(string type, Dictionary<string, string> items)
+        {
+            await _page.Page.EvaluateFunctionAsync(@"(storageType, items) => {
+                const storage = storageType === 'session' ? window.sessionStorage : window.localStorage;
+                Object.keys(items || {}).forEach(k => {
+                    storage.setItem(k, items[k] ?? '');
+                });
+            }", type?.ToLowerInvariant() == "session" ? "session" : "local", items ?? new Dictionary<string, string>()).ConfigureAwait(false);
+        }
+
+        public async Task ClearStorageAsync(string type, string key = null)
+        {
+            await _page.Page.EvaluateFunctionAsync(@"(storageType, key) => {
+                const storage = storageType === 'session' ? window.sessionStorage : window.localStorage;
+                if (key) {
+                    storage.removeItem(key);
+                } else {
+                    storage.clear();
+                }
+            }", type?.ToLowerInvariant() == "session" ? "session" : "local", key).ConfigureAwait(false);
         }
 
         public void SetDialogHandler(PupDialogAction action, string promptText = null)
