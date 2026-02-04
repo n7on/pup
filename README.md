@@ -1,6 +1,8 @@
 # Pup
 Pup is a native PowerShell module made for browser automation. It's build upon PuppeteerSharp, which is a Dotnet library using DevTools API in order to automate the browser. It targets the netstandard 2.0, so it's fully supported on all powershell versions. 
-
+```powershell
+Install-Module Pup
+```
 # Examples
 This example scrape Ubunty security notices. And return the date and link to security issues.
 
