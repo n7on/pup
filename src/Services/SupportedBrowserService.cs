@@ -17,7 +17,7 @@ namespace Pup.Services
         PupBrowser GetBrowser(PupSupportedBrowser browserType);
         List<PupBrowser> GetBrowsers();
         bool IsBrowserTypeInstalled(PupSupportedBrowser browserType);
-        PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height);
+        PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height, string proxy = null, string[] arguments = null);
     }
 
     public class SupportedBrowserService : ISupportedBrowserService
@@ -116,10 +116,22 @@ namespace Pup.Services
             return GetBrowser(browserType);
         }
 
-        public PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height)
+        public PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height, string proxy = null, string[] arguments = null)
         {
             var path = GetBrowserTypeInstallPath(browserType);
             var browserTypeName = browserType.ToString();
+
+            // Build browser arguments
+            var args = new List<string>();
+            if (!string.IsNullOrEmpty(proxy))
+            {
+                args.Add($"--proxy-server={proxy}");
+            }
+            if (arguments != null)
+            {
+                args.AddRange(arguments);
+            }
+
             var launchOptions = new LaunchOptions
             {
                 Headless = headless,
@@ -127,7 +139,8 @@ namespace Pup.Services
                 {
                     Width = width,
                     Height = height
-                }
+                },
+                Args = args.ToArray()
             };
 
             // Set the executable path using BrowserFetcher
@@ -143,7 +156,19 @@ namespace Pup.Services
                 throw new InvalidOperationException($"No browser installations found in {path}");
             }
 
-            var browserInfo = installedBrowsers[0]; // Use the first (and should be only) installation
+            // Select the correct browser: ChromeHeadlessShell for headless, Chrome for headful
+            var targetBrowser = headless ? SupportedBrowser.ChromeHeadlessShell : SupportedBrowser.Chrome;
+            var browserInfo = installedBrowsers.FirstOrDefault(b => b.Browser == targetBrowser)
+                ?? installedBrowsers[0];
+
+            // Error if user wants GUI but only headless shell is available
+            if (!headless && browserInfo.Browser == SupportedBrowser.ChromeHeadlessShell)
+            {
+                throw new InvalidOperationException(
+                    "Cannot run in GUI mode: only ChromeHeadlessShell is installed. " +
+                    "Run Install-PupBrowser to install the full browser, or use -Headless.");
+            }
+
             launchOptions.ExecutablePath = browserInfo.GetExecutablePath();
 
             var browser = Puppeteer.LaunchAsync(launchOptions).GetAwaiter().GetResult();

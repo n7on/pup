@@ -22,6 +22,9 @@ namespace Pup.Commands.Browser
         [Parameter(HelpMessage = "Additional arguments to pass to the browser")]
         public string[] Arguments { get; set; }
 
+        [Parameter(HelpMessage = "Proxy server URL (e.g., 127.0.0.1:8080 for Burp Suite)")]
+        public string Proxy { get; set; }
+
         [Parameter(HelpMessage = "Window width (default: 1280)")]
         public int Width { get; set; } = 1280;
 
@@ -58,7 +61,9 @@ namespace Pup.Commands.Browser
                     BrowserType.ToPBSupportedBrowser(),
                     Headless.IsPresent,
                     Width,
-                    Height
+                    Height,
+                    Proxy,
+                    Arguments
                 );
                 WriteObject(browser);
             }
