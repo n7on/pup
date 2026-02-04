@@ -7,14 +7,10 @@ Install-Module Pup
 This example scrape Ubunty security notices. And return the date and link to security issues.
 
 ```powershell
-[CmdletBinding()]
-param(
-    [datetime]$FromDate = (Get-Date).AddMonths(-1)
-)
-
 Import-Module Pup
 Install-PupBrowser
 
+$FromDate = (Get-Date).AddMonths(-1)
 $Browser = Start-PupBrowser -Headless
 $Page = New-PupPage -Url "https://ubuntu.com/security/notices" 
 
