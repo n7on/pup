@@ -7,6 +7,7 @@ using System.Management.Automation;
 using System.Collections.Generic;
 using Pup.Common;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Pup.Services
 {
@@ -35,7 +36,9 @@ namespace Pup.Services
             foreach (var page in pages)
             {
                 var title = await page.GetTitleAsync().ConfigureAwait(false);
-                pupPages.Add(new PupPage(page, title));
+                var pupPage = new PupPage(page, title);
+                await InitializePageCaptureAsync(pupPage).ConfigureAwait(false);
+                pupPages.Add(pupPage);
             }
 
             return pupPages;
@@ -47,6 +50,7 @@ namespace Pup.Services
             string pageName = string.IsNullOrEmpty(name) ? $"Page{pages.Length + 1}" : name;
 
             var page = await _browser.Browser.NewPageAsync().ConfigureAwait(false);
+            var pupPage = new PupPage(page, string.Empty);
 
             // Set viewport size
             await page.SetViewportAsync(new ViewPortOptions
@@ -54,6 +58,8 @@ namespace Pup.Services
                 Width = width,
                 Height = height
             }).ConfigureAwait(false);
+
+            await InitializePageCaptureAsync(pupPage).ConfigureAwait(false);
 
             // Navigate to URL if specified
             if (!string.IsNullOrEmpty(url) && url != "about:blank")
@@ -72,7 +78,9 @@ namespace Pup.Services
             }
 
             var title = await page.GetTitleAsync().ConfigureAwait(false);
-            return new PupPage(page, title);
+            pupPage.Title = title;
+            pupPage.Url = page.Url;
+            return pupPage;
         }
 
         public bool RemoveBrowser()
@@ -98,6 +106,161 @@ namespace Pup.Services
             _sessionStateService.Remove(_browser.BrowserType.ToString());
 
             return true;
+        }
+
+        private async Task InitializePageCaptureAsync(PupPage pupPage)
+        {
+            if (pupPage == null || pupPage.CaptureInitialized)
+            {
+                return;
+            }
+
+            // Console capture
+            pupPage.Page.Console += (sender, e) =>
+            {
+                try
+                {
+                    var entry = new PupConsoleEntry
+                    {
+                        Type = e.Message.Type.ToString(),
+                        Text = e.Message.Text,
+                        Url = e.Message.Location?.URL,
+                        LineNumber = e.Message.Location?.LineNumber,
+                        ColumnNumber = e.Message.Location?.ColumnNumber,
+                        Timestamp = DateTime.UtcNow
+                    };
+
+                    lock (pupPage.ConsoleLock)
+                    {
+                        pupPage.ConsoleEntries.Add(entry);
+                    }
+                }
+                catch
+                {
+                    // ignore console parsing issues
+                }
+            };
+
+            // Network capture via CDP
+            try
+            {
+                var session = await pupPage.Page.CreateCDPSessionAsync().ConfigureAwait(false);
+                pupPage.NetworkSession = session;
+                session.MessageReceived += (sender, e) =>
+                {
+                    try
+                    {
+                        switch (e.MessageID)
+                        {
+                            case "Network.requestWillBeSent":
+                                HandleRequestWillBeSent(pupPage, e.MessageData);
+                                break;
+                            case "Network.responseReceived":
+                                HandleResponseReceived(pupPage, e.MessageData);
+                                break;
+                            case "Network.loadingFinished":
+                                HandleLoadingFinished(pupPage, e.MessageData);
+                                break;
+                            case "Network.loadingFailed":
+                                HandleLoadingFailed(pupPage, e.MessageData);
+                                break;
+                        }
+                    }
+                    catch
+                    {
+                        // swallow event parsing errors
+                    }
+                };
+                await session.SendAsync("Network.enable").ConfigureAwait(false);
+            }
+            catch
+            {
+                // ignore network capture init failures
+            }
+
+            pupPage.CaptureInitialized = true;
+        }
+
+        private static void HandleRequestWillBeSent(PupPage pupPage, JsonElement data)
+        {
+            var requestId = data.GetProperty("requestId").GetString();
+            var request = data.GetProperty("request");
+            var entry = new PupNetworkEntry
+            {
+                RequestId = requestId,
+                Url = request.GetProperty("url").GetString(),
+                Method = request.GetProperty("method").GetString(),
+                ResourceType = data.TryGetProperty("type", out var t) ? t.GetString() : null,
+                StartTime = DateTime.UtcNow,
+                RequestHeaders = ToHeaderDictionary(request.GetProperty("headers"))
+            };
+
+            lock (pupPage.NetworkLock)
+            {
+                pupPage.NetworkMap[requestId] = entry;
+                pupPage.NetworkEntries.Add(entry);
+            }
+        }
+
+        private static void HandleResponseReceived(PupPage pupPage, JsonElement data)
+        {
+            var requestId = data.GetProperty("requestId").GetString();
+            var response = data.GetProperty("response");
+
+            lock (pupPage.NetworkLock)
+            {
+                if (!pupPage.NetworkMap.TryGetValue(requestId, out var entry))
+                {
+                    entry = new PupNetworkEntry { RequestId = requestId, StartTime = DateTime.UtcNow };
+                    pupPage.NetworkMap[requestId] = entry;
+                    pupPage.NetworkEntries.Add(entry);
+                }
+
+                entry.Status = (int)response.GetProperty("status").GetDouble();
+                entry.StatusText = response.GetProperty("statusText").GetString();
+                entry.MimeType = response.TryGetProperty("mimeType", out var mt) ? mt.GetString() : null;
+                entry.ResponseHeaders = ToHeaderDictionary(response.GetProperty("headers"));
+                entry.FromDiskCache = response.TryGetProperty("fromDiskCache", out var fdc) && fdc.GetBoolean();
+                entry.FromServiceWorker = response.TryGetProperty("fromServiceWorker", out var fsw) && fsw.GetBoolean();
+                entry.RemoteAddress = response.TryGetProperty("remoteIPAddress", out var ip) ? ip.GetString() : null;
+            }
+        }
+
+        private static void HandleLoadingFinished(PupPage pupPage, JsonElement data)
+        {
+            var requestId = data.GetProperty("requestId").GetString();
+
+            lock (pupPage.NetworkLock)
+            {
+                if (pupPage.NetworkMap.TryGetValue(requestId, out var entry))
+                {
+                    entry.EncodedDataLength = data.TryGetProperty("encodedDataLength", out var len) ? len.GetInt64() : (long?)null;
+                    entry.EndTime = DateTime.UtcNow;
+                }
+            }
+        }
+
+        private static void HandleLoadingFailed(PupPage pupPage, JsonElement data)
+        {
+            var requestId = data.GetProperty("requestId").GetString();
+            lock (pupPage.NetworkLock)
+            {
+                if (pupPage.NetworkMap.TryGetValue(requestId, out var entry))
+                {
+                    entry.ErrorText = data.TryGetProperty("errorText", out var err) ? err.GetString() : null;
+                    entry.EndTime = DateTime.UtcNow;
+                }
+            }
+        }
+
+        private static Dictionary<string, string> ToHeaderDictionary(JsonElement headersElement)
+        {
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var prop in headersElement.EnumerateObject())
+            {
+                dict[prop.Name] = prop.Value.GetString();
+            }
+            return dict;
         }
     }
 }

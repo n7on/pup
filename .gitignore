@@ -55,3 +55,4 @@ TestResult.xml
 nunit-*.xml
 .fake
 .claude
+.env

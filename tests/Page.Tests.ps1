@@ -98,6 +98,12 @@ Describe "Page PDF Export" {
         Test-Path $path | Should -BeTrue
         Remove-Item $path
     }
+
+    It "Gets page source" {
+        $html = Get-PupPageSource -Page $script:page
+        $html | Should -BeLike "*Pup Test Page*"
+        $html | Should -Match 'id=["'']title["'']'
+    }
 }
 
 Describe "Page JavaScript" {
@@ -159,6 +165,43 @@ Describe "Page Cookies" {
 
         (Get-PupPageCookie -Page $script:page -Name "session*").Count | Should -Be 0
         (Get-PupPageCookie -Page $script:page -Name "other").Count | Should -Be 1
+    }
+}
+
+Describe "Network Capture" {
+    BeforeAll {
+        $script:netPage = New-PupPage -Browser $script:browser -Url $script:testUrl -WaitForLoad
+    }
+
+    AfterAll {
+        if ($script:netPage.Running) { Remove-PupPage -Page $script:netPage }
+    }
+
+    It "captures requests and saves to file" {
+        Invoke-PupPageReload -Page $script:netPage -WaitForLoad
+        $entries = Get-PupPageNetwork -Page $script:netPage
+
+        $entries.Count | Should -BeGreaterThan 0
+        ($entries | Where-Object { $_.Url -like "*test-page.html*" }).Count | Should -BeGreaterThan 0
+        ($entries | Where-Object { $_.Url -like "*network.js*" }).Count | Should -BeGreaterThan 0
+    }
+}
+
+Describe "Console Capture" {
+    BeforeAll {
+        $script:consolePage = New-PupPage -Browser $script:browser -Url $script:testUrl -WaitForLoad
+    }
+
+    AfterAll {
+        if ($script:consolePage.Running) { Remove-PupPage -Page $script:consolePage }
+    }
+
+    It "captures console output" {
+        Invoke-PupPageScript -Page $script:consolePage -Script "() => { console.log('hello'); console.error('boom'); }" -AsVoid
+        $logs = Get-PupPageConsole -Page $script:consolePage
+
+        $logs | Where-Object { $_.Type -eq "Log" -and $_.Text -like "*hello*" } | Should -Not -BeNullOrEmpty
+        $logs | Where-Object { $_.Type -eq "Error" -and $_.Text -like "*boom*" } | Should -Not -BeNullOrEmpty
     }
 }
 

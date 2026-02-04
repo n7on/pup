@@ -1,6 +1,6 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '1.0.0'
+    ModuleVersion = '0.1.0'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
@@ -22,7 +22,7 @@
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-Initial release of Pup v1.0.0
+Initial release of Pup v0.1.0
 
 Features:
 - Install and launch Chrome/Chromium browsers
