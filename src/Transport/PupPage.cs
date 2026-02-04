@@ -34,6 +34,13 @@ namespace Pup.Transport
         [Hidden]
         internal PuppeteerSharp.ICDPSession NetworkSession { get; set; }
 
+        [Hidden]
+        internal object WebSocketLock { get; } = new object();
+        [Hidden]
+        internal System.Collections.Generic.List<PupWebSocketEntry> WebSocketEntries { get; } = new System.Collections.Generic.List<PupWebSocketEntry>();
+        [Hidden]
+        internal System.Collections.Generic.Dictionary<string, PupWebSocketEntry> WebSocketMap { get; } = new System.Collections.Generic.Dictionary<string, PupWebSocketEntry>(System.StringComparer.OrdinalIgnoreCase);
+
         public PupPage(IPage page, string title)
         {
             Page = page;

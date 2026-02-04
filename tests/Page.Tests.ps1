@@ -285,3 +285,51 @@ Describe "Page Dialog Handler" {
         { $btn | Invoke-PupElementClick; Start-Sleep -Milliseconds 200 } | Should -Not -Throw
     }
 }
+
+Describe "Request Headers" {
+    BeforeAll {
+        $script:headerPage = New-PupPage -Browser $script:browser -Url $script:testUrl -WaitForLoad
+    }
+
+    AfterAll {
+        Set-PupHttpHeader -Page $script:headerPage -Clear
+        Remove-PupPage -Page $script:headerPage
+    }
+
+    It "Sets single header" {
+        { Set-PupHttpHeader -Page $script:headerPage -Name "X-Custom-Header" -Value "test-value" } | Should -Not -Throw
+    }
+
+    It "Sets multiple headers via hashtable" {
+        { Set-PupHttpHeader -Page $script:headerPage -Headers @{ "X-Header-One" = "value1"; "X-Header-Two" = "value2" } } | Should -Not -Throw
+    }
+
+    It "Clears headers" {
+        { Set-PupHttpHeader -Page $script:headerPage -Clear } | Should -Not -Throw
+    }
+}
+
+Describe "HTTP Authentication" {
+    BeforeAll {
+        $script:authPage = New-PupPage -Browser $script:browser -Url $script:testUrl -WaitForLoad
+    }
+
+    AfterAll {
+        Set-PupHttpAuth -Page $script:authPage -Clear
+        Remove-PupPage -Page $script:authPage
+    }
+
+    It "Sets authentication with username and password" {
+        { Set-PupHttpAuth -Page $script:authPage -Username "testuser" -Password "testpass" } | Should -Not -Throw
+    }
+
+    It "Sets authentication with PSCredential" {
+        $securePass = ConvertTo-SecureString "testpass" -AsPlainText -Force
+        $cred = New-Object PSCredential("testuser", $securePass)
+        { Set-PupHttpAuth -Page $script:authPage -Credential $cred } | Should -Not -Throw
+    }
+
+    It "Clears authentication" {
+        { Set-PupHttpAuth -Page $script:authPage -Clear } | Should -Not -Throw
+    }
+}

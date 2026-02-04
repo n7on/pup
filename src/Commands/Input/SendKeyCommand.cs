@@ -2,7 +2,7 @@ using System;
 using System.Management.Automation;
 using Pup.Transport;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Input
 {
     [Cmdlet(VerbsCommunications.Send, "PupKey")]
     [OutputType(typeof(void))]

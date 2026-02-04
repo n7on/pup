@@ -167,6 +167,18 @@ namespace Pup.Services
                             case "Network.loadingFailed":
                                 HandleLoadingFailed(pupPage, e.MessageData);
                                 break;
+                            case "Network.webSocketCreated":
+                                HandleWebSocketCreated(pupPage, e.MessageData);
+                                break;
+                            case "Network.webSocketFrameSent":
+                                HandleWebSocketFrameSent(pupPage, e.MessageData);
+                                break;
+                            case "Network.webSocketFrameReceived":
+                                HandleWebSocketFrameReceived(pupPage, e.MessageData);
+                                break;
+                            case "Network.webSocketClosed":
+                                HandleWebSocketClosed(pupPage, e.MessageData);
+                                break;
                         }
                     }
                     catch
@@ -266,6 +278,100 @@ namespace Pup.Services
             return dict;
         }
 
+        private static void HandleWebSocketCreated(PupPage pupPage, JsonElement data)
+        {
+            var requestId = data.GetProperty("requestId").GetString();
+            var url = data.TryGetProperty("url", out var urlProp) ? urlProp.GetString() : null;
+
+            var entry = new PupWebSocketEntry
+            {
+                RequestId = requestId,
+                Url = url,
+                State = "connecting",
+                CreatedTime = DateTime.UtcNow
+            };
+
+            lock (pupPage.WebSocketLock)
+            {
+                pupPage.WebSocketMap[requestId] = entry;
+                pupPage.WebSocketEntries.Add(entry);
+            }
+        }
+
+        private static void HandleWebSocketFrameSent(PupPage pupPage, JsonElement data)
+        {
+            var requestId = data.GetProperty("requestId").GetString();
+
+            lock (pupPage.WebSocketLock)
+            {
+                if (pupPage.WebSocketMap.TryGetValue(requestId, out var entry))
+                {
+                    // Mark as open once we see frames
+                    if (entry.State == "connecting")
+                    {
+                        entry.State = "open";
+                    }
+
+                    if (data.TryGetProperty("response", out var response))
+                    {
+                        var frame = new PupWebSocketFrame
+                        {
+                            Direction = "sent",
+                            Timestamp = DateTime.UtcNow,
+                            Opcode = response.TryGetProperty("opcode", out var op) ? op.GetInt32() : 1,
+                            PayloadData = response.TryGetProperty("payloadData", out var pd) ? pd.GetString() : null
+                        };
+                        frame.PayloadLength = frame.PayloadData?.Length ?? 0;
+                        entry.Frames.Add(frame);
+                    }
+                }
+            }
+        }
+
+        private static void HandleWebSocketFrameReceived(PupPage pupPage, JsonElement data)
+        {
+            var requestId = data.GetProperty("requestId").GetString();
+
+            lock (pupPage.WebSocketLock)
+            {
+                if (pupPage.WebSocketMap.TryGetValue(requestId, out var entry))
+                {
+                    // Mark as open once we see frames
+                    if (entry.State == "connecting")
+                    {
+                        entry.State = "open";
+                    }
+
+                    if (data.TryGetProperty("response", out var response))
+                    {
+                        var frame = new PupWebSocketFrame
+                        {
+                            Direction = "received",
+                            Timestamp = DateTime.UtcNow,
+                            Opcode = response.TryGetProperty("opcode", out var op) ? op.GetInt32() : 1,
+                            PayloadData = response.TryGetProperty("payloadData", out var pd) ? pd.GetString() : null
+                        };
+                        frame.PayloadLength = frame.PayloadData?.Length ?? 0;
+                        entry.Frames.Add(frame);
+                    }
+                }
+            }
+        }
+
+        private static void HandleWebSocketClosed(PupPage pupPage, JsonElement data)
+        {
+            var requestId = data.GetProperty("requestId").GetString();
+
+            lock (pupPage.WebSocketLock)
+            {
+                if (pupPage.WebSocketMap.TryGetValue(requestId, out var entry))
+                {
+                    entry.State = "closed";
+                    entry.ClosedTime = DateTime.UtcNow;
+                }
+            }
+        }
+
         private static async Task ApplyStealthModeAsync(IPage page)
         {
             // Stealth script to hide automation indicators
@@ -357,6 +463,25 @@ namespace Pup.Services
                     }
                     return originalToString.call(this);
                 };
+
+                // Track WebSocket instances for Send-PupWebSocketMessage
+                const OriginalWebSocket = window.WebSocket;
+                window.__pup_websockets = [];
+                window.WebSocket = function(url, protocols) {
+                    const ws = protocols ? new OriginalWebSocket(url, protocols) : new OriginalWebSocket(url);
+                    ws.__pup_url = url;
+                    window.__pup_websockets.push(ws);
+                    ws.addEventListener('close', () => {
+                        const idx = window.__pup_websockets.indexOf(ws);
+                        if (idx > -1) window.__pup_websockets.splice(idx, 1);
+                    });
+                    return ws;
+                };
+                window.WebSocket.prototype = OriginalWebSocket.prototype;
+                window.WebSocket.CONNECTING = OriginalWebSocket.CONNECTING;
+                window.WebSocket.OPEN = OriginalWebSocket.OPEN;
+                window.WebSocket.CLOSING = OriginalWebSocket.CLOSING;
+                window.WebSocket.CLOSED = OriginalWebSocket.CLOSED;
             ";
 
             // Apply to future navigations

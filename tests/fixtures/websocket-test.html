@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test Page</title>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="messages"></div>
+    <script>
+        const statusEl = document.getElementById('status');
+        const messagesEl = document.getElementById('messages');
+
+        // Connect to Postman echo server
+        const ws = new WebSocket('wss://ws.postman-echo.com/raw');
+
+        ws.onopen = () => {
+            statusEl.textContent = 'Connected';
+            // Send initial message
+            ws.send('hello from pup test');
+        };
+
+        ws.onmessage = (event) => {
+            const div = document.createElement('div');
+            div.textContent = 'Received: ' + event.data;
+            messagesEl.appendChild(div);
+        };
+
+        ws.onerror = (error) => {
+            statusEl.textContent = 'Error: ' + error.message;
+        };
+
+        ws.onclose = () => {
+            statusEl.textContent = 'Closed';
+        };
+    </script>
+</body>
+</html>

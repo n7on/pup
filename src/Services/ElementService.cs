@@ -41,6 +41,9 @@ namespace Pup.Services
 
         // Screenshot
         Task<byte[]> GetScreenshotAsync(string filePath = null);
+
+        // File upload
+        Task UploadFilesAsync(params string[] filePaths);
     }
 
     public class ElementService : IElementService
@@ -587,6 +590,11 @@ namespace Pup.Services
             }
 
             return await _element.Element.ScreenshotDataAsync(options).ConfigureAwait(false);
+        }
+
+        public async Task UploadFilesAsync(params string[] filePaths)
+        {
+            await _element.Element.UploadFileAsync(filePaths).ConfigureAwait(false);
         }
     }
 }

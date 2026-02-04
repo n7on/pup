@@ -3,7 +3,7 @@ using System.Management.Automation;
 using Pup.Common;
 using Pup.Transport;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Input
 {
     [Cmdlet(VerbsCommon.Set, "PupDialogHandler")]
     [OutputType(typeof(void))]

@@ -60,6 +60,13 @@ namespace Pup.Services
         Task<Dictionary<string, string>> GetStorageAsync(string type);
         Task SetStorageAsync(string type, Dictionary<string, string> items);
         Task ClearStorageAsync(string type, string key = null);
+
+        // Extra HTTP headers
+        Task SetExtraHeadersAsync(Dictionary<string, string> headers);
+
+        // HTTP Basic Authentication
+        Task SetAuthenticationAsync(string username, string password);
+        Task ClearAuthenticationAsync();
     }
 
 
@@ -559,6 +566,25 @@ namespace Pup.Services
             }
 
             return await _page.Page.PdfDataAsync(options).ConfigureAwait(false);
+        }
+
+        public async Task SetExtraHeadersAsync(Dictionary<string, string> headers)
+        {
+            await _page.Page.SetExtraHttpHeadersAsync(headers).ConfigureAwait(false);
+        }
+
+        public async Task SetAuthenticationAsync(string username, string password)
+        {
+            await _page.Page.AuthenticateAsync(new Credentials
+            {
+                Username = username,
+                Password = password
+            }).ConfigureAwait(false);
+        }
+
+        public async Task ClearAuthenticationAsync()
+        {
+            await _page.Page.AuthenticateAsync(null).ConfigureAwait(false);
         }
     }
 }

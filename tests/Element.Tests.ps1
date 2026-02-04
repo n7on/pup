@@ -201,34 +201,34 @@ Describe "Select Element" {
 
     It "Lists options" {
         $sel = Find-PupElements -Page $script:page -Selector "#country" -First
-        $opts = Select-PupOption -Element $sel -List
+        $opts = Select-PupElementOption -Element $sel -List
         $opts.Count | Should -Be 4
     }
 
     It "Selects by value" {
         $sel = Find-PupElements -Page $script:page -Selector "#country" -First
-        Select-PupOption -Element $sel -Value "uk"
+        Select-PupElementOption -Element $sel -Value "uk"
         $val = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('country').value" -AsString
         $val | Should -Be "uk"
     }
 
     It "Selects by text" {
         $sel = Find-PupElements -Page $script:page -Selector "#country" -First
-        Select-PupOption -Element $sel -Text "Canada"
+        Select-PupElementOption -Element $sel -Text "Canada"
         $val = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('country').value" -AsString
         $val | Should -Be "ca"
     }
 
     It "Selects by index" {
         $sel = Find-PupElements -Page $script:page -Selector "#country" -First
-        Select-PupOption -Element $sel -Index 1
+        Select-PupElementOption -Element $sel -Index 1
         $val = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('country').value" -AsString
         $val | Should -Be "us"
     }
 
     It "Multi-selects" {
         $sel = Find-PupElements -Page $script:page -Selector "#colors" -First
-        Select-PupOption -Element $sel -Value "red", "blue"
+        Select-PupElementOption -Element $sel -Value "red", "blue"
         $vals = Invoke-PupPageScript -Page $script:page -Script "() => Array.from(document.getElementById('colors').selectedOptions).map(o => o.value).join(',')" -AsString
         $vals | Should -BeLike "*red*"
         $vals | Should -BeLike "*blue*"

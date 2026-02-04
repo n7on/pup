@@ -2,32 +2,28 @@
 
 This document tracks missing functionality and enhancements.
 
-## Network & Performance
-- [ ] **Get-BrowserHar** - Export network log/filters  
-  - Params: `-IncludeBody`, `-MaxContentBytes`, `-Filter` (domain/type/status)  
-  - Export HAR/JSON for captured traffic
-- [ ] **Set-BrowserNetworkCondition** - Simulate network conditions  
-  - Params: `-Speed` (Fast3G, Slow3G, Offline), `-Latency`, `-Throughput`
+## Pentesting Features
 
-## Frames
-- [ ] **Get-BrowserFrame** / **Switch-BrowserFrame** - List and switch iframes
+- [x] **Stealth mode** - Hide `navigator.webdriver` and other bot detection signals
+  - Always enabled by default
+- [x] **File upload** - Set file input values for testing upload vulnerabilities
+  - `Send-PupFile -Element $el -FilePath "malicious.pdf"`
+- [x] **HTTP Basic Auth** - Handle auth dialogs automatically
+  - `Set-PupHttpAuth -Page $p -Username "admin" -Password "pass"`
+- [x] **Custom HTTP Headers** - Inject headers into all requests
+  - `Set-PupHttpHeader -Page $p -Name "X-Forwarded-For" -Value "127.0.0.1"`
+- [x] **WebSocket support** - Test WS-based APIs
+  - `Get-PupWebSocket` - List active WebSocket connections with frames
+  - `Send-PupWebSocketMessage` - Send messages through WebSocket
+- [ ] **iframe support** - Interact with elements inside iframes
+  - `Get-PupFrame` / `Switch-PupFrame` - List and switch iframes
+  - `Find-PupElements -Frame $frame -Selector "..."`
+- [ ] **Multi-tab/popup handling** - Handle OAuth popups, window.open() flows
+  - `Get-PupPage -All` - List all pages/tabs
+  - Event handler for new popups
 
 ## Auth & Permissions
-- [ ] **Set-BrowserAuthentication** - HTTP auth  
-  - Params: `-Username`, `-Password`, `-Type`
-- [ ] **Set-BrowserPermission** - Camera/mic/location/notifications toggles
-
-## Device Emulation
-- [ ] **Set-BrowserMobileEmulation** - Device profiles (width/height/user agent/touch)
-- [ ] **Set-BrowserThrottle** - Network throttling/offline switches
+- [ ] **Set-PupPermission** - Camera/mic/location/notifications toggles
 
 ## Session Portability
-- [ ] **Export/Import-BrowserSession** - Bundle cookies + storage to/from file
-
-## Quality of Life
-- [ ] **Use system-installed browser** - Allow `-ExecutablePath` to launch local Chrome/Chromium
-
-## CI/CD
-- [x] **GitHub Actions** - Automated build/test on PR/push
-- [ ] **Code coverage** - Track coverage metrics
-- [ ] **Test reporting** - Publish Pester results
+- [ ] **Export/Import-PupSession** - Bundle cookies + storage to/from file

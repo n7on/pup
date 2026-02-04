@@ -4,10 +4,10 @@ using Pup.Transport;
 
 namespace Pup.Commands.Element
 {
-    [Cmdlet(VerbsCommon.Select, "PupOption")]
+    [Cmdlet(VerbsCommon.Select, "PupElementOption")]
     [OutputType(typeof(string[]))]
     [OutputType(typeof(PupSelectOption[]))]
-    public class SelectOptionCommand : PSCmdlet
+    public class SelectElementOptionCommand : PSCmdlet
     {
         [Parameter(
             Position = 0,
