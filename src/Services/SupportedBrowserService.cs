@@ -17,13 +17,16 @@ namespace Pup.Services
         PupBrowser GetBrowser(PupSupportedBrowser browserType);
         List<PupBrowser> GetBrowsers();
         bool IsBrowserTypeInstalled(PupSupportedBrowser browserType);
-        PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height, string proxy = null, string[] arguments = null);
+        PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height, string proxy = null, string userAgent = null, string[] arguments = null);
     }
 
     public class SupportedBrowserService : ISupportedBrowserService
     {
         protected readonly SessionStateService<PupBrowser> _sessionStateService;
         private const string RunningBrowsersKey = "RunningBrowsers";
+
+        // Realistic Chrome user-agent to avoid bot detection
+        public const string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
         public SupportedBrowserService(SessionState sessionState)
         {
@@ -116,7 +119,7 @@ namespace Pup.Services
             return GetBrowser(browserType);
         }
 
-        public PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height, string proxy = null, string[] arguments = null)
+        public PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height, string proxy = null, string userAgent = null, string[] arguments = null)
         {
             var path = GetBrowserTypeInstallPath(browserType);
             var browserTypeName = browserType.ToString();
@@ -127,6 +130,16 @@ namespace Pup.Services
             {
                 args.Add($"--proxy-server={proxy}");
             }
+
+            // Use realistic UA by default, custom if specified, or "none" to use browser's native UA
+            var effectiveUserAgent = string.Equals(userAgent, "none", StringComparison.OrdinalIgnoreCase)
+                ? null
+                : (string.IsNullOrEmpty(userAgent) ? DefaultUserAgent : userAgent);
+            if (!string.IsNullOrEmpty(effectiveUserAgent))
+            {
+                args.Add($"--user-agent=\"{effectiveUserAgent}\"");
+            }
+
             if (arguments != null)
             {
                 args.AddRange(arguments);
