@@ -1,5 +1,5 @@
 BeforeAll {
-    Import-Module "$PSScriptRoot\..\output\Pup\Pup.psd1" -Force
+    Import-Module (Join-Path $PSScriptRoot "../" "output" "Pup" "Pup.psd1") -Force
 }
 
 Describe "Browser" {
