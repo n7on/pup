@@ -17,6 +17,10 @@
     <None Include="Pup.psd1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="en-US\Pup.dll-Help.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>en-US\Pup.dll-Help.xml</Link>
+    </None>
   </ItemGroup>
 
 </Project>
