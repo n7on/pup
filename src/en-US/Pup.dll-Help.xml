@@ -1673,4 +1673,103 @@ $form = Find-PupElements -Page $page -Selector "form" -First
     </command:examples>
   </command:command>
 
+  <!-- Export-PupPageSession -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Export-PupPageSession</command:name>
+      <maml:description>
+        <maml:para>Exports browser session data (cookies, localStorage, sessionStorage) to a file or object.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Captures the current session state including cookies, localStorage, and sessionStorage. Can be saved to a JSON file for later import or sharing with team members.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Export session to file</maml:title>
+        <dev:code>Export-PupPageSession -Page $page -FilePath "authenticated-session.json"</dev:code>
+        <dev:remarks>
+          <maml:para>Saves the current session to a JSON file.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Export session to object</maml:title>
+        <dev:code>$session = Export-PupPageSession -Page $page
+$session.Cookies | Format-Table Name, Value, Domain</dev:code>
+        <dev:remarks>
+          <maml:para>Returns the session as an object for inspection.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Save after authentication</maml:title>
+        <dev:code># Log in to the application
+$username = Find-PupElements -Page $page -Selector "#username" -First
+Set-PupElement -Element $username -Text "admin"
+$password = Find-PupElements -Page $page -Selector "#password" -First
+Set-PupElement -Element $password -Text "secret"
+$login = Find-PupElements -Page $page -Selector "#login-btn" -First
+$login | Invoke-PupElementClick
+Start-Sleep -Seconds 2
+
+# Save the authenticated session for reuse
+Export-PupPageSession -Page $page -FilePath "admin-session.json"</dev:code>
+        <dev:remarks>
+          <maml:para>Saves an authenticated session for reuse without logging in again.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Import-PupPageSession -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Import-PupPageSession</command:name>
+      <maml:description>
+        <maml:para>Imports browser session data from a file or object.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Restores a previously exported session including cookies, localStorage, and sessionStorage. Useful for resuming authenticated sessions or sharing session data between team members.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Import session from file</maml:title>
+        <dev:code>Import-PupPageSession -Page $page -FilePath "authenticated-session.json" -Reload</dev:code>
+        <dev:remarks>
+          <maml:para>Restores the session and reloads the page to apply it.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Import only cookies</maml:title>
+        <dev:code>Import-PupPageSession -Page $page -FilePath "session.json" -NoLocalStorage -NoSessionStorage</dev:code>
+        <dev:remarks>
+          <maml:para>Imports only cookies, skipping storage data.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Import from session object</maml:title>
+        <dev:code>$session = Export-PupPageSession -Page $page
+# ... do some testing ...
+# Restore the original session
+Import-PupPageSession -Page $page -Session $session -Reload</dev:code>
+        <dev:remarks>
+          <maml:para>Restores a session from an in-memory object.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Test with different user sessions</maml:title>
+        <dev:code># Test as admin
+Import-PupPageSession -Page $page -FilePath "admin-session.json" -Reload
+# ... run admin tests ...
+
+# Test as regular user
+Import-PupPageSession -Page $page -FilePath "user-session.json" -Reload
+# ... run user tests ...</dev:code>
+        <dev:remarks>
+          <maml:para>Switches between different user sessions for testing access controls.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
 </helpItems>

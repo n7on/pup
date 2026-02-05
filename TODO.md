@@ -28,4 +28,6 @@ This document tracks missing functionality and enhancements.
 - [ ] **Set-PupPermission** - Camera/mic/location/notifications toggles
 
 ## Session Portability
-- [ ] **Export/Import-PupSession** - Bundle cookies + storage to/from file
+- [x] **Export/Import-PupPageSession** - Bundle cookies + storage to/from file
+  - `Export-PupPageSession -Page $p -FilePath "session.json"`
+  - `Import-PupPageSession -Page $p -FilePath "session.json" -Reload`

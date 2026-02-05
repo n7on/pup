@@ -72,6 +72,10 @@ namespace Pup.Services
 
         // HTTP Fetch
         Task<PupFetchResponse> FetchAsync(string url, string method, object body, Dictionary<string, string> headers, string contentType, int timeout, bool parseJsonBody = false);
+
+        // Session Export/Import
+        Task<PupSession> ExportSessionAsync();
+        Task ImportSessionAsync(PupSession session, bool includeCookies = true, bool includeLocalStorage = true, bool includeSessionStorage = true);
     }
 
 
@@ -725,6 +729,38 @@ async (url, options, timeout) => {
             }
 
             return response;
+        }
+
+        public async Task<PupSession> ExportSessionAsync()
+        {
+            var session = new PupSession
+            {
+                Url = _page.Page.Url,
+                ExportedAt = DateTime.UtcNow,
+                Cookies = await GetCookiesAsync().ConfigureAwait(false),
+                LocalStorage = await GetStorageAsync("local").ConfigureAwait(false),
+                SessionStorage = await GetStorageAsync("session").ConfigureAwait(false)
+            };
+
+            return session;
+        }
+
+        public async Task ImportSessionAsync(PupSession session, bool includeCookies = true, bool includeLocalStorage = true, bool includeSessionStorage = true)
+        {
+            if (includeCookies && session.Cookies?.Count > 0)
+            {
+                await SetCookiesAsync(session.Cookies.ToArray()).ConfigureAwait(false);
+            }
+
+            if (includeLocalStorage && session.LocalStorage?.Count > 0)
+            {
+                await SetStorageAsync("local", session.LocalStorage).ConfigureAwait(false);
+            }
+
+            if (includeSessionStorage && session.SessionStorage?.Count > 0)
+            {
+                await SetStorageAsync("session", session.SessionStorage).ConfigureAwait(false);
+            }
         }
 
         private static object ConvertJsonElement(JsonElement element)
