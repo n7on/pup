@@ -73,6 +73,9 @@ namespace Pup.Services
         // HTTP Fetch
         Task<PupFetchResponse> FetchAsync(string url, string method, object body, Dictionary<string, string> headers, string contentType, int timeout, bool parseJsonBody = false);
 
+        // Viewport
+        Task SetViewportAsync(int width, int height, double deviceScaleFactor = 1, bool isMobile = false, bool hasTouch = false, bool isLandscape = false);
+
         // Session Export/Import
         Task<PupSession> ExportSessionAsync();
         Task ImportSessionAsync(PupSession session, bool includeCookies = true, bool includeLocalStorage = true, bool includeSessionStorage = true);
@@ -729,6 +732,19 @@ async (url, options, timeout) => {
             }
 
             return response;
+        }
+
+        public async Task SetViewportAsync(int width, int height, double deviceScaleFactor = 1, bool isMobile = false, bool hasTouch = false, bool isLandscape = false)
+        {
+            await _page.Page.SetViewportAsync(new ViewPortOptions
+            {
+                Width = width,
+                Height = height,
+                DeviceScaleFactor = deviceScaleFactor,
+                IsMobile = isMobile,
+                HasTouch = hasTouch,
+                IsLandscape = isLandscape
+            }).ConfigureAwait(false);
         }
 
         public async Task<PupSession> ExportSessionAsync()

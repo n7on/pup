@@ -10,20 +10,25 @@ namespace Pup.Commands.Element
     {
         [Parameter(
             Position = 0,
-            ParameterSetName = "Element",
             Mandatory = true,
             ValueFromPipeline = true,
             HelpMessage = "Element to click")]
         public PupElement Element { get; set; }
 
+        [Parameter(HelpMessage = "Number of clicks (2 for double-click)")]
+        [ValidateRange(1, 3)]
+        public int ClickCount { get; set; } = 1;
+
+        [Parameter(HelpMessage = "Perform a double-click")]
+        public SwitchParameter DoubleClick { get; set; }
 
         protected override void ProcessRecord()
         {
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
-
-                elementService.ClickElementAsync().GetAwaiter().GetResult();
+                var clicks = DoubleClick.IsPresent ? 2 : ClickCount;
+                elementService.ClickElementAsync(clicks).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {

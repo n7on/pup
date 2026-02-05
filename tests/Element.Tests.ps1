@@ -258,3 +258,36 @@ Describe "Element Screenshot" {
         Remove-Item $path
     }
 }
+
+Describe "Element Click Options" {
+    BeforeEach {
+        Invoke-PupPageReload -Page $script:page -WaitForLoad
+    }
+
+    It "Performs double-click with DoubleClick switch" {
+        $btn = Find-PupElements -Page $script:page -Selector "#btn-submit" -First
+        { $btn | Invoke-PupElementClick -DoubleClick } | Should -Not -Throw
+    }
+
+    It "Performs double-click with ClickCount" {
+        $btn = Find-PupElements -Page $script:page -Selector "#btn-submit" -First
+        { $btn | Invoke-PupElementClick -ClickCount 2 } | Should -Not -Throw
+    }
+}
+
+Describe "Element Scroll" {
+    It "Scrolls element into view" {
+        $el = Find-PupElements -Page $script:page -Selector "#title" -First
+        { $el | Invoke-PupElementScroll } | Should -Not -Throw
+    }
+}
+
+Describe "Page Viewport" {
+    It "Sets viewport size" {
+        { Set-PupPageViewport -Page $script:page -Width 1920 -Height 1080 } | Should -Not -Throw
+    }
+
+    It "Sets mobile viewport" {
+        { Set-PupPageViewport -Page $script:page -Width 375 -Height 667 -IsMobile -HasTouch } | Should -Not -Throw
+    }
+}

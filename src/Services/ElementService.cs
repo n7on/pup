@@ -10,7 +10,8 @@ namespace Pup.Services
 {
     public interface IElementService
     {
-        Task ClickElementAsync();
+        Task ClickElementAsync(int clickCount = 1);
+        Task ScrollIntoViewAsync();
         Task SetElementTextAsync(string text);
         Task SetElementValueAsync(string value);
         
@@ -56,9 +57,35 @@ namespace Pup.Services
             _element = element;
         }
 
-        public async Task ClickElementAsync()
+        public async Task ClickElementAsync(int clickCount = 1)
         {
-            await _element.Element.ClickAsync().ConfigureAwait(false);
+            if (clickCount == 1)
+            {
+                await _element.Element.ClickAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                // Use JavaScript for double/triple click since ClickOptions.ClickCount may not be available
+                await _element.Element.EvaluateFunctionAsync(@"(el, count) => {
+                    const rect = el.getBoundingClientRect();
+                    const x = rect.left + rect.width / 2;
+                    const y = rect.top + rect.height / 2;
+                    const event = new MouseEvent('dblclick', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window,
+                        detail: count,
+                        clientX: x,
+                        clientY: y
+                    });
+                    el.dispatchEvent(event);
+                }", clickCount).ConfigureAwait(false);
+            }
+        }
+
+        public async Task ScrollIntoViewAsync()
+        {
+            await _element.Element.ScrollIntoViewAsync().ConfigureAwait(false);
         }
 
 
