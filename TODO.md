@@ -31,3 +31,8 @@ This document tracks missing functionality and enhancements.
 - [x] **Export/Import-PupPageSession** - Bundle cookies + storage to/from file
   - `Export-PupPageSession -Page $p -FilePath "session.json"`
   - `Import-PupPageSession -Page $p -FilePath "session.json" -Reload`
+
+## Script Generation
+- [x] **Convert-PupRecording** - Convert Chrome DevTools Recorder to Pup scripts
+  - `Convert-PupRecording -InputFile "recording.json" -OutputFile "script.ps1" -IncludeSetup`
+  - Supports: navigate, click, doubleClick, change, keyDown, scroll, hover, waitForElement, setViewport

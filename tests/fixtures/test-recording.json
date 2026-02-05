@@ -1,0 +1,78 @@
+{
+  "title": "Login Flow Test",
+  "steps": [
+    {
+      "type": "setViewport",
+      "width": 1920,
+      "height": 1080,
+      "deviceScaleFactor": 1,
+      "isMobile": false,
+      "hasTouch": false,
+      "isLandscape": false
+    },
+    {
+      "type": "navigate",
+      "url": "https://example.com/login"
+    },
+    {
+      "type": "click",
+      "selectors": [
+        ["#username"],
+        ["xpath///*[@id='username']"]
+      ],
+      "offsetX": 50,
+      "offsetY": 10
+    },
+    {
+      "type": "change",
+      "selectors": [
+        ["#username"]
+      ],
+      "value": "admin"
+    },
+    {
+      "type": "click",
+      "selectors": [
+        ["#password"]
+      ]
+    },
+    {
+      "type": "change",
+      "selectors": [
+        ["#password"]
+      ],
+      "value": "secret123"
+    },
+    {
+      "type": "click",
+      "selectors": [
+        ["#login-btn"],
+        [".btn-primary"]
+      ]
+    },
+    {
+      "type": "waitForElement",
+      "selectors": [
+        ["#dashboard"]
+      ],
+      "visible": true,
+      "timeout": 5000
+    },
+    {
+      "type": "doubleClick",
+      "selectors": [
+        [".user-profile"]
+      ]
+    },
+    {
+      "type": "hover",
+      "selectors": [
+        [".dropdown-menu"]
+      ]
+    },
+    {
+      "type": "keyDown",
+      "key": "Escape"
+    }
+  ]
+}

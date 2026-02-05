@@ -1772,4 +1772,132 @@ Import-PupPageSession -Page $page -FilePath "user-session.json" -Reload
     </command:examples>
   </command:command>
 
+  <!-- Convert-PupRecording -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Convert-PupRecording</command:name>
+      <maml:description>
+        <maml:para>Converts Chrome DevTools Recorder JSON to a Pup PowerShell script.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Takes a recording exported from Chrome DevTools Recorder (JSON format) and generates equivalent Pup PowerShell commands. Supports navigation, clicks, typing, keyboard input, scrolling, hovering, and wait conditions.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Convert recording to script</maml:title>
+        <dev:code>Convert-PupRecording -InputFile "recording.json" -OutputFile "script.ps1"</dev:code>
+        <dev:remarks>
+          <maml:para>Converts a Chrome DevTools recording to a Pup script file.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Include setup and teardown</maml:title>
+        <dev:code>Convert-PupRecording -InputFile "recording.json" -IncludeSetup -IncludeTeardown -OutputFile "complete-script.ps1"</dev:code>
+        <dev:remarks>
+          <maml:para>Generates a complete script with browser setup and cleanup code.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Preview conversion output</maml:title>
+        <dev:code>Convert-PupRecording -InputFile "recording.json" | Out-Host</dev:code>
+        <dev:remarks>
+          <maml:para>Outputs the converted script to the console for review.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Custom variable names</maml:title>
+        <dev:code>Convert-PupRecording -InputFile "recording.json" -PageVariable '$p' -BrowserVariable '$b' -IncludeSetup</dev:code>
+        <dev:remarks>
+          <maml:para>Uses custom variable names for page and browser objects.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 5: Record in Chrome, convert, run</maml:title>
+        <dev:code># 1. In Chrome: DevTools > Recorder > Start recording
+# 2. Perform actions in the browser
+# 3. Export as JSON
+
+# 4. Convert to Pup script
+Convert-PupRecording -InputFile "my-recording.json" -OutputFile "test.ps1" -IncludeSetup -IncludeTeardown
+
+# 5. Run the script
+./test.ps1</dev:code>
+        <dev:remarks>
+          <maml:para>Complete workflow from recording to automated script.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Invoke-PupElementScroll -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupElementScroll</command:name>
+      <maml:description>
+        <maml:para>Scrolls an element into view.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Scrolls the page so that the specified element is visible in the viewport. Useful before interacting with elements that are off-screen.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Scroll element into view</maml:title>
+        <dev:code>$el = Find-PupElements -Page $page -Selector "#footer-link" -First
+$el | Invoke-PupElementScroll
+$el | Invoke-PupElementClick</dev:code>
+        <dev:remarks>
+          <maml:para>Scrolls to an element before clicking it.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupPageViewport -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupPageViewport</command:name>
+      <maml:description>
+        <maml:para>Sets the browser viewport size and device emulation settings.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Configures the viewport dimensions and device characteristics. Useful for testing responsive designs or emulating mobile devices.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Set desktop viewport</maml:title>
+        <dev:code>Set-PupPageViewport -Page $page -Width 1920 -Height 1080</dev:code>
+        <dev:remarks>
+          <maml:para>Sets a standard desktop viewport size.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Emulate mobile device</maml:title>
+        <dev:code>Set-PupPageViewport -Page $page -Width 375 -Height 667 -IsMobile -HasTouch -DeviceScaleFactor 2</dev:code>
+        <dev:remarks>
+          <maml:para>Emulates an iPhone-like mobile device.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Test responsive breakpoints</maml:title>
+        <dev:code># Test mobile
+Set-PupPageViewport -Page $page -Width 375 -Height 667
+Get-PupPageScreenshot -Page $page -FilePath "mobile.png"
+
+# Test tablet
+Set-PupPageViewport -Page $page -Width 768 -Height 1024
+Get-PupPageScreenshot -Page $page -FilePath "tablet.png"
+
+# Test desktop
+Set-PupPageViewport -Page $page -Width 1920 -Height 1080
+Get-PupPageScreenshot -Page $page -FilePath "desktop.png"</dev:code>
+        <dev:remarks>
+          <maml:para>Captures screenshots at different responsive breakpoints.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
 </helpItems>

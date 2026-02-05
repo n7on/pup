@@ -27,4 +27,9 @@ public static class ServiceFactory
         var elementService = new ElementService(element);
         return elementService;
     }
+
+    public static IRecordingService CreateRecordingService()
+    {
+        return new RecordingService();
+    }
 }
