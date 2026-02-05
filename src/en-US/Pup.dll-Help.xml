@@ -222,6 +222,71 @@ $active | Where-Object { $_.Url -like "*chat*" }</dev:code>
     </command:examples>
   </command:command>
 
+  <!-- Invoke-PupHttpFetch -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupHttpFetch</command:name>
+      <maml:description>
+        <maml:para>Makes an HTTP request from within the browser context.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Executes a fetch() request in the browser page context. Automatically uses the page's cookies and session. Subject to CORS and CSP restrictions like a real browser request.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Simple GET request</maml:title>
+        <dev:code>$response = Invoke-PupFetch -Page $page -Url "/api/user/profile"
+$response.Body | ConvertFrom-Json</dev:code>
+        <dev:remarks>
+          <maml:para>Makes a GET request to a relative URL using the page's session.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: POST with JSON body</maml:title>
+        <dev:code>$response = Invoke-PupFetch -Page $page -Url "/api/users" -Method POST -Body @{
+    username = "newuser"
+    role = "admin"
+} -AsJson
+if ($response.Ok) { "User created: $($response.Body.id)" }</dev:code>
+        <dev:remarks>
+          <maml:para>Sends a POST request with a JSON body. The -AsJson switch parses the response.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Test API endpoint with custom headers</maml:title>
+        <dev:code>$response = Invoke-PupFetch -Page $page -Url "/api/admin/users" -Method DELETE -Headers @{
+    "X-Custom-Header" = "test"
+}
+"Status: $($response.Status) - $($response.StatusText)"</dev:code>
+        <dev:remarks>
+          <maml:para>Makes a DELETE request with custom headers.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Test IDOR vulnerability</maml:title>
+        <dev:code># Try accessing another user's data
+$response = Invoke-PupFetch -Page $page -Url "/api/users/999/documents" -AsJson
+if ($response.Ok) {
+    "IDOR vulnerability! Got $($response.Body.Count) documents"
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Tests for insecure direct object reference by accessing another user's resources.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 5: Test CSRF with state-changing request</maml:title>
+        <dev:code>$response = Invoke-PupFetch -Page $page -Url "/api/account/email" -Method PUT -Body @{
+    email = "attacker@evil.com"
+}
+"Response: $($response.Status) - Check if CSRF token was required"</dev:code>
+        <dev:remarks>
+          <maml:para>Tests if state-changing requests require CSRF protection.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
   <!-- Set-PupHttpHeader -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>

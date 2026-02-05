@@ -15,6 +15,8 @@ This document tracks missing functionality and enhancements.
 - [x] **WebSocket support** - Test WS-based APIs
   - `Get-PupWebSocket` - List active WebSocket connections with frames
   - `Send-PupWebSocketMessage` - Send messages through WebSocket
+- [x] **In-browser HTTP requests** - Make fetch requests from browser context
+  - `Invoke-PupHttpFetch -Page $p -Url "/api/data" -Method POST -Body @{...}`
 - [ ] **iframe support** - Interact with elements inside iframes
   - `Get-PupFrame` / `Switch-PupFrame` - List and switch iframes
   - `Find-PupElements -Frame $frame -Selector "..."`

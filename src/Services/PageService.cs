@@ -1,13 +1,15 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Management.Automation;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Pup.Common;
+using Pup.Transport;
 using PuppeteerSharp;
 using PuppeteerSharp.Input;
 using PuppeteerSharp.Media;
-using Pup.Transport;
-using Pup.Common;
-using System.Management.Automation;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Pup.Services
 {
@@ -67,6 +69,9 @@ namespace Pup.Services
         // HTTP Basic Authentication
         Task SetAuthenticationAsync(string username, string password);
         Task ClearAuthenticationAsync();
+
+        // HTTP Fetch
+        Task<PupFetchResponse> FetchAsync(string url, string method, object body, Dictionary<string, string> headers, string contentType, int timeout, bool parseJsonBody = false);
     }
 
 
@@ -585,6 +590,181 @@ namespace Pup.Services
         public async Task ClearAuthenticationAsync()
         {
             await _page.Page.AuthenticateAsync(null).ConfigureAwait(false);
+        }
+
+        public async Task<PupFetchResponse> FetchAsync(string url, string method, object body, Dictionary<string, string> headers, string contentType, int timeout, bool parseJsonBody = false)
+        {
+            // Build fetch options
+            var fetchOptions = new Dictionary<string, object>
+            {
+                ["method"] = method ?? "GET"
+            };
+
+            // Handle headers
+            var headerDict = headers != null
+                ? new Dictionary<string, string>(headers)
+                : new Dictionary<string, string>();
+
+            // Handle body
+            if (body != null)
+            {
+                string bodyString;
+                if (body is string str)
+                {
+                    bodyString = str;
+                }
+                else if (body is Hashtable ht)
+                {
+                    var dict = new Dictionary<string, object>();
+                    foreach (DictionaryEntry entry in ht)
+                    {
+                        dict[entry.Key.ToString()] = entry.Value;
+                    }
+                    bodyString = JsonSerializer.Serialize(dict);
+
+                    if (string.IsNullOrEmpty(contentType) && !headerDict.ContainsKey("Content-Type"))
+                    {
+                        headerDict["Content-Type"] = "application/json";
+                    }
+                }
+                else
+                {
+                    bodyString = JsonSerializer.Serialize(body);
+                    if (string.IsNullOrEmpty(contentType) && !headerDict.ContainsKey("Content-Type"))
+                    {
+                        headerDict["Content-Type"] = "application/json";
+                    }
+                }
+
+                fetchOptions["body"] = bodyString;
+            }
+
+            // Set explicit content-type if provided
+            if (!string.IsNullOrEmpty(contentType))
+            {
+                headerDict["Content-Type"] = contentType;
+            }
+
+            if (headerDict.Count > 0)
+            {
+                fetchOptions["headers"] = headerDict;
+            }
+
+            var script = @"
+async (url, options, timeout) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+        const fetchOptions = { ...options, signal: controller.signal };
+        const response = await fetch(url, fetchOptions);
+        clearTimeout(timeoutId);
+
+        const headers = {};
+        response.headers.forEach((v, k) => headers[k] = v);
+
+        let body = '';
+        try {
+            body = await response.text();
+        } catch (e) {
+            // Body may not be readable
+        }
+
+        return {
+            status: response.status,
+            statusText: response.statusText,
+            headers: headers,
+            body: body,
+            ok: response.ok,
+            url: response.url
+        };
+    } catch (e) {
+        clearTimeout(timeoutId);
+        if (e.name === 'AbortError') {
+            throw new Error('Request timed out');
+        }
+        throw e;
+    }
+}";
+
+            var jsonResult = await _page.Page.EvaluateFunctionAsync<JsonElement>(
+                script,
+                url,
+                fetchOptions,
+                timeout
+            ).ConfigureAwait(false);
+
+            var response = new PupFetchResponse
+            {
+                Status = jsonResult.GetProperty("status").GetInt32(),
+                StatusText = jsonResult.GetProperty("statusText").GetString(),
+                Body = jsonResult.GetProperty("body").GetString(),
+                Ok = jsonResult.GetProperty("ok").GetBoolean(),
+                Url = jsonResult.GetProperty("url").GetString()
+            };
+
+            // Parse headers
+            var headersElement = jsonResult.GetProperty("headers");
+            foreach (var prop in headersElement.EnumerateObject())
+            {
+                response.Headers[prop.Name] = prop.Value.GetString();
+            }
+
+            // Parse JSON body if requested
+            if (parseJsonBody && !string.IsNullOrEmpty(response.Body))
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(response.Body);
+                    response.JsonBody = ConvertJsonElement(doc.RootElement);
+                }
+                catch
+                {
+                    // Leave JsonBody as null if parsing fails
+                }
+            }
+
+            return response;
+        }
+
+        private static object ConvertJsonElement(JsonElement element)
+        {
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.Object:
+                    var dict = new Dictionary<string, object>();
+                    foreach (var prop in element.EnumerateObject())
+                    {
+                        dict[prop.Name] = ConvertJsonElement(prop.Value);
+                    }
+                    return dict;
+
+                case JsonValueKind.Array:
+                    var list = new List<object>();
+                    foreach (var item in element.EnumerateArray())
+                    {
+                        list.Add(ConvertJsonElement(item));
+                    }
+                    return list.ToArray();
+
+                case JsonValueKind.String:
+                    return element.GetString();
+
+                case JsonValueKind.Number:
+                    if (element.TryGetInt64(out var longVal))
+                        return longVal;
+                    return element.GetDouble();
+
+                case JsonValueKind.True:
+                    return true;
+
+                case JsonValueKind.False:
+                    return false;
+
+                case JsonValueKind.Null:
+                default:
+                    return null;
+            }
         }
     }
 }
