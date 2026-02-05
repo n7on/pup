@@ -32,4 +32,9 @@ public static class ServiceFactory
     {
         return new RecordingService();
     }
+
+    public static IConsoleService CreateConsoleService(PupPage page)
+    {
+        return new ConsoleService(page);
+    }
 }

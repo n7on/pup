@@ -333,3 +333,12 @@ Describe "HTTP Authentication" {
         { Set-PupHttpAuth -Page $script:authPage -Clear } | Should -Not -Throw
     }
 }
+
+Describe "Interactive Console" {
+    It "Command exists with correct parameters" {
+        $cmd = Get-Command Enter-PupConsole -ErrorAction SilentlyContinue
+        $cmd | Should -Not -BeNullOrEmpty
+        $cmd.Parameters.Keys | Should -Contain "Page"
+        $cmd.Parameters.Keys | Should -Contain "Prompt"
+    }
+}
