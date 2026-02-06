@@ -47,7 +47,7 @@ namespace Pup.Commands.Page
 
                 // Auto-wrap simple expressions in arrow functions if needed
                 string scriptToExecute = Script;
-                if (!Script.TrimStart().StartsWith("(") && !Script.TrimStart().StartsWith("function") && 
+                if (!Script.TrimStart().StartsWith("(") && !Script.TrimStart().StartsWith("function") &&
                     !Script.Contains("=>") && !Script.Contains("return") && !Script.Contains(";"))
                 {
                     scriptToExecute = $"() => {Script}";
@@ -74,17 +74,8 @@ namespace Pup.Commands.Page
                 }
                 else
                 {
-                    // Default: try to get result as object
-                    try
-                    {
-                        result = pageService.ExecuteScriptAsync<object>(scriptToExecute, Arguments).GetAwaiter().GetResult();
-                    }
-                    catch
-                    {
-                        // If that fails, execute as void
-                        pageService.ExecuteScriptAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
-                        result = null;
-                    }
+                    // Default: execute and convert JsonElement results to PSObjects
+                    result = pageService.ExecuteScriptWithConversionAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
                 }
 
                 if (result != null || !AsVoid.IsPresent)

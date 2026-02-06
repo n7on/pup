@@ -22,8 +22,8 @@ namespace Pup.Commands.Page
         [Parameter(HelpMessage = "Take screenshot of full page (default: false - visible area only)")]
         public SwitchParameter FullPage { get; set; }
 
-        [Parameter(HelpMessage = "Return screenshot data as byte array (default: true)")]
-        public SwitchParameter PassThru { get; set; } = true;
+        [Parameter(HelpMessage = "Return screenshot data as byte array")]
+        public SwitchParameter PassThru { get; set; }
 
         protected override void ProcessRecord()
         {

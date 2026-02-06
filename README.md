@@ -32,7 +32,7 @@ while ($Date -gt $FromDate) {
 $Browser | Stop-PupBrowser
 
 ```
-
+See more examples in [./examples](./examples/)
 # Development
 
 ## Prerequisites

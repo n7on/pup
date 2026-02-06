@@ -38,6 +38,7 @@ namespace Pup.Services
 
         Task<T> ExecuteScriptAsync<T>(string script, params object[] args);
         Task ExecuteScriptAsync(string script, params object[] args);
+        Task<object> ExecuteScriptWithConversionAsync(string script, params object[] args);
 
         Task<List<PupCookie>> GetCookiesAsync();
         Task DeleteCookiesAsync(PupCookie[] cookies);
@@ -330,6 +331,16 @@ namespace Pup.Services
         public async Task<T> ExecuteScriptAsync<T>(string script, params object[] args)
         {
             return await _page.Page.EvaluateFunctionAsync<T>(script, args).ConfigureAwait(false);
+        }
+
+        public async Task<object> ExecuteScriptWithConversionAsync(string script, params object[] args)
+        {
+            var result = await _page.Page.EvaluateFunctionAsync<object>(script, args).ConfigureAwait(false);
+            if (result is JsonElement element)
+            {
+                return ConvertJsonElementToPSObject(element);
+            }
+            return result;
         }
 
         public async Task ExecuteScriptAsync(string script, params object[] args)
@@ -796,6 +807,46 @@ async (url, options, timeout) => {
                     foreach (var item in element.EnumerateArray())
                     {
                         list.Add(ConvertJsonElement(item));
+                    }
+                    return list.ToArray();
+
+                case JsonValueKind.String:
+                    return element.GetString();
+
+                case JsonValueKind.Number:
+                    if (element.TryGetInt64(out var longVal))
+                        return longVal;
+                    return element.GetDouble();
+
+                case JsonValueKind.True:
+                    return true;
+
+                case JsonValueKind.False:
+                    return false;
+
+                case JsonValueKind.Null:
+                default:
+                    return null;
+            }
+        }
+
+        private static object ConvertJsonElementToPSObject(JsonElement element)
+        {
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.Object:
+                    var psObj = new PSObject();
+                    foreach (var prop in element.EnumerateObject())
+                    {
+                        psObj.Properties.Add(new PSNoteProperty(prop.Name, ConvertJsonElementToPSObject(prop.Value)));
+                    }
+                    return psObj;
+
+                case JsonValueKind.Array:
+                    var list = new List<object>();
+                    foreach (var item in element.EnumerateArray())
+                    {
+                        list.Add(ConvertJsonElementToPSObject(item));
                     }
                     return list.ToArray();
 
