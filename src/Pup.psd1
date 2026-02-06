@@ -1,39 +1,104 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.1.0'
+    ModuleVersion = '0.2.0'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
     Copyright = '(c) 2025 Anton Lindström. All rights reserved.'
-    Description = 'PowerShell module for browser automation powered by PuppeteerSharp. Install browsers, start/stop them, create/manage pages, and automate web interactions.'
+    Description = 'Browser automation for PowerShell. Control headless or visible Chrome/Chromium browsers via the DevTools Protocol. Automate web scraping, form filling, screenshots, PDF export, network interception, WebSocket monitoring, and session management. Convert Chrome DevTools recordings to PowerShell scripts. Cross-platform support for Windows, Linux, and macOS.'
     
     PowerShellVersion = '5.1'
     DotNetFrameworkVersion = '4.6.1'
     
     FunctionsToExport = @()
-    CmdletsToExport = @('*')
+    CmdletsToExport = @(
+        'Clear-PupPageStorage',
+        'Convert-PupRecording',
+        'Enter-PupConsole',
+        'Export-PupPagePdf',
+        'Export-PupPageSession',
+        'Find-PupElements',
+        'Get-PupBrowser',
+        'Get-PupElementAttribute',
+        'Get-PupElementScreenshot',
+        'Get-PupElementSelector',
+        'Get-PupElementValue',
+        'Get-PupPage',
+        'Get-PupPageConsole',
+        'Get-PupPageCookie',
+        'Get-PupPageNetwork',
+        'Get-PupPageScreenshot',
+        'Get-PupPageSource',
+        'Get-PupPageStorage',
+        'Get-PupWebSocket',
+        'Import-PupPageSession',
+        'Install-PupBrowser',
+        'Invoke-PupElementClick',
+        'Invoke-PupElementFocus',
+        'Invoke-PupElementHover',
+        'Invoke-PupElementScroll',
+        'Invoke-PupHttpFetch',
+        'Invoke-PupPageBack',
+        'Invoke-PupPageForward',
+        'Invoke-PupPageReload',
+        'Invoke-PupPageScript',
+        'Move-PupPage',
+        'New-PupPage',
+        'Remove-PupPage',
+        'Remove-PupPageCookie',
+        'Select-PupElementOption',
+        'Send-PupFile',
+        'Send-PupKey',
+        'Send-PupWebSocketMessage',
+        'Set-PupDialogHandler',
+        'Set-PupElement',
+        'Set-PupElementAttribute',
+        'Set-PupElementValue',
+        'Set-PupHttpAuth',
+        'Set-PupHttpHeader',
+        'Set-PupPageCookie',
+        'Set-PupPageStorage',
+        'Set-PupPageViewport',
+        'Start-PupBrowser',
+        'Stop-PupBrowser',
+        'Uninstall-PupBrowser',
+        'Wait-PupElement'
+    )
     VariablesToExport = @()
-    AliasesToExport = @('*')
+    AliasesToExport = @()
     
     PrivateData = @{
         PSData = @{
-            Tags = @('Browser', 'Automation', 'PowerShell', 'WebScraping', 'Testing', 'Puppeteer', 'Chrome')
+            Tags = @('Browser', 'Automation', 'WebScraping', 'Puppeteer', 'Chrome', 'Chromium', 'Headless', 'Selenium', 'CDP', 'DevTools', 'Screenshot', 'PDF', 'Testing', 'Web')
             LicenseUri = 'https://github.com/n7on/Pup/blob/main/LICENSE'
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-Initial release of Pup v0.1.0
+Pup v0.2.0
 
-Features:
-- Install and launch Chrome/Chromium browsers
-- Create and manage browser pages
-- Navigate to URLs
-- Take screenshots
-- Find and interact with page elements
-- Click elements and fill forms
-- Extract page content
+Browser Automation:
+- Install, launch, and control Chrome/Chromium (headless or visible)
+- Multi-page/tab management with navigation controls
 
-Powered by PuppeteerSharp
+Web Interaction:
+- Find elements via CSS selectors or XPath
+- Click, hover, scroll, focus, and fill forms
+- Handle dialogs, file uploads, and keyboard input
+
+Data Extraction:
+- Screenshots (page or element), PDF export
+- Extract HTML, text, attributes, and form values
+- Cookie and local/session storage management
+
+Advanced Features:
+- Network interception with custom headers and HTTP auth
+- WebSocket monitoring and messaging
+- Export/import browser sessions
+- Convert Chrome DevTools recordings to PowerShell scripts
+- Proxy support and stealth mode
+- Interactive console mode
+
+Cross-platform: Windows, Linux, macOS | PowerShell 5.1+
 '@
         }
     }

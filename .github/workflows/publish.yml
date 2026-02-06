@@ -1,0 +1,89 @@
+name: Publish to PowerShell Gallery
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (without v prefix, e.g., 0.1.0)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    env:
+      POWERSHELL_TELEMETRY_OPTOUT: 1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Get version from tag
+        id: version
+        shell: pwsh
+        run: |
+          if ('${{ github.event.inputs.version }}') {
+            $version = '${{ github.event.inputs.version }}'
+          } else {
+            $version = '${{ github.ref_name }}' -replace '^v', ''
+          }
+          Write-Output "VERSION=$version" >> $env:GITHUB_OUTPUT
+          Write-Host "Publishing version: $version"
+
+      - name: Update manifest version
+        shell: pwsh
+        run: |
+          $manifestPath = 'src/Pup.psd1'
+          $content = Get-Content $manifestPath -Raw
+          $content = $content -replace "ModuleVersion = '[^']*'", "ModuleVersion = '${{ steps.version.outputs.VERSION }}'"
+          Set-Content -Path $manifestPath -Value $content
+          Write-Host "Updated manifest to version ${{ steps.version.outputs.VERSION }}"
+
+      - name: Restore
+        run: dotnet restore src/Pup.csproj
+
+      - name: Build
+        run: dotnet build src/Pup.csproj -c Release --no-restore
+
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          Install-Module Pester -Scope CurrentUser -Force -AllowClobber -SkipPublisherCheck
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          Import-Module Pester
+          $result = Invoke-Pester ./tests -Output Detailed -PassThru
+          if ($result.FailedCount -gt 0) {
+            throw "Tests failed"
+          }
+
+      - name: Publish to PowerShell Gallery
+        shell: pwsh
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          if (-not $env:PSGALLERY_API_KEY) {
+            throw "PSGALLERY_API_KEY secret is not set"
+          }
+
+          Write-Host "Publishing Pup module to PowerShell Gallery..."
+          Publish-Module -Path "./output/Pup" -NuGetApiKey $env:PSGALLERY_API_KEY -Repository PSGallery -Verbose
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true
+          files: |
+            output/Pup/*.dll
+            output/Pup/*.psd1
