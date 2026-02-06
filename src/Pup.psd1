@@ -1,10 +1,10 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.2.0'
+    ModuleVersion = '0.2.1'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
-    Copyright = '(c) 2025 Anton Lindström. All rights reserved.'
+    Copyright = '(c) 2026 Anton Lindström. All rights reserved.'
     Description = 'Browser automation for PowerShell. Control headless or visible Chrome/Chromium browsers via the DevTools Protocol. Automate web scraping, form filling, screenshots, PDF export, network interception, WebSocket monitoring, and session management. Convert Chrome DevTools recordings to PowerShell scripts. Cross-platform support for Windows, Linux, and macOS.'
     
     PowerShellVersion = '5.1'
