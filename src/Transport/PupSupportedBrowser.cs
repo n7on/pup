@@ -1,7 +1,7 @@
 using System;
 using PuppeteerSharp;
 
-namespace Pup.Common
+namespace Pup.Transport
 {
 
     public enum PupSupportedBrowser

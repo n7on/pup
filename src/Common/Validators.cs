@@ -1,5 +1,5 @@
 using System;
-using Pup.Common;
+using Pup.Transport;
 
 public static class BrowserTypeValidator
 {

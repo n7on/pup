@@ -37,4 +37,9 @@ public static class ServiceFactory
     {
         return new ConsoleService(page);
     }
+
+    public static ICdpService CreateCdpService(PupPage page)
+    {
+        return new CdpService(page);
+    }
 }

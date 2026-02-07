@@ -1,4 +1,4 @@
-namespace Pup.Common
+namespace Pup.Transport
 {
     /// <summary>
     /// Action to take when a JavaScript dialog (alert, confirm, prompt) appears

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
+using Pup.Common;
 using Pup.Transport;
 
 namespace Pup.Services
@@ -131,7 +131,7 @@ namespace Pup.Services
                         return new ConsoleEvalResult { Success = false, Error = errorProp.GetString() };
                     }
 
-                    var formatted = FormatJsonElement(doc.RootElement, 0);
+                    var formatted = JsonHelper.PrettyPrint(doc.RootElement);
                     return new ConsoleEvalResult { Success = true, FormattedValue = formatted };
                 }
                 catch
@@ -162,99 +162,6 @@ namespace Pup.Services
                 _lastConsoleIndex = _page.ConsoleEntries.Count;
             }
             return entries;
-        }
-
-        private static string FormatJsonElement(JsonElement element, int indent)
-        {
-            var indentStr = new string(' ', indent * 2);
-
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Undefined:
-                    return "undefined";
-
-                case JsonValueKind.Null:
-                    return "null";
-
-                case JsonValueKind.True:
-                    return "true";
-
-                case JsonValueKind.False:
-                    return "false";
-
-                case JsonValueKind.Number:
-                    return element.GetRawText();
-
-                case JsonValueKind.String:
-                    return element.GetString();
-
-                case JsonValueKind.Array:
-                    return FormatArray(element, indent, indentStr);
-
-                case JsonValueKind.Object:
-                    return FormatObject(element, indent, indentStr);
-
-                default:
-                    return element.GetRawText();
-            }
-        }
-
-        private static string FormatArray(JsonElement element, int indent, string indentStr)
-        {
-            var items = new List<string>();
-            foreach (var item in element.EnumerateArray())
-            {
-                items.Add(FormatJsonElement(item, indent + 1));
-            }
-
-            if (items.Count == 0)
-                return "[]";
-
-            if (items.Count <= 5 && string.Join(", ", items).Length < 80)
-                return $"[{string.Join(", ", items)}]";
-
-            var sb = new StringBuilder("[\n");
-            for (int i = 0; i < Math.Min(items.Count, 20); i++)
-            {
-                sb.Append($"{indentStr}  {items[i]}");
-                if (i < items.Count - 1) sb.Append(',');
-                sb.Append('\n');
-            }
-            if (items.Count > 20)
-            {
-                sb.Append($"{indentStr}  ... ({items.Count - 20} more items)\n");
-            }
-            sb.Append($"{indentStr}]");
-            return sb.ToString();
-        }
-
-        private static string FormatObject(JsonElement element, int indent, string indentStr)
-        {
-            var props = new List<string>();
-            foreach (var prop in element.EnumerateObject())
-            {
-                props.Add($"{prop.Name}: {FormatJsonElement(prop.Value, indent + 1)}");
-            }
-
-            if (props.Count == 0)
-                return "{}";
-
-            if (props.Count <= 3 && string.Join(", ", props).Length < 60)
-                return $"{{ {string.Join(", ", props)} }}";
-
-            var sb = new StringBuilder("{\n");
-            for (int i = 0; i < Math.Min(props.Count, 30); i++)
-            {
-                sb.Append($"{indentStr}  {props[i]}");
-                if (i < props.Count - 1) sb.Append(',');
-                sb.Append('\n');
-            }
-            if (props.Count > 30)
-            {
-                sb.Append($"{indentStr}  ... ({props.Count - 30} more properties)\n");
-            }
-            sb.Append($"{indentStr}}}");
-            return sb.ToString();
         }
     }
 }

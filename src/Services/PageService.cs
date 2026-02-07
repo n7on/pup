@@ -338,7 +338,7 @@ namespace Pup.Services
             var result = await _page.Page.EvaluateFunctionAsync<object>(script, args).ConfigureAwait(false);
             if (result is JsonElement element)
             {
-                return ConvertJsonElementToPSObject(element);
+                return JsonHelper.ConvertJsonElement(element);
             }
             return result;
         }
@@ -633,12 +633,7 @@ namespace Pup.Services
                 }
                 else if (body is Hashtable ht)
                 {
-                    var dict = new Dictionary<string, object>();
-                    foreach (DictionaryEntry entry in ht)
-                    {
-                        dict[entry.Key.ToString()] = entry.Value;
-                    }
-                    bodyString = JsonSerializer.Serialize(dict);
+                    bodyString = JsonSerializer.Serialize(PowerShellHelper.ConvertHashtable(ht));
 
                     if (string.IsNullOrEmpty(contentType) && !headerDict.ContainsKey("Content-Type"))
                     {
@@ -734,7 +729,7 @@ async (url, options, timeout) => {
                 try
                 {
                     using var doc = JsonDocument.Parse(response.Body);
-                    response.JsonBody = ConvertJsonElement(doc.RootElement);
+                    response.JsonBody = JsonHelper.ConvertJsonElement(doc.RootElement);
                 }
                 catch
                 {
@@ -790,84 +785,5 @@ async (url, options, timeout) => {
             }
         }
 
-        private static object ConvertJsonElement(JsonElement element)
-        {
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Object:
-                    var dict = new Dictionary<string, object>();
-                    foreach (var prop in element.EnumerateObject())
-                    {
-                        dict[prop.Name] = ConvertJsonElement(prop.Value);
-                    }
-                    return dict;
-
-                case JsonValueKind.Array:
-                    var list = new List<object>();
-                    foreach (var item in element.EnumerateArray())
-                    {
-                        list.Add(ConvertJsonElement(item));
-                    }
-                    return list.ToArray();
-
-                case JsonValueKind.String:
-                    return element.GetString();
-
-                case JsonValueKind.Number:
-                    if (element.TryGetInt64(out var longVal))
-                        return longVal;
-                    return element.GetDouble();
-
-                case JsonValueKind.True:
-                    return true;
-
-                case JsonValueKind.False:
-                    return false;
-
-                case JsonValueKind.Null:
-                default:
-                    return null;
-            }
-        }
-
-        private static object ConvertJsonElementToPSObject(JsonElement element)
-        {
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Object:
-                    var psObj = new PSObject();
-                    foreach (var prop in element.EnumerateObject())
-                    {
-                        psObj.Properties.Add(new PSNoteProperty(prop.Name, ConvertJsonElementToPSObject(prop.Value)));
-                    }
-                    return psObj;
-
-                case JsonValueKind.Array:
-                    var list = new List<object>();
-                    foreach (var item in element.EnumerateArray())
-                    {
-                        list.Add(ConvertJsonElementToPSObject(item));
-                    }
-                    return list.ToArray();
-
-                case JsonValueKind.String:
-                    return element.GetString();
-
-                case JsonValueKind.Number:
-                    if (element.TryGetInt64(out var longVal))
-                        return longVal;
-                    return element.GetDouble();
-
-                case JsonValueKind.True:
-                    return true;
-
-                case JsonValueKind.False:
-                    return false;
-
-                case JsonValueKind.Null:
-                default:
-                    return null;
-            }
-        }
     }
 }

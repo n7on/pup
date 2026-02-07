@@ -37,6 +37,7 @@
         'Invoke-PupElementFocus',
         'Invoke-PupElementHover',
         'Invoke-PupElementScroll',
+        'Invoke-PupCdpMessage',
         'Invoke-PupHttpFetch',
         'Invoke-PupPageBack',
         'Invoke-PupPageForward',
