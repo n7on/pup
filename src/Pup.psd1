@@ -19,6 +19,7 @@
         'Export-PupPageSession',
         'Find-PupElements',
         'Get-PupBrowser',
+        'Get-PupCertificate',
         'Get-PupElementAttribute',
         'Get-PupElementScreenshot',
         'Get-PupElementSelector',

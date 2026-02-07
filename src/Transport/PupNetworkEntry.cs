@@ -27,6 +27,9 @@ namespace Pup.Transport
         public string Body { get; set; }
         public bool BodyBase64Encoded { get; set; }
 
+        // Security details for HTTPS requests
+        public PupSecurityDetails SecurityDetails { get; set; }
+
         public override string ToString()
         {
             return $"{Method} {Url} {(Status.HasValue ? Status.ToString() : "")}";

@@ -238,6 +238,13 @@ namespace Pup.Services
                 entry.FromDiskCache = response.TryGetProperty("fromDiskCache", out var fdc) && fdc.GetBoolean();
                 entry.FromServiceWorker = response.TryGetProperty("fromServiceWorker", out var fsw) && fsw.GetBoolean();
                 entry.RemoteAddress = response.TryGetProperty("remoteIPAddress", out var ip) ? ip.GetString() : null;
+
+                // Capture security details for HTTPS requests
+                if (response.TryGetProperty("securityDetails", out var securityDetails) &&
+                    securityDetails.ValueKind == JsonValueKind.Object)
+                {
+                    entry.SecurityDetails = ParseSecurityDetails(securityDetails);
+                }
             }
         }
 
@@ -266,6 +273,73 @@ namespace Pup.Services
                     entry.EndTime = DateTime.UtcNow;
                 }
             }
+        }
+
+        private static PupSecurityDetails ParseSecurityDetails(JsonElement securityDetails)
+        {
+            var details = new PupSecurityDetails
+            {
+                Protocol = securityDetails.TryGetProperty("protocol", out var proto) ? proto.GetString() : null,
+                KeyExchange = securityDetails.TryGetProperty("keyExchange", out var kx) ? kx.GetString() : null,
+                KeyExchangeGroup = securityDetails.TryGetProperty("keyExchangeGroup", out var kxg) ? kxg.GetString() : null,
+                Cipher = securityDetails.TryGetProperty("cipher", out var cipher) ? cipher.GetString() : null,
+                Mac = securityDetails.TryGetProperty("mac", out var mac) ? mac.GetString() : null,
+                SubjectName = securityDetails.TryGetProperty("subjectName", out var subj) ? subj.GetString() : null,
+                Issuer = securityDetails.TryGetProperty("issuer", out var issuer) ? issuer.GetString() : null,
+                CertificateTransparencyCompliance = securityDetails.TryGetProperty("certificateTransparencyCompliance", out var ctc) ? ctc.GetString() : null
+            };
+
+            // Parse validFrom/validTo (Unix epoch seconds)
+            if (securityDetails.TryGetProperty("validFrom", out var validFrom))
+            {
+                details.ValidFrom = DateTimeOffset.FromUnixTimeSeconds((long)validFrom.GetDouble()).UtcDateTime;
+            }
+            if (securityDetails.TryGetProperty("validTo", out var validTo))
+            {
+                details.ValidTo = DateTimeOffset.FromUnixTimeSeconds((long)validTo.GetDouble()).UtcDateTime;
+            }
+
+            // Parse SAN list
+            if (securityDetails.TryGetProperty("sanList", out var sanList) && sanList.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var san in sanList.EnumerateArray())
+                {
+                    if (san.ValueKind == JsonValueKind.String)
+                    {
+                        details.SanList.Add(san.GetString());
+                    }
+                }
+            }
+
+            // Parse Signed Certificate Timestamp list
+            if (securityDetails.TryGetProperty("signedCertificateTimestampList", out var sctList) && sctList.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var sct in sctList.EnumerateArray())
+                {
+                    if (sct.ValueKind == JsonValueKind.Object)
+                    {
+                        var timestamp = new PupSignedCertificateTimestamp
+                        {
+                            Status = sct.TryGetProperty("status", out var status) ? status.GetString() : null,
+                            Origin = sct.TryGetProperty("origin", out var origin) ? origin.GetString() : null,
+                            LogDescription = sct.TryGetProperty("logDescription", out var logDesc) ? logDesc.GetString() : null,
+                            LogId = sct.TryGetProperty("logId", out var logId) ? logId.GetString() : null,
+                            HashAlgorithm = sct.TryGetProperty("hashAlgorithm", out var hashAlg) ? hashAlg.GetString() : null,
+                            SignatureAlgorithm = sct.TryGetProperty("signatureAlgorithm", out var sigAlg) ? sigAlg.GetString() : null,
+                            SignatureData = sct.TryGetProperty("signatureData", out var sigData) ? sigData.GetString() : null
+                        };
+
+                        if (sct.TryGetProperty("timestamp", out var ts))
+                        {
+                            timestamp.Timestamp = DateTimeOffset.FromUnixTimeMilliseconds((long)ts.GetDouble()).UtcDateTime;
+                        }
+
+                        details.SignedCertificateTimestampList.Add(timestamp);
+                    }
+                }
+            }
+
+            return details;
         }
 
         private static Dictionary<string, string> ToHeaderDictionary(JsonElement headersElement)

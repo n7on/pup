@@ -42,4 +42,10 @@ public static class ServiceFactory
     {
         return new CdpService(page);
     }
+
+    public static ICertificateService CreateCertificateService(PupPage page)
+    {
+        var cdpService = CreateCdpService(page);
+        return new CertificateService(page, cdpService);
+    }
 }

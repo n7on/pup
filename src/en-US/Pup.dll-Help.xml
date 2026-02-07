@@ -1900,4 +1900,72 @@ Get-PupPageScreenshot -Page $page -FilePath "desktop.png"</dev:code>
     </command:examples>
   </command:command>
 
+  <!-- Get-PupCertificate -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupCertificate</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>PupCertificate</command:noun>
+      <maml:description>
+        <maml:para>Retrieves SSL/TLS certificate and security details from a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Gets SSL/TLS certificate information in two modes: passive mode returns security details captured from network requests (protocol, cipher, subject, validity), while active mode fetches the full certificate chain for a specific origin via CDP. Useful for certificate validation, expiry monitoring, and TLS configuration analysis.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all captured security details</maml:title>
+        <dev:code>$certs = Get-PupCertificate -Page $page
+$certs | Format-Table SubjectName, Protocol, Cipher, ValidTo</dev:code>
+        <dev:remarks>
+          <maml:para>Lists TLS security details for all HTTPS requests made by the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Filter by URL pattern</maml:title>
+        <dev:code>Get-PupCertificate -Page $page -UrlFilter "api.github.com"</dev:code>
+        <dev:remarks>
+          <maml:para>Returns security details only for requests matching the URL pattern.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Find certificates expiring soon</maml:title>
+        <dev:code>Get-PupCertificate -Page $page -ExpiringWithin 30 |
+    Select-Object SubjectName, ValidTo, DaysUntilExpiry</dev:code>
+        <dev:remarks>
+          <maml:para>Finds certificates expiring within 30 days for proactive monitoring.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Fetch full certificate for an origin</maml:title>
+        <dev:code>$cert = Get-PupCertificate -Page $page -Origin "https://github.com"
+$cert.SubjectName
+$cert.Thumbprint
+$cert.DaysUntilExpiry
+$cert.CertificateChain.Count  # Number of certs in chain</dev:code>
+        <dev:remarks>
+          <maml:para>Actively fetches the full certificate chain and parses X.509 details including thumbprint and serial number.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 5: Get unique certificates</maml:title>
+        <dev:code>Get-PupCertificate -Page $page -Unique |
+    Select-Object SubjectName, Issuer, Protocol</dev:code>
+        <dev:remarks>
+          <maml:para>Deduplicates results by SubjectName to see unique certificates across all requests.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 6: Check certificate in network entries</maml:title>
+        <dev:code>$network = Get-PupPageNetwork -Page $page
+$network | Where-Object { $_.SecurityDetails } |
+    Select-Object Url, @{N="TLS";E={$_.SecurityDetails.Protocol}}</dev:code>
+        <dev:remarks>
+          <maml:para>Access security details directly from network entries for per-request TLS info.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
 </helpItems>

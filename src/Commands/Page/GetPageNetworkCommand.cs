@@ -76,7 +76,8 @@ namespace Pup.Commands.Page
                         ResponseHeaders = new Dictionary<string, string>(entry.ResponseHeaders, StringComparer.OrdinalIgnoreCase),
                         RemoteAddress = entry.RemoteAddress,
                         Body = entry.Body,
-                        BodyBase64Encoded = entry.BodyBase64Encoded
+                        BodyBase64Encoded = entry.BodyBase64Encoded,
+                        SecurityDetails = entry.SecurityDetails
                     });
                 }
             }
