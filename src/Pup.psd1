@@ -21,6 +21,7 @@
         'Get-PupBrowser',
         'Get-PupCertificate',
         'Get-PupElementAttribute',
+        'Get-PupElementPattern',
         'Get-PupElementScreenshot',
         'Get-PupElementSelector',
         'Get-PupElementValue',
