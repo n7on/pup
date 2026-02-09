@@ -6,7 +6,7 @@ Pup is a native PowerShell module made for browser automation. It's build upon P
 Install-Module Pup
 ```
 # Examples
-This example scrape Ubunty security notices. And return the date and link to security issues.
+This example scrape Ubuntu security notices. And return the date and link to security issues.
 
 ```powershell
 Import-Module Pup
