@@ -92,7 +92,7 @@ $nextPageSelector = ".p-pagination__link--next i"
 Now we have everything that is needed for the script. We only need the Ubunty Notices from 1 month back. So we'll stop when we get an older notice.
 
 ```powershell
-$url = "https://ubuntu.com/security/notices"
+$url = "https://ubuntu.com"
 $listSelector = "#notices-list section"
 $dateSelector = "div.row > div.col-6 > p.u-text--muted"
 $linkSelector = "div.u-fixed-width > h3.u-no-margin > a"
@@ -101,7 +101,7 @@ $nextPageSelector = ".p-pagination__link--next i"
 # check notices from 1 month back.
 $fromDate = (Get-Date).AddMonths(-1)
 $browser = Start-PupBrowser -Headless
-$page = New-PupPage -Url $url
+$page = New-PupPage -Url "$url/security/notices"
 
 $date = Get-Date
 
@@ -110,10 +110,10 @@ while ($date -gt $fromDate) {
 
     $page | Find-PupElements -WaitForLoad -Selector $listSelector | ForEach-Object {
         $date = [datetime]($_ | Find-PupElements -Selector $dateSelector).InnerHTML.Trim()
-        $link = ($_ | Find-PupElements -Selector $linkSelector).InnerHTML.Trim()
+        $href = $_ | Find-PupElements -Selector $linkSelector | Get-PupElementAttribute -Name href
         [PSCustomObject]@{
             Date  = $date
-            Link  = $link
+            Link  = "$url$href"
         }
     }
     # click next-page link
