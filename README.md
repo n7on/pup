@@ -4,37 +4,128 @@ Pup is a native PowerShell module made for browser automation. It's build upon P
 ## Install
 ```powershell
 Install-Module Pup
+Install-PupBrowser
 ```
-# Examples
-This example scrape Ubuntu security notices. And return the date and link to security issues.
 
+# Use-Cases
+
+## Web Scraping
+This example scrape Ubuntu security notices from `https://ubuntu.com/security/notices `. And return the date and link to security issues.
+
+
+### Start browser 
 ```powershell
 Import-Module Pup
-Install-PupBrowser
+$page = start-PupBrowser | New-PupPage -Url https://ubuntu.com/security/notices 
+```
+### Get selectors
 
-$FromDate = (Get-Date).AddMonths(-1)
-$Browser = Start-PupBrowser -Headless
-$Page = New-PupPage -Url "https://ubuntu.com/security/notices" 
+#### List selector
+If you look at the opened page in the browser, you see that there are 10 notices per page. So we need a list that contains all those, so that we can iterate over it. Copy the first link name, which at this time is `USN-8015-3: Linux kernel (FIPS) vulnerabilities`.
+```powershell
 
-$Date = Get-Date
-while ($Date -gt $FromDate) {
+# Try with different depts, and try to go as deep as possible while at same time catch all 10 items.
+$page | find-pupelements -Text "USN-8015-3: Linux kernel (FIPS) vulnerabilities" | get-PupElementPattern -Depth 3
 
-    $Page | Find-PupElements -WaitForLoad -Selector "#notices-list > section" | ForEach-Object {
-        $Date = [datetime]($_ | Find-PupElements -Selector ".row > div.col-6 > p:first-child").InnerHTML.Trim()
-        $Link = ($_ | Find-PupElements -Selector ".u-fixed-width > h3").InnerHTML.Trim()
+# Type          Selector                   MatchCount Description
+# ----          --------                   ---------- -----------
+# ByClass       section.p-section--shallow         10 Elements with same tag and…
+# ByParentClass .col-9 section                     10 All section inside .col-9
+# ByAncestorId  #notices-list section              10 All section under #notices…
+# ByStructure   div.col-9 section                  10 Elements in repeating div.…
+# ByTag         section                            16 All section elements
+
+$listSelector = "#notices-list section"
+```
+#### Date selector
+If we first get the first element by using the `$listSelector`, we can get the element that holds the date-text, and see its selector.
+```powershell
+$page | find-pupelements -Selector $listSelector -First | Find-PupElements -TextContains "6 february"
+
+# Selector  : div.row > div.col-6 > p.u-text--muted
+# Index     : 0
+# FoundTime : 2026-02-09 20:21:09
+# TagName   : P
+# InnerText : 6 February 2026
+# InnerHTML : 6 February 2026
+# Id        : 
+# IsVisible : False
+
+$dateSelector = "div.row > div.col-6 > p.u-text--muted"
+```
+#### Link selector
+
+We use the `$listSelector` again, and get the element that holds the link-text, and see its selector.
+```powershell
+$page | find-pupelements -Selector $listSelector -First | Find-PupElements -TextContains "USN-8015-3: Linux kernel (FIPS) vulnerabilities"
+
+# ElementId : 17fa5859-2293-4913-87db-4fc0049e3f89
+# Selector  : div.u-fixed-width > h3.u-no-margin > a
+# Index     : 0
+# FoundTime : 2026-02-09 20:34:23
+# TagName   : A
+# InnerText : USN-8015-3: Linux kernel (FIPS) vulnerabilities
+# InnerHTML : USN-8015-3: Linux kernel (FIPS) vulnerabilities
+# Id        : 
+# IsVisible : False
+
+$linkSelector = "div.u-fixed-width > h3.u-no-margin > a"
+```
+#### NextPage selector 
+We need the selector to next page in order to scrape multiple pages.
+```powershell
+# it doesn't show on the page, but if you look in source it's actually "Next page". 
+# the selector from find-pupElements doesn't look great, but if we run the element through Get-PupElementPattern we get better onces. And we can choose anyone which have 1 matches.
+$page | find-pupelements -Text "Next page" | Get-PupElementPattern
+
+# Type          Selector                            MatchCount Description
+# ----          --------                            ---------- -----------
+# ByClass       i.p-icon--chevron-down                       3 Elements with same tag and classes
+# ByTag         i                                           13 All i elements
+# ByParentClass .p-pagination__link--next i                  1 All i inside .p-pagination__link--next
+# ByAncestorId  #notices-list div > ol > li > a > i          1 All i under #notices-list
+# ByStructure   li.p-pagination__item a > i                  1 Elements in repeating li.p-pagination__item containers
+
+$nextPageSelector = ".p-pagination__link--next i"
+```
+### Create script
+Now we have everything that is needed for the script. We only need the Ubunty Notices from 1 month back. So we'll stop when we get an older notice.
+
+```powershell
+$url = "https://ubuntu.com/security/notices"
+$listSelector = "#notices-list section"
+$dateSelector = "div.row > div.col-6 > p.u-text--muted"
+$linkSelector = "div.u-fixed-width > h3.u-no-margin > a"
+$nextPageSelector = ".p-pagination__link--next i"
+
+# check notices from 1 month back.
+$fromDate = (Get-Date).AddMonths(-1)
+$browser = Start-PupBrowser -Headless
+$page = New-PupPage -Url $url
+
+$date = Get-Date
+
+# while found date is not older than 1 month
+while ($date -gt $fromDate) {
+
+    $page | Find-PupElements -WaitForLoad -Selector $listSelector | ForEach-Object {
+        $date = [datetime]($_ | Find-PupElements -Selector $dateSelector).InnerHTML.Trim()
+        $link = ($_ | Find-PupElements -Selector $linkSelector).InnerHTML.Trim()
         [PSCustomObject]@{
-            Date  = $Date
-            Link  = $Link
+            Date  = $date
+            Link  = $link
         }
     }
-    $Page | Find-PupElements -Selector "a.p-pagination__link--next" | Invoke-PupElementClick
+    # click next-page link
+    $page | Find-PupElements -Selector $nextPageSelector | Invoke-PupElementClick
 }
-$Browser | Stop-PupBrowser
+$browser | Stop-PupBrowser
 
 ```
 See more examples in [./examples](./examples/)
-# Development
 
+# Development
+If you want to contribute to the source you're highly welcome! 
 ## Prerequisites
 
 * Dotnet 8

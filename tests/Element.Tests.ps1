@@ -356,4 +356,84 @@ Describe "Find Elements by Text" {
         $el = Find-PupElements -Element $form -Text "Item 1" -First
         $el | Should -BeNullOrEmpty
     }
+
+    It "Text search via pipeline respects element scope" {
+        # "Item 1" is in the ul#items, not in #form
+        $form = Find-PupElements -Page $script:page -Selector "#form" -First
+        $el = $form | Find-PupElements -Text "Item 1" -First
+        $el | Should -BeNullOrEmpty
+
+        # But searching within #items should find it
+        $list = Find-PupElements -Page $script:page -Selector "#items" -First
+        $el2 = $list | Find-PupElements -Text "Item 1" -First
+        $el2 | Should -Not -BeNullOrEmpty
+    }
+
+    It "Returns relative selector when searching within element" {
+        # When searching within a parent element, the selector should be relative to that parent
+        $list = Find-PupElements -Page $script:page -Selector "#items" -First
+        $item = Find-PupElements -Element $list -Text "Item 1" -First
+        $item | Should -Not -BeNullOrEmpty
+
+        # The selector should NOT start with #items (the parent) since it's relative
+        # It should be something like "li.item:nth-of-type(1)" not "#items > li.item:nth-of-type(1)"
+        $item.Selector | Should -Not -BeLike "#items*"
+        $item.Selector | Should -Not -BeLike "*body*"
+
+        # The relative selector should work when used on the parent element
+        $found = Find-PupElements -Element $list -Selector $item.Selector -First
+        $found | Should -Not -BeNullOrEmpty
+        $found.InnerText | Should -Be "Item 1"
+    }
+}
+
+Describe "Get Element Pattern" {
+    It "Returns patterns for an element" {
+        $el = Find-PupElements -Page $script:page -Selector ".item" -First
+        $patterns = Get-PupElementPattern -Element $el
+        $patterns.Count | Should -BeGreaterThan 0
+    }
+
+    It "Patterns have required properties" {
+        $el = Find-PupElements -Page $script:page -Selector ".item" -First
+        $patterns = @(Get-PupElementPattern -Element $el)
+        $patterns.Count | Should -BeGreaterThan 0
+        $pattern = $patterns[0]
+        $pattern.Type | Should -Not -BeNullOrEmpty
+        $pattern.Selector | Should -Not -BeNullOrEmpty
+        $pattern.MatchCount | Should -BeGreaterThan 0
+    }
+
+    It "ByClass pattern matches similar elements" {
+        $el = Find-PupElements -Page $script:page -Selector ".item" -First
+        $pattern = Get-PupElementPattern -Element $el -Type "ByClass"
+        $pattern | Should -Not -BeNullOrEmpty
+        $pattern.MatchCount | Should -Be 3  # 3 .item elements in test page
+    }
+
+    It "Filters by MinMatches" {
+        $el = Find-PupElements -Page $script:page -Selector ".item" -First
+        $patterns = Get-PupElementPattern -Element $el -MinMatches 2
+        $patterns | ForEach-Object { $_.MatchCount | Should -BeGreaterOrEqual 2 }
+    }
+
+    It "Pattern selector can be used to find elements" {
+        $el = Find-PupElements -Page $script:page -Selector ".item" -First
+        $pattern = Get-PupElementPattern -Element $el -Type "ByClass"
+        $found = Find-PupElements -Page $script:page -Selector $pattern.Selector
+        $found.Count | Should -Be $pattern.MatchCount
+    }
+
+    It "Depth parameter gets parent patterns" {
+        # Find an li.item element
+        $el = Find-PupElements -Page $script:page -Selector ".item" -First
+
+        # Depth 0 should give patterns for li
+        $patterns0 = @(Get-PupElementPattern -Element $el -Depth 0)
+        $patterns0[0].Selector | Should -BeLike "*li*"
+
+        # Depth 1 should give patterns for ul#items (the parent)
+        $patterns1 = @(Get-PupElementPattern -Element $el -Depth 1)
+        $patterns1[0].Selector | Should -BeLike "*ul*"
+    }
 }

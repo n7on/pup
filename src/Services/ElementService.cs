@@ -46,6 +46,9 @@ namespace Pup.Services
 
         // File upload
         Task UploadFilesAsync(params string[] filePaths);
+
+        // Pattern detection
+        Task<List<PupElementPattern>> GetElementPatternsAsync(int depth = 0);
     }
 
     public class ElementService : IElementService
@@ -359,8 +362,8 @@ namespace Pup.Services
 
                 if (prop.Value is IElementHandle element)
                 {
-                    // Generate a stable CSS selector for this element
-                    var elementSelector = await element.EvaluateFunctionAsync<string>(GenerateUniqueSelectorScript).ConfigureAwait(false);
+                    // Generate a stable CSS selector for this element (relative to root element)
+                    var elementSelector = await element.EvaluateFunctionAsync<string>(GenerateUniqueSelectorScript, _element.Element).ConfigureAwait(false);
 
                     pbElements.Add(new PupElement(
                         element,
@@ -381,41 +384,52 @@ namespace Pup.Services
         }
 
         private const string GenerateUniqueSelectorScript = @"
-            (element) => {
-                // Try ID first (most stable)
-                if (element.id) return '#' + CSS.escape(element.id);
+            (element, rootElement) => {
+                // Try ID first (most stable) - but only if not searching within a root
+                if (!rootElement && element.id) return '#' + CSS.escape(element.id);
 
-                // Build path from element to a unique ancestor
+                // Build path from element up to root (or document)
                 const path = [];
                 let current = element;
 
                 while (current && current.nodeType === Node.ELEMENT_NODE) {
+                    // Stop if we've reached the root element (for relative selectors)
+                    if (rootElement && current === rootElement) break;
+
                     let selector = current.tagName.toLowerCase();
 
-                    // If element has ID, use it and stop
-                    if (current.id) {
+                    // If element has ID and we're not doing relative selector, use it and stop
+                    if (!rootElement && current.id) {
                         selector = '#' + CSS.escape(current.id);
                         path.unshift(selector);
                         break;
                     }
 
-                    // Add nth-child for uniqueness among siblings
-                    const parent = current.parentElement;
-                    if (parent) {
-                        const siblings = [...parent.children];
-                        const sameTagSiblings = siblings.filter(s => s.tagName === current.tagName);
-                        if (sameTagSiblings.length > 1) {
-                            const index = sameTagSiblings.indexOf(current) + 1;
-                            selector += ':nth-of-type(' + index + ')';
+                    // Add class if available (more readable than nth-of-type)
+                    const classes = current.className && typeof current.className === 'string'
+                        ? current.className.trim().split(/\s+/).filter(c => c.length > 0)
+                        : [];
+                    if (classes.length > 0) {
+                        selector += '.' + CSS.escape(classes[0]);
+                    } else {
+                        // Add nth-of-type for uniqueness among siblings if no class
+                        const parent = current.parentElement;
+                        if (parent && (!rootElement || parent !== rootElement)) {
+                            const siblings = [...parent.children];
+                            const sameTagSiblings = siblings.filter(s => s.tagName === current.tagName);
+                            if (sameTagSiblings.length > 1) {
+                                const index = sameTagSiblings.indexOf(current) + 1;
+                                selector += ':nth-of-type(' + index + ')';
+                            }
                         }
                     }
 
                     path.unshift(selector);
 
-                    // Stop at body
-                    if (current.tagName.toLowerCase() === 'body') break;
+                    // Stop at body (for absolute selectors)
+                    if (!rootElement && current.tagName.toLowerCase() === 'body') break;
 
-                    current = parent;
+                    current = current.parentElement;
                 }
 
                 return path.join(' > ');
@@ -738,6 +752,223 @@ namespace Pup.Services
         public async Task UploadFilesAsync(params string[] filePaths)
         {
             await _element.Element.UploadFileAsync(filePaths).ConfigureAwait(false);
+        }
+
+        public async Task<List<PupElementPattern>> GetElementPatternsAsync(int depth = 0)
+        {
+            var script = @"
+                (element, depth) => {
+                    // Traverse up to the specified depth
+                    let target = element;
+                    for (let i = 0; i < depth && target.parentElement; i++) {
+                        target = target.parentElement;
+                    }
+                    element = target;
+                    const results = [];
+                    const escape = (s) => s ? CSS.escape(s) : '';
+
+                    // Helper to count matches
+                    const count = (sel) => {
+                        try { return document.querySelectorAll(sel).length; }
+                        catch { return 0; }
+                    };
+
+                    // Helper to check if selector matches our element
+                    const matchesElement = (sel) => {
+                        try {
+                            const matches = document.querySelectorAll(sel);
+                            return Array.from(matches).includes(element);
+                        } catch { return false; }
+                    };
+
+                    const tag = element.tagName.toLowerCase();
+                    const classes = element.className && typeof element.className === 'string'
+                        ? element.className.trim().split(/\s+/).filter(c => c.length > 0)
+                        : [];
+
+                    // 1. ByTag - just the tag name
+                    const byTag = tag;
+                    if (matchesElement(byTag)) {
+                        results.push({
+                            type: 'ByTag',
+                            selector: byTag,
+                            matchCount: count(byTag),
+                            description: 'All ' + tag + ' elements'
+                        });
+                    }
+
+                    // 2. ByClass - tag with classes
+                    if (classes.length > 0) {
+                        const byClass = tag + '.' + classes.map(c => escape(c)).join('.');
+                        if (matchesElement(byClass)) {
+                            results.push({
+                                type: 'ByClass',
+                                selector: byClass,
+                                matchCount: count(byClass),
+                                description: 'Elements with same tag and classes'
+                            });
+                        }
+                    }
+
+                    // 3. ByParentClass - find nearest parent with meaningful class
+                    let parent = element.parentElement;
+                    let parentDepth = 0;
+                    while (parent && parentDepth < 5) {
+                        const parentClasses = parent.className && typeof parent.className === 'string'
+                            ? parent.className.trim().split(/\s+/).filter(c => c.length > 0)
+                            : [];
+
+                        if (parentClasses.length > 0) {
+                            const parentSel = '.' + escape(parentClasses[0]);
+                            const childSel = parentSel + ' ' + tag;
+                            if (matchesElement(childSel)) {
+                                results.push({
+                                    type: 'ByParentClass',
+                                    selector: childSel,
+                                    matchCount: count(childSel),
+                                    description: 'All ' + tag + ' inside .' + parentClasses[0]
+                                });
+                            }
+
+                            // Also try direct child
+                            const directChildSel = parentSel + ' > ' + tag;
+                            if (matchesElement(directChildSel) && count(directChildSel) !== count(childSel)) {
+                                results.push({
+                                    type: 'ByDirectParent',
+                                    selector: directChildSel,
+                                    matchCount: count(directChildSel),
+                                    description: 'Direct ' + tag + ' children of .' + parentClasses[0]
+                                });
+                            }
+                            break;
+                        }
+                        parent = parent.parentElement;
+                        parentDepth++;
+                    }
+
+                    // 4. ByAncestorId - find nearest ancestor with ID
+                    let ancestor = element.parentElement;
+                    let ancestorDepth = 0;
+                    let pathFromAncestor = [tag];
+                    while (ancestor && ancestorDepth < 10) {
+                        if (ancestor.id) {
+                            const byAncestorId = '#' + escape(ancestor.id) + ' ' + pathFromAncestor.join(' > ');
+                            if (matchesElement(byAncestorId)) {
+                                results.push({
+                                    type: 'ByAncestorId',
+                                    selector: byAncestorId,
+                                    matchCount: count(byAncestorId),
+                                    description: 'All ' + tag + ' under #' + ancestor.id
+                                });
+                            }
+                            break;
+                        }
+                        pathFromAncestor.unshift(ancestor.tagName.toLowerCase());
+                        ancestor = ancestor.parentElement;
+                        ancestorDepth++;
+                    }
+
+                    // 5. ByStructure - find repeating container pattern
+                    // Look for parent that has multiple similar children
+                    let container = element.parentElement;
+                    let relPath = tag;
+                    let structureDepth = 0;
+                    while (container && structureDepth < 6) {
+                        const containerTag = container.tagName.toLowerCase();
+                        const containerParent = container.parentElement;
+
+                        if (containerParent) {
+                            // Count siblings with same tag
+                            const siblings = [...containerParent.children].filter(
+                                c => c.tagName === container.tagName
+                            );
+
+                            if (siblings.length > 1) {
+                                // Found a repeating container
+                                let containerSel = containerTag;
+                                const containerClasses = container.className && typeof container.className === 'string'
+                                    ? container.className.trim().split(/\s+/).filter(c => c.length > 0)
+                                    : [];
+                                if (containerClasses.length > 0) {
+                                    containerSel += '.' + escape(containerClasses[0]);
+                                }
+
+                                const structureSel = containerSel + ' ' + relPath;
+                                if (matchesElement(structureSel)) {
+                                    results.push({
+                                        type: 'ByStructure',
+                                        selector: structureSel,
+                                        matchCount: count(structureSel),
+                                        description: 'Elements in repeating ' + containerSel + ' containers'
+                                    });
+                                }
+                                break;
+                            }
+                        }
+
+                        relPath = containerTag + ' > ' + relPath;
+                        container = containerParent;
+                        structureDepth++;
+                    }
+
+                    // 6. ByRole - if element has role or aria attributes
+                    const role = element.getAttribute('role');
+                    if (role) {
+                        const byRole = '[role=""' + role + '""]';
+                        if (matchesElement(byRole)) {
+                            results.push({
+                                type: 'ByRole',
+                                selector: byRole,
+                                matchCount: count(byRole),
+                                description: 'Elements with role=' + role
+                            });
+                        }
+                    }
+
+                    // 7. ByDataAttribute - common data-* attributes
+                    const dataAttrs = [...element.attributes]
+                        .filter(a => a.name.startsWith('data-') && !a.name.includes('id'))
+                        .map(a => a.name);
+                    if (dataAttrs.length > 0) {
+                        const attr = dataAttrs[0];
+                        const byData = tag + '[' + attr + ']';
+                        if (matchesElement(byData)) {
+                            results.push({
+                                type: 'ByDataAttribute',
+                                selector: byData,
+                                matchCount: count(byData),
+                                description: 'All ' + tag + ' with ' + attr + ' attribute'
+                            });
+                        }
+                    }
+
+                    // Sort by match count (prefer patterns with reasonable count)
+                    results.sort((a, b) => {
+                        // Prefer counts > 1 but not too high
+                        const scoreA = a.matchCount > 1 && a.matchCount < 1000 ? 1000 - a.matchCount : -a.matchCount;
+                        const scoreB = b.matchCount > 1 && b.matchCount < 1000 ? 1000 - b.matchCount : -b.matchCount;
+                        return scoreB - scoreA;
+                    });
+
+                    return results;
+                }
+            ";
+
+            var patternsJson = await _element.Element.EvaluateFunctionAsync<JsonElement>(script, depth).ConfigureAwait(false);
+            var patterns = new List<PupElementPattern>();
+
+            foreach (var item in patternsJson.EnumerateArray())
+            {
+                patterns.Add(new PupElementPattern
+                {
+                    Type = item.GetProperty("type").GetString(),
+                    Selector = item.GetProperty("selector").GetString(),
+                    MatchCount = item.GetProperty("matchCount").GetInt32(),
+                    Description = item.GetProperty("description").GetString()
+                });
+            }
+
+            return patterns;
         }
     }
 }
