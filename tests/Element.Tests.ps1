@@ -291,3 +291,69 @@ Describe "Page Viewport" {
         { Set-PupPageViewport -Page $script:page -Width 375 -Height 667 -IsMobile -HasTouch } | Should -Not -Throw
     }
 }
+
+Describe "Find Elements by Text" {
+    BeforeEach {
+        Invoke-PupPageReload -Page $script:page -WaitForLoad
+    }
+
+    It "Finds element by exact text" {
+        $el = Find-PupElements -Page $script:page -Text "Test Page" -First
+        $el | Should -Not -BeNullOrEmpty
+        $el.TagName | Should -Be "H1"
+    }
+
+    It "Finds element by text contains (case-insensitive)" {
+        $el = Find-PupElements -Page $script:page -Selector "h1" -TextContains "test page" -First
+        $el | Should -Not -BeNullOrEmpty
+        $el.TagName | Should -Be "H1"
+    }
+
+    It "Finds button by text" {
+        $el = Find-PupElements -Page $script:page -Text "Submit" -First
+        $el | Should -Not -BeNullOrEmpty
+        $el.TagName | Should -Be "BUTTON"
+    }
+
+    It "Finds multiple elements containing text" {
+        $els = Find-PupElements -Page $script:page -TextContains "Item"
+        $els.Count | Should -Be 3
+    }
+
+    It "Combines text search with selector" {
+        $el = Find-PupElements -Page $script:page -Selector "button" -TextContains "Submit" -First
+        $el | Should -Not -BeNullOrEmpty
+        $el.Id | Should -Be "btn-submit"
+    }
+
+    It "Returns most specific element (not parent)" {
+        # "Item 1" appears in the li, not the parent ul
+        $el = Find-PupElements -Page $script:page -Text "Item 1" -First
+        $el | Should -Not -BeNullOrEmpty
+        $el.TagName | Should -Be "LI"
+    }
+
+    It "Returns empty for non-matching text" {
+        $el = Find-PupElements -Page $script:page -Text "NonExistentText12345" -First
+        $el | Should -BeNullOrEmpty
+    }
+
+    It "Exact match does not match partial text" {
+        $el = Find-PupElements -Page $script:page -Text "Item" -First
+        $el | Should -BeNullOrEmpty
+    }
+
+    It "Finds text within parent element" {
+        $list = Find-PupElements -Page $script:page -Selector "#items" -First
+        $item = Find-PupElements -Element $list -Text "Item 2" -First
+        $item | Should -Not -BeNullOrEmpty
+        $item.TagName | Should -Be "LI"
+    }
+
+    It "Text search within element respects scope" {
+        $form = Find-PupElements -Page $script:page -Selector "#form" -First
+        # "Item 1" is outside the form, should not be found
+        $el = Find-PupElements -Element $form -Text "Item 1" -First
+        $el | Should -BeNullOrEmpty
+    }
+}

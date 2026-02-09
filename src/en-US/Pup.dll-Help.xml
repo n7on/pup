@@ -77,11 +77,11 @@
       <command:verb>Find</command:verb>
       <command:noun>PupElements</command:noun>
       <maml:description>
-        <maml:para>Finds elements on a page using CSS selectors or XPath.</maml:para>
+        <maml:para>Finds elements on a page using CSS selectors, XPath, or visible text.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Searches for elements matching the given selector. Returns element objects that can be used for interaction (click, type, etc.).</maml:para>
+      <maml:para>Searches for elements matching the given selector or text content. Returns element objects that can be used for interaction (click, type, etc.). Text search finds the most specific matching elements, filtering out parent elements whose text is inherited from children.</maml:para>
     </maml:description>
     <command:examples>
       <command:example>
@@ -103,6 +103,29 @@
         <dev:code>$el = Find-PupElements -Page $page -Selector "//input[@name='csrf_token']" -XPath -First</dev:code>
         <dev:remarks>
           <maml:para>Uses XPath to find CSRF token input fields.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Find element by exact visible text</maml:title>
+        <dev:code>$btn = Find-PupElements -Page $page -Text "Add to Cart" -First
+$btn | Invoke-PupElementClick</dev:code>
+        <dev:remarks>
+          <maml:para>Finds an element with exactly "Add to Cart" as its visible text and clicks it.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 5: Find elements containing text (case-insensitive)</maml:title>
+        <dev:code>$links = Find-PupElements -Page $page -TextContains "privacy"
+$links | ForEach-Object { $_.InnerText }</dev:code>
+        <dev:remarks>
+          <maml:para>Finds all elements containing "privacy" in their text (case-insensitive partial match).</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 6: Combine text search with CSS selector</maml:title>
+        <dev:code>$submitBtn = Find-PupElements -Page $page -Selector "button" -TextContains "Submit" -First</dev:code>
+        <dev:remarks>
+          <maml:para>Finds the first button element containing "Submit" text. Combining selector and text search narrows results efficiently.</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>

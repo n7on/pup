@@ -29,6 +29,7 @@ namespace Pup.Services
         Task<List<PupElement>> FindElementsBySelectorAsync(string selector);
         Task<PupElement> FindElementByXPathAsync(string xpath);
         Task<List<PupElement>> FindElementsByXPathAsync(string xpath);
+        Task<List<PupElement>> FindElementsByTextAsync(string text, bool exactMatch, string selector);
         
         Task<string> GetElementSelectorAsync(bool unique = false, bool shortest = false, bool fullPath = false);
         Task<string> GetSimilarElementsSelectorAsync(bool sameTag = false, bool sameClass = false);
@@ -284,7 +285,7 @@ namespace Pup.Services
         {
             var elements = await _element.Element.QuerySelectorAllAsync($"xpath/{xpath}").ConfigureAwait(false);
             var results = new List<PupElement>();
-            
+
             for (int i = 0; i < elements.Length; i++)
             {
                 var element = elements[i];
@@ -301,9 +302,124 @@ namespace Pup.Services
                     isVisible: await element.IsIntersectingViewportAsync().ConfigureAwait(false)
                 ));
             }
-            
+
             return results;
         }
+
+        public async Task<List<PupElement>> FindElementsByTextAsync(string text, bool exactMatch, string selector = null)
+        {
+            // JavaScript that finds elements by visible text within this element
+            var script = @"(root, searchText, exactMatch, cssSelector) => {
+                const normalize = (s) => (s || '').trim().replace(/\s+/g, ' ');
+                const searchNorm = normalize(searchText);
+
+                // Get candidate elements within root
+                let candidates;
+                if (cssSelector) {
+                    candidates = [...root.querySelectorAll(cssSelector)];
+                } else {
+                    candidates = [...root.querySelectorAll('*')];
+                }
+
+                // Filter to elements whose innerText matches
+                const matches = candidates.filter(el => {
+                    const text = normalize(el.innerText);
+                    if (exactMatch) {
+                        return text === searchNorm;
+                    } else {
+                        return text.toLowerCase().includes(searchNorm.toLowerCase());
+                    }
+                });
+
+                // Filter to most specific elements (no child also matches)
+                const specific = matches.filter(el => {
+                    const dominated = matches.some(other =>
+                        other !== el && el.contains(other)
+                    );
+                    return !dominated;
+                });
+
+                return specific;
+            }";
+
+            var elementHandles = await _element.Element.EvaluateFunctionHandleAsync(script, text, exactMatch, selector).ConfigureAwait(false);
+            var jsHandle = elementHandles as IJSHandle;
+
+            // Get properties to iterate over array elements
+            var properties = await jsHandle.GetPropertiesAsync().ConfigureAwait(false);
+
+            var pbElements = new List<PupElement>();
+            int index = 0;
+
+            foreach (var prop in properties)
+            {
+                // Skip non-numeric properties (like 'length')
+                if (!int.TryParse(prop.Key, out _))
+                    continue;
+
+                if (prop.Value is IElementHandle element)
+                {
+                    // Generate a stable CSS selector for this element
+                    var elementSelector = await element.EvaluateFunctionAsync<string>(GenerateUniqueSelectorScript).ConfigureAwait(false);
+
+                    pbElements.Add(new PupElement(
+                        element,
+                        _element.Page,
+                        Guid.NewGuid().ToString(),
+                        elementSelector,
+                        index++,
+                        await element.EvaluateFunctionAsync<string>("el => el.tagName").ConfigureAwait(false),
+                        await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
+                        await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
+                        await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
+                        await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                    ));
+                }
+            }
+
+            return pbElements;
+        }
+
+        private const string GenerateUniqueSelectorScript = @"
+            (element) => {
+                // Try ID first (most stable)
+                if (element.id) return '#' + CSS.escape(element.id);
+
+                // Build path from element to a unique ancestor
+                const path = [];
+                let current = element;
+
+                while (current && current.nodeType === Node.ELEMENT_NODE) {
+                    let selector = current.tagName.toLowerCase();
+
+                    // If element has ID, use it and stop
+                    if (current.id) {
+                        selector = '#' + CSS.escape(current.id);
+                        path.unshift(selector);
+                        break;
+                    }
+
+                    // Add nth-child for uniqueness among siblings
+                    const parent = current.parentElement;
+                    if (parent) {
+                        const siblings = [...parent.children];
+                        const sameTagSiblings = siblings.filter(s => s.tagName === current.tagName);
+                        if (sameTagSiblings.length > 1) {
+                            const index = sameTagSiblings.indexOf(current) + 1;
+                            selector += ':nth-of-type(' + index + ')';
+                        }
+                    }
+
+                    path.unshift(selector);
+
+                    // Stop at body
+                    if (current.tagName.toLowerCase() === 'body') break;
+
+                    current = parent;
+                }
+
+                return path.join(' > ');
+            }";
 
         public async Task<string> GetElementSelectorAsync(bool unique = false, bool shortest = false, bool fullPath = false)
         {

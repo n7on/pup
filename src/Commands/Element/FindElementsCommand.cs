@@ -30,12 +30,17 @@ namespace Pup.Commands.Element
 
         [Parameter(
             Position = 1,
-            HelpMessage = "CSS selector or XPath expression to find elements", 
-            Mandatory = true)]
+            HelpMessage = "CSS selector or XPath expression to find elements")]
         public string Selector { get; set; }
 
         [Parameter(HelpMessage = "Use XPath expression instead of CSS selector")]
         public SwitchParameter XPath { get; set; }
+
+        [Parameter(HelpMessage = "Find elements by exact visible text match")]
+        public string Text { get; set; }
+
+        [Parameter(HelpMessage = "Find elements containing this text (case-insensitive)")]
+        public string TextContains { get; set; }
 
         [Parameter(HelpMessage = "Wait for elements to load before returning")]
         public SwitchParameter WaitForLoad { get; set; }
@@ -52,45 +57,87 @@ namespace Pup.Commands.Element
             {
                 List<PupElement> results = new List<PupElement>();
 
+                // Determine if we're doing text-based search
+                bool isTextSearch = !string.IsNullOrEmpty(Text) || !string.IsNullOrEmpty(TextContains);
+
                 if (ParameterSetName == "FromPage")
                 {
-                    // Find elements within a page
                     var pageService = ServiceFactory.CreatePageService(Page);
-                    if (First.IsPresent)
+
+                    if (isTextSearch)
                     {
-                        var singleElement = XPath.IsPresent
-                            ? pageService.FindElementByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
-                            : pageService.FindElementBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
-                        if (singleElement != null) results.Add(singleElement);
-                    }
-                    else
-                    {
-                        results = XPath.IsPresent
-                            ? pageService.FindElementsByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
-                            : pageService.FindElementsBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
-                    }
-                }
-                else if (ParameterSetName == "FromElement")
-                {
-                    // Find elements within a parent element using ElementService
-                    var elementService = new ElementService(Element);
-                    
-                    if (First.IsPresent)
-                    {
-                        var childElement = XPath.IsPresent
-                            ? elementService.FindElementByXPathAsync(Selector).GetAwaiter().GetResult()
-                            : elementService.FindElementBySelectorAsync(Selector).GetAwaiter().GetResult();
-                        if (childElement != null)
+                        // Text-based search
+                        bool exactMatch = !string.IsNullOrEmpty(Text);
+                        string searchText = exactMatch ? Text : TextContains;
+                        results = pageService.FindElementsByTextAsync(searchText, exactMatch, Selector).GetAwaiter().GetResult();
+
+                        if (First.IsPresent && results.Count > 0)
                         {
-                            results.Add(childElement);
+                            results = new List<PupElement> { results[0] };
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(Selector))
+                    {
+                        // CSS/XPath selector search
+                        if (First.IsPresent)
+                        {
+                            var singleElement = XPath.IsPresent
+                                ? pageService.FindElementByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
+                                : pageService.FindElementBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
+                            if (singleElement != null) results.Add(singleElement);
+                        }
+                        else
+                        {
+                            results = XPath.IsPresent
+                                ? pageService.FindElementsByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
+                                : pageService.FindElementsBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
                         }
                     }
                     else
                     {
-                        var childElements = XPath.IsPresent
-                            ? elementService.FindElementsByXPathAsync(Selector).GetAwaiter().GetResult()
-                            : elementService.FindElementsBySelectorAsync(Selector).GetAwaiter().GetResult();
-                        results.AddRange(childElements);
+                        throw new ArgumentException("Either -Selector, -Text, or -TextContains must be specified.");
+                    }
+                }
+                else if (ParameterSetName == "FromElement")
+                {
+                    var elementService = new ElementService(Element);
+
+                    if (isTextSearch)
+                    {
+                        // Text-based search within element
+                        bool exactMatch = !string.IsNullOrEmpty(Text);
+                        string searchText = exactMatch ? Text : TextContains;
+                        results = elementService.FindElementsByTextAsync(searchText, exactMatch, Selector).GetAwaiter().GetResult();
+
+                        if (First.IsPresent && results.Count > 0)
+                        {
+                            results = new List<PupElement> { results[0] };
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(Selector))
+                    {
+                        // CSS/XPath selector search within element
+                        if (First.IsPresent)
+                        {
+                            var childElement = XPath.IsPresent
+                                ? elementService.FindElementByXPathAsync(Selector).GetAwaiter().GetResult()
+                                : elementService.FindElementBySelectorAsync(Selector).GetAwaiter().GetResult();
+                            if (childElement != null)
+                            {
+                                results.Add(childElement);
+                            }
+                        }
+                        else
+                        {
+                            var childElements = XPath.IsPresent
+                                ? elementService.FindElementsByXPathAsync(Selector).GetAwaiter().GetResult()
+                                : elementService.FindElementsBySelectorAsync(Selector).GetAwaiter().GetResult();
+                            results.AddRange(childElements);
+                        }
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Either -Selector, -Text, or -TextContains must be specified.");
                     }
                 }
 
