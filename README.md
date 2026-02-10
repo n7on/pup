@@ -1,4 +1,11 @@
 # Pup
+
+[![CI](https://github.com/n7on/Pup/actions/workflows/ci.yml/badge.svg)](https://github.com/n7on/Pup/actions/workflows/ci.yml)
+[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/Pup)](https://www.powershellgallery.com/packages/Pup)
+[![PowerShell Gallery Downloads](https://img.shields.io/powershellgallery/dt/Pup)](https://www.powershellgallery.com/packages/Pup)
+[![License](https://img.shields.io/github/license/n7on/Pup)](https://github.com/n7on/Pup/blob/main/LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blue)](#)
+
 Pup is a native PowerShell module made for browser automation. It's build upon PuppeteerSharp, which is a Dotnet library using DevTools API in order to automate the browser. It targets the netstandard 2.0, so it's fully supported on all powershell versions. 
 
 ## Install
