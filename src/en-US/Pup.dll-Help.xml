@@ -2090,4 +2090,217 @@ $allRows = Find-PupElements -Page $page -Selector $rowPattern.Selector</dev:code
     </command:examples>
   </command:command>
 
+  <!-- Start-PupRecording -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Start-PupRecording</command:name>
+      <command:verb>Start</command:verb>
+      <command:noun>PupRecording</command:noun>
+      <maml:description>
+        <maml:para>Starts recording user interactions on a browser page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Begins capturing user interactions (clicks, typing, navigation, etc.) on the specified page. The recording continues until Stop-PupRecording is called. Use Get-PupRecording to retrieve captured events and ConvertTo-PupScript to generate a PowerShell automation script.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Start recording on a page</maml:title>
+        <dev:code>$page = New-PupPage -Browser $browser -Url "https://example.com" -WaitForLoad
+Start-PupRecording -Page $page
+# Interact with the browser manually...
+Stop-PupRecording -Page $page</dev:code>
+        <dev:remarks>
+          <maml:para>Starts recording interactions on the page. Interact with the browser, then stop recording.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Start recording with scroll events</maml:title>
+        <dev:code>Start-PupRecording -Page $page -IncludeScroll</dev:code>
+        <dev:remarks>
+          <maml:para>Includes scroll events in the recording (can be verbose).</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Clear previous recording and start fresh</maml:title>
+        <dev:code>Start-PupRecording -Page $page -Clear</dev:code>
+        <dev:remarks>
+          <maml:para>Clears any existing recorded events before starting the new recording.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Stop-PupRecording -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Stop-PupRecording</command:name>
+      <command:verb>Stop</command:verb>
+      <command:noun>PupRecording</command:noun>
+      <maml:description>
+        <maml:para>Stops recording user interactions on a browser page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Stops the active recording session on the specified page. The recorded events are preserved and can be retrieved using Get-PupRecording. Recording can be started and stopped multiple times to capture different sessions.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Stop recording</maml:title>
+        <dev:code>Stop-PupRecording -Page $page</dev:code>
+        <dev:remarks>
+          <maml:para>Stops the recording session on the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Full recording workflow</maml:title>
+        <dev:code>Start-PupRecording -Page $page
+# ... user interactions ...
+Stop-PupRecording -Page $page
+$events = Get-PupRecording -Page $page
+$script = $events | ConvertTo-PupScript -IncludeSetup</dev:code>
+        <dev:remarks>
+          <maml:para>Complete workflow: start recording, interact, stop, get events, and convert to script.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupRecording -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupRecording</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>PupRecording</command:noun>
+      <maml:description>
+        <maml:para>Gets the recorded events from a browser page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Retrieves the recorded interaction events from the specified page. Events include clicks, typing, navigation, and other user interactions. Can be called while recording is active or after it has been stopped. Use -IncludeWaits to insert wait events based on actual timing between actions.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get recorded events</maml:title>
+        <dev:code>$events = Get-PupRecording -Page $page
+$events | Format-Table Type, Selector, Value</dev:code>
+        <dev:remarks>
+          <maml:para>Retrieves all recorded events and displays them in a table.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Get events with wait times</maml:title>
+        <dev:code>$events = Get-PupRecording -Page $page -IncludeWaits</dev:code>
+        <dev:remarks>
+          <maml:para>Includes wait events based on actual timing between actions (useful for realistic playback).</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Get events with custom wait threshold</maml:title>
+        <dev:code>$events = Get-PupRecording -Page $page -IncludeWaits -WaitThreshold 500</dev:code>
+        <dev:remarks>
+          <maml:para>Only includes wait events longer than 500ms (default is 100ms).</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Clear-PupRecording -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Clear-PupRecording</command:name>
+      <command:verb>Clear</command:verb>
+      <command:noun>PupRecording</command:noun>
+      <maml:description>
+        <maml:para>Clears all recorded events from a browser page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Removes all recorded interaction events from the specified page. This can be called whether recording is active or not. Useful for starting a fresh recording session without creating a new page.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Clear recorded events</maml:title>
+        <dev:code>Clear-PupRecording -Page $page</dev:code>
+        <dev:remarks>
+          <maml:para>Clears all recorded events from the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Record multiple sessions</maml:title>
+        <dev:code># First session
+Start-PupRecording -Page $page
+# ... interactions ...
+Stop-PupRecording -Page $page
+$session1 = Get-PupRecording -Page $page
+Clear-PupRecording -Page $page
+
+# Second session
+Start-PupRecording -Page $page
+# ... more interactions ...
+Stop-PupRecording -Page $page
+$session2 = Get-PupRecording -Page $page</dev:code>
+        <dev:remarks>
+          <maml:para>Record multiple separate sessions by clearing between them.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- ConvertTo-PupScript -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>ConvertTo-PupScript</command:name>
+      <command:verb>ConvertTo</command:verb>
+      <command:noun>PupScript</command:noun>
+      <maml:description>
+        <maml:para>Converts recorded events to a PowerShell automation script.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Converts an array of recorded events into a PowerShell script that can replay the interactions. Supports adding setup/teardown code, custom variable names, and delays between actions for human-like behavior.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Convert events to script</maml:title>
+        <dev:code>$events = Get-PupRecording -Page $page
+$script = $events | ConvertTo-PupScript
+$script</dev:code>
+        <dev:remarks>
+          <maml:para>Converts recorded events to a PowerShell script and displays it.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Generate complete script with setup and teardown</maml:title>
+        <dev:code>$events = Get-PupRecording -Page $page
+$script = $events | ConvertTo-PupScript -IncludeSetup -IncludeTeardown</dev:code>
+        <dev:remarks>
+          <maml:para>Generates a complete script including browser startup and cleanup code. The URL is automatically captured from when recording started.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Save script to file with custom variable names</maml:title>
+        <dev:code>$events | ConvertTo-PupScript -IncludeSetup -PageVariable '$myPage' -BrowserVariable '$myBrowser' -OutputFile "automation.ps1"</dev:code>
+        <dev:remarks>
+          <maml:para>Saves the script to a file using custom variable names.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Add human-like delays between actions</maml:title>
+        <dev:code>$events | ConvertTo-PupScript -DelayMin 100 -DelayMax 500</dev:code>
+        <dev:remarks>
+          <maml:para>Adds random delays between 100-500ms between each action for more human-like behavior.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 5: Preserve actual timing from recording</maml:title>
+        <dev:code>$events = Get-PupRecording -Page $page -IncludeWaits
+$script = $events | ConvertTo-PupScript</dev:code>
+        <dev:remarks>
+          <maml:para>Using -IncludeWaits with Get-PupRecording adds wait events that preserve the actual timing from the recording session.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
 </helpItems>

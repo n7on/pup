@@ -1,3 +1,4 @@
+using Pup.Common;
 using Pup.Transport;
 using PuppeteerSharp;
 using System;
@@ -10,7 +11,7 @@ namespace Pup.Services
 {
     public interface IElementService
     {
-        Task ClickElementAsync(int clickCount = 1);
+        Task ClickElementAsync(int clickCount = 1, bool waitForLoad = false);
         Task ScrollIntoViewAsync();
         Task SetElementTextAsync(string text);
         Task SetElementValueAsync(string value);
@@ -61,30 +62,70 @@ namespace Pup.Services
             _element = element;
         }
 
-        public async Task ClickElementAsync(int clickCount = 1)
+        public async Task ClickElementAsync(int clickCount = 1, bool waitForLoad = false)
         {
-            if (clickCount == 1)
+            if (waitForLoad)
             {
-                await _element.Element.ClickAsync().ConfigureAwait(false);
+                // Start waiting for navigation before clicking
+                var navigationTask = _element.Page.WaitForNavigationAsync(new NavigationOptions
+                {
+                    WaitUntil = new[] { WaitUntilNavigation.Load },
+                    Timeout = 30000
+                });
+
+                try
+                {
+                    if (clickCount == 1)
+                    {
+                        await _element.Element.ClickAsync().ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await PerformMultiClickAsync(clickCount).ConfigureAwait(false);
+                    }
+
+                    // Wait for navigation to complete
+                    await navigationTask.ConfigureAwait(false);
+                }
+                catch (PuppeteerSharp.NavigationException)
+                {
+                    // Navigation didn't happen (click didn't cause navigation) - that's OK
+                }
+                catch (TimeoutException)
+                {
+                    // Navigation timed out - that's OK, continue
+                }
             }
             else
             {
-                // Use JavaScript for double/triple click since ClickOptions.ClickCount may not be available
-                await _element.Element.EvaluateFunctionAsync(@"(el, count) => {
-                    const rect = el.getBoundingClientRect();
-                    const x = rect.left + rect.width / 2;
-                    const y = rect.top + rect.height / 2;
-                    const event = new MouseEvent('dblclick', {
-                        bubbles: true,
-                        cancelable: true,
-                        view: window,
-                        detail: count,
-                        clientX: x,
-                        clientY: y
-                    });
-                    el.dispatchEvent(event);
-                }", clickCount).ConfigureAwait(false);
+                if (clickCount == 1)
+                {
+                    await _element.Element.ClickAsync().ConfigureAwait(false);
+                }
+                else
+                {
+                    await PerformMultiClickAsync(clickCount).ConfigureAwait(false);
+                }
             }
+        }
+
+        private async Task PerformMultiClickAsync(int clickCount)
+        {
+            // Use JavaScript for double/triple click since ClickOptions.ClickCount may not be available
+            await _element.Element.EvaluateFunctionAsync(@"(el, count) => {
+                const rect = el.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                const event = new MouseEvent('dblclick', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window,
+                    detail: count,
+                    clientX: x,
+                    clientY: y
+                });
+                el.dispatchEvent(event);
+            }", clickCount).ConfigureAwait(false);
         }
 
         public async Task ScrollIntoViewAsync()
@@ -345,95 +386,9 @@ namespace Pup.Services
                 return specific;
             }";
 
-            var elementHandles = await _element.Element.EvaluateFunctionHandleAsync(script, text, exactMatch, selector).ConfigureAwait(false);
-            var jsHandle = elementHandles as IJSHandle;
-
-            // Get properties to iterate over array elements
-            var properties = await jsHandle.GetPropertiesAsync().ConfigureAwait(false);
-
-            var pbElements = new List<PupElement>();
-            int index = 0;
-
-            foreach (var prop in properties)
-            {
-                // Skip non-numeric properties (like 'length')
-                if (!int.TryParse(prop.Key, out _))
-                    continue;
-
-                if (prop.Value is IElementHandle element)
-                {
-                    // Generate a stable CSS selector for this element (relative to root element)
-                    var elementSelector = await element.EvaluateFunctionAsync<string>(GenerateUniqueSelectorScript, _element.Element).ConfigureAwait(false);
-
-                    pbElements.Add(new PupElement(
-                        element,
-                        _element.Page,
-                        Guid.NewGuid().ToString(),
-                        elementSelector,
-                        index++,
-                        await element.EvaluateFunctionAsync<string>("el => el.tagName").ConfigureAwait(false),
-                        await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
-                        await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
-                        await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                        await element.IsIntersectingViewportAsync().ConfigureAwait(false)
-                    ));
-                }
-            }
-
-            return pbElements;
+            var jsHandle = await _element.Element.EvaluateFunctionHandleAsync(script, text, exactMatch, selector).ConfigureAwait(false);
+            return await ElementHelper.CreatePupElementsFromHandleAsync(jsHandle, _element.Page, _element.Element).ConfigureAwait(false);
         }
-
-        private const string GenerateUniqueSelectorScript = @"
-            (element, rootElement) => {
-                // Try ID first (most stable) - but only if not searching within a root
-                if (!rootElement && element.id) return '#' + CSS.escape(element.id);
-
-                // Build path from element up to root (or document)
-                const path = [];
-                let current = element;
-
-                while (current && current.nodeType === Node.ELEMENT_NODE) {
-                    // Stop if we've reached the root element (for relative selectors)
-                    if (rootElement && current === rootElement) break;
-
-                    let selector = current.tagName.toLowerCase();
-
-                    // If element has ID and we're not doing relative selector, use it and stop
-                    if (!rootElement && current.id) {
-                        selector = '#' + CSS.escape(current.id);
-                        path.unshift(selector);
-                        break;
-                    }
-
-                    // Add class if available (more readable than nth-of-type)
-                    const classes = current.className && typeof current.className === 'string'
-                        ? current.className.trim().split(/\s+/).filter(c => c.length > 0)
-                        : [];
-                    if (classes.length > 0) {
-                        selector += '.' + CSS.escape(classes[0]);
-                    } else {
-                        // Add nth-of-type for uniqueness among siblings if no class
-                        const parent = current.parentElement;
-                        if (parent && (!rootElement || parent !== rootElement)) {
-                            const siblings = [...parent.children];
-                            const sameTagSiblings = siblings.filter(s => s.tagName === current.tagName);
-                            if (sameTagSiblings.length > 1) {
-                                const index = sameTagSiblings.indexOf(current) + 1;
-                                selector += ':nth-of-type(' + index + ')';
-                            }
-                        }
-                    }
-
-                    path.unshift(selector);
-
-                    // Stop at body (for absolute selectors)
-                    if (!rootElement && current.tagName.toLowerCase() === 'body') break;
-
-                    current = current.parentElement;
-                }
-
-                return path.join(' > ');
-            }";
 
         public async Task<string> GetElementSelectorAsync(bool unique = false, bool shortest = false, bool fullPath = false)
         {

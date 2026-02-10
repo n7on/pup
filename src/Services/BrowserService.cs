@@ -123,10 +123,30 @@ namespace Pup.Services
             {
                 try
                 {
+                    var text = e.Message.Text;
+
+                    // Check for recording event
+                    if (text != null && text.StartsWith("__PUP_RECORDING__:"))
+                    {
+                        if (pupPage.RecordingActive)
+                        {
+                            var json = text.Substring("__PUP_RECORDING__:".Length);
+                            var recordingEvent = ParseRecordingEvent(json);
+                            if (recordingEvent != null)
+                            {
+                                lock (pupPage.RecordingLock)
+                                {
+                                    pupPage.RecordingEvents.Add(recordingEvent);
+                                }
+                            }
+                        }
+                        return; // Don't add to regular console entries
+                    }
+
                     var entry = new PupConsoleEntry
                     {
                         Type = e.Message.Type.ToString(),
-                        Text = e.Message.Text,
+                        Text = text,
                         Url = e.Message.Location?.URL,
                         LineNumber = e.Message.Location?.LineNumber,
                         ColumnNumber = e.Message.Location?.ColumnNumber,
@@ -446,117 +466,32 @@ namespace Pup.Services
             }
         }
 
+        private static PupRecordingEvent ParseRecordingEvent(string json)
+        {
+            try
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var evt = JsonSerializer.Deserialize<PupRecordingEvent>(json, options);
+                if (evt != null && string.IsNullOrEmpty(evt.Timestamp.ToString()) == false)
+                {
+                    return evt;
+                }
+                // If timestamp wasn't parsed, set it now
+                if (evt != null && evt.Timestamp == default)
+                {
+                    evt.Timestamp = DateTime.UtcNow;
+                }
+                return evt;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private static async Task ApplyStealthModeAsync(IPage page)
         {
-            // Stealth script to hide automation indicators
-            const string stealthScript = @"
-                // Remove webdriver property
-                Object.defineProperty(navigator, 'webdriver', {
-                    get: () => undefined,
-                    configurable: true
-                });
-
-                // Mock plugins to look like a real browser
-                Object.defineProperty(navigator, 'plugins', {
-                    get: () => {
-                        const plugins = [
-                            { name: 'Chrome PDF Plugin', filename: 'internal-pdf-viewer', description: 'Portable Document Format' },
-                            { name: 'Chrome PDF Viewer', filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai', description: '' },
-                            { name: 'Native Client', filename: 'internal-nacl-plugin', description: '' }
-                        ];
-                        plugins.item = (i) => plugins[i] || null;
-                        plugins.namedItem = (name) => plugins.find(p => p.name === name) || null;
-                        plugins.refresh = () => {};
-                        return plugins;
-                    },
-                    configurable: true
-                });
-
-                // Mock languages
-                Object.defineProperty(navigator, 'languages', {
-                    get: () => ['en-US', 'en'],
-                    configurable: true
-                });
-
-                // Fix permissions API
-                const originalQuery = window.navigator.permissions?.query;
-                if (originalQuery) {
-                    window.navigator.permissions.query = (parameters) => (
-                        parameters.name === 'notifications' ?
-                            Promise.resolve({ state: Notification.permission }) :
-                            originalQuery(parameters)
-                    );
-                }
-
-                // Mock chrome runtime to look like a real browser
-                if (!window.chrome) {
-                    window.chrome = {};
-                }
-                if (!window.chrome.runtime) {
-                    window.chrome.runtime = {
-                        connect: () => {},
-                        sendMessage: () => {},
-                        onMessage: { addListener: () => {} }
-                    };
-                }
-
-                // Remove automation-related properties from navigator
-                const automationProps = ['__webdriver_evaluate', '__selenium_evaluate', '__webdriver_script_function',
-                    '__webdriver_script_func', '__webdriver_script_fn', '__fxdriver_evaluate', '__driver_unwrapped',
-                    '__webdriver_unwrapped', '__driver_evaluate', '__selenium_unwrapped', '__fxdriver_unwrapped'];
-                automationProps.forEach(prop => {
-                    delete navigator[prop];
-                    delete window[prop];
-                });
-
-                // Fix iframe contentWindow access detection
-                const originalContentWindow = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'contentWindow');
-                Object.defineProperty(HTMLIFrameElement.prototype, 'contentWindow', {
-                    get: function() {
-                        const win = originalContentWindow.get.call(this);
-                        if (win) {
-                            // Make sure nested iframes also don't expose webdriver
-                            try {
-                                Object.defineProperty(win.navigator, 'webdriver', {
-                                    get: () => undefined,
-                                    configurable: true
-                                });
-                            } catch (e) {}
-                        }
-                        return win;
-                    }
-                });
-
-                // Patch toString to hide native code modifications
-                const originalToString = Function.prototype.toString;
-                Function.prototype.toString = function() {
-                    if (this === navigator.webdriver?.get ||
-                        this === navigator.plugins?.get ||
-                        this === navigator.languages?.get) {
-                        return 'function get webdriver() { [native code] }';
-                    }
-                    return originalToString.call(this);
-                };
-
-                // Track WebSocket instances for Send-PupWebSocketMessage
-                const OriginalWebSocket = window.WebSocket;
-                window.__pup_websockets = [];
-                window.WebSocket = function(url, protocols) {
-                    const ws = protocols ? new OriginalWebSocket(url, protocols) : new OriginalWebSocket(url);
-                    ws.__pup_url = url;
-                    window.__pup_websockets.push(ws);
-                    ws.addEventListener('close', () => {
-                        const idx = window.__pup_websockets.indexOf(ws);
-                        if (idx > -1) window.__pup_websockets.splice(idx, 1);
-                    });
-                    return ws;
-                };
-                window.WebSocket.prototype = OriginalWebSocket.prototype;
-                window.WebSocket.CONNECTING = OriginalWebSocket.CONNECTING;
-                window.WebSocket.OPEN = OriginalWebSocket.OPEN;
-                window.WebSocket.CLOSING = OriginalWebSocket.CLOSING;
-                window.WebSocket.CLOSED = OriginalWebSocket.CLOSED;
-            ";
+            var stealthScript = EmbeddedResourceService.LoadScript("stealth.js");
 
             // Apply to future navigations
             await page.EvaluateExpressionOnNewDocumentAsync(stealthScript).ConfigureAwait(false);

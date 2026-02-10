@@ -28,9 +28,9 @@ public static class ServiceFactory
         return elementService;
     }
 
-    public static IRecordingService CreateRecordingService()
+    public static IRecordingService CreateRecordingService(PupPage page)
     {
-        return new RecordingService();
+        return new RecordingService(page);
     }
 
     public static IConsoleService CreateConsoleService(PupPage page)

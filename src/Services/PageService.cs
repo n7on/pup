@@ -48,6 +48,7 @@ namespace Pup.Services
         Task<PupPage> NavigateBackAsync(bool waitForLoad);
         Task<PupPage> NavigateForwardAsync(bool waitForLoad);
         Task<PupPage> ReloadPageAsync(bool waitForLoad);
+        Task ScrollToAsync(double x, double y, bool smooth = false);
 
         // Keyboard
         Task SendKeyAsync(string key, string[] modifiers = null);
@@ -257,84 +258,9 @@ namespace Pup.Services
                 return specific;
             }";
 
-            var elementHandles = await _page.Page.EvaluateFunctionHandleAsync(script, text, exactMatch, selector).ConfigureAwait(false);
-            var jsHandle = elementHandles as PuppeteerSharp.IJSHandle;
-
-            // Get properties to iterate over array elements
-            var properties = await jsHandle.GetPropertiesAsync().ConfigureAwait(false);
-
-            var pbElements = new List<PupElement>();
-            int index = 0;
-
-            foreach (var prop in properties)
-            {
-                // Skip non-numeric properties (like 'length')
-                if (!int.TryParse(prop.Key, out _))
-                    continue;
-
-                if (prop.Value is IElementHandle element)
-                {
-                    // Generate a stable CSS selector for this element
-                    var elementSelector = await element.EvaluateFunctionAsync<string>(GenerateUniqueSelectorScript).ConfigureAwait(false);
-
-                    pbElements.Add(new PupElement(
-                        element,
-                        _page.Page,
-                        Guid.NewGuid().ToString(),
-                        elementSelector,
-                        index++,
-                        await element.EvaluateFunctionAsync<string>("el => el.tagName").ConfigureAwait(false),
-                        await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
-                        await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
-                        await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                        await element.IsIntersectingViewportAsync().ConfigureAwait(false)
-                    ));
-                }
-            }
-
-            return pbElements;
+            var jsHandle = await _page.Page.EvaluateFunctionHandleAsync(script, text, exactMatch, selector).ConfigureAwait(false);
+            return await ElementHelper.CreatePupElementsFromHandleAsync(jsHandle, _page.Page).ConfigureAwait(false);
         }
-
-        private const string GenerateUniqueSelectorScript = @"
-            (element) => {
-                // Try ID first (most stable)
-                if (element.id) return '#' + CSS.escape(element.id);
-
-                // Build path from element to a unique ancestor
-                const path = [];
-                let current = element;
-
-                while (current && current.nodeType === Node.ELEMENT_NODE) {
-                    let selector = current.tagName.toLowerCase();
-
-                    // If element has ID, use it and stop
-                    if (current.id) {
-                        selector = '#' + CSS.escape(current.id);
-                        path.unshift(selector);
-                        break;
-                    }
-
-                    // Add nth-child for uniqueness among siblings
-                    const parent = current.parentElement;
-                    if (parent) {
-                        const siblings = [...parent.children];
-                        const sameTagSiblings = siblings.filter(s => s.tagName === current.tagName);
-                        if (sameTagSiblings.length > 1) {
-                            const index = sameTagSiblings.indexOf(current) + 1;
-                            selector += ':nth-of-type(' + index + ')';
-                        }
-                    }
-
-                    path.unshift(selector);
-
-                    // Stop at body
-                    if (current.tagName.toLowerCase() === 'body') break;
-
-                    current = parent;
-                }
-
-                return path.join(' > ');
-            }";
 
         public async Task ClickElementBySelectorAsync(string selector)
         {
@@ -580,6 +506,37 @@ namespace Pup.Services
                 await _page.Page.ReloadAsync().ConfigureAwait(false);
             }
             return _page;
+        }
+
+        public async Task ScrollToAsync(double x, double y, bool smooth = false)
+        {
+            var behavior = smooth ? "smooth" : "auto";
+            await _page.Page.EvaluateFunctionAsync(@"
+                (x, y, behavior) => new Promise((resolve) => {
+                    // For instant scroll, resolve immediately after scrollTo
+                    if (behavior === 'auto') {
+                        window.scrollTo({ left: x, top: y, behavior: behavior });
+                        resolve();
+                        return;
+                    }
+
+                    // For smooth scroll, wait for scrollend or timeout
+                    let resolved = false;
+                    const done = () => {
+                        if (!resolved) {
+                            resolved = true;
+                            window.removeEventListener('scrollend', done);
+                            resolve();
+                        }
+                    };
+
+                    window.addEventListener('scrollend', done, { once: true });
+                    window.scrollTo({ left: x, top: y, behavior: behavior });
+
+                    // Fallback timeout in case scrollend doesn't fire
+                    setTimeout(done, 1000);
+                })
+            ", x, y, behavior).ConfigureAwait(false);
         }
 
         public async Task SendKeyAsync(string key, string[] modifiers = null)

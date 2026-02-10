@@ -22,13 +22,16 @@ namespace Pup.Commands.Element
         [Parameter(HelpMessage = "Perform a double-click")]
         public SwitchParameter DoubleClick { get; set; }
 
+        [Parameter(HelpMessage = "Wait for page to load after click (useful for links)")]
+        public SwitchParameter WaitForLoad { get; set; }
+
         protected override void ProcessRecord()
         {
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
                 var clicks = DoubleClick.IsPresent ? 2 : ClickCount;
-                elementService.ClickElementAsync(clicks).GetAwaiter().GetResult();
+                elementService.ClickElementAsync(clicks, WaitForLoad.IsPresent).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {

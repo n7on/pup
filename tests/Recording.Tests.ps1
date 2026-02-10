@@ -1,106 +1,153 @@
 BeforeAll {
     Import-Module (Join-Path $PSScriptRoot "../" "output" "Pup" "Pup.psd1") -Force
-    $script:testRecording = Join-Path $PSScriptRoot "fixtures" "test-recording.json"
 }
 
-Describe "Convert-PupRecording" {
-    It "Converts recording from file" {
-        $script = Convert-PupRecording -InputFile $script:testRecording
-
-        $script | Should -Not -BeNullOrEmpty
-        $script | Should -BeLike "*Login Flow Test*"
+Describe "Live Recording" {
+    BeforeAll {
+        Install-PupBrowser -BrowserType Chrome
+        $script:browser = Start-PupBrowser -Headless
+        $script:testUrl = "file://" + (Join-Path $PSScriptRoot "fixtures" "test-page.html")
+        $script:page = New-PupPage -Browser $script:browser -Url $script:testUrl -WaitForLoad
     }
 
-    It "Includes navigate command" {
-        $script = Convert-PupRecording -InputFile $script:testRecording
-
-        $script | Should -BeLike "*Move-PupPage*"
-        $script | Should -BeLike "*example.com/login*"
+    AfterAll {
+        if ($script:page.Running) { Remove-PupPage -Page $script:page }
+        if ($script:browser.Running) { Stop-PupBrowser -Browser $script:browser }
     }
 
-    It "Includes click commands" {
-        $script = Convert-PupRecording -InputFile $script:testRecording
-
-        $script | Should -BeLike "*Invoke-PupElementClick*"
+    BeforeEach {
+        # Clear any existing recordings and stop if active
+        if ($script:page.RecordingActive) {
+            Stop-PupRecording -Page $script:page | Out-Null
+        }
+        Invoke-PupPageReload -Page $script:page -WaitForLoad
     }
 
-    It "Includes change/input commands" {
-        $script = Convert-PupRecording -InputFile $script:testRecording
-
-        $script | Should -BeLike "*Set-PupElement*"
-        $script | Should -BeLike "*admin*"
+    It "Starts and stops recording" {
+        { Start-PupRecording -Page $script:page } | Should -Not -Throw
+        { Stop-PupRecording -Page $script:page } | Should -Not -Throw
     }
 
-    It "Includes viewport command" {
-        $script = Convert-PupRecording -InputFile $script:testRecording
+    It "Captures click events" {
+        Start-PupRecording -Page $script:page
 
-        $script | Should -BeLike "*Set-PupPageViewport*"
-        $script | Should -BeLike "*1920*"
+        # Perform a click
+        $btn = Find-PupElements -Page $script:page -Selector "#btn-submit" -First
+        $btn | Invoke-PupElementClick
+
+        Start-Sleep -Milliseconds 100
+
+        Stop-PupRecording -Page $script:page
+        $events = Get-PupRecording -Page $script:page
+        $clickEvents = $events | Where-Object { $_.Type -eq 'click' }
+        $clickEvents.Count | Should -BeGreaterThan 0
+        Clear-PupRecording -Page $script:page
     }
 
-    It "Includes wait command" {
-        $script = Convert-PupRecording -InputFile $script:testRecording
+    It "Captures input events" {
+        Start-PupRecording -Page $script:page
 
-        $script | Should -BeLike "*Wait-PupElement*"
-        $script | Should -BeLike "*-Visible*"
+        # Type in an input
+        $inputEl = Find-PupElements -Page $script:page -Selector "#username" -First
+        Set-PupElement -Element $inputEl -Text "testuser" -Clear
+
+        Start-Sleep -Milliseconds 600  # Wait for debounce
+
+        Stop-PupRecording -Page $script:page
+        $events = Get-PupRecording -Page $script:page
+        $inputEvents = $events | Where-Object { $_.Type -eq 'input' -or $_.Type -eq 'change' }
+        $inputEvents.Count | Should -BeGreaterThan 0
+        Clear-PupRecording -Page $script:page
     }
 
-    It "Includes double-click command" {
-        $script = Convert-PupRecording -InputFile $script:testRecording
+    It "Get-PupRecording returns events without stopping" {
+        Start-PupRecording -Page $script:page
 
-        $script | Should -BeLike "*-DoubleClick*"
+        # Perform a click
+        $btn = Find-PupElements -Page $script:page -Selector "#btn-submit" -First
+        $btn | Invoke-PupElementClick
+
+        Start-Sleep -Milliseconds 100
+
+        # Get events without stopping
+        $events = Get-PupRecording -Page $script:page
+        $events.Count | Should -BeGreaterThan 0
+
+        # Perform another click to verify recording is still active
+        $btn | Invoke-PupElementClick
+        Start-Sleep -Milliseconds 100
+
+        # Should have more events now
+        $events2 = Get-PupRecording -Page $script:page
+        $events2.Count | Should -BeGreaterThan $events.Count
+
+        Stop-PupRecording -Page $script:page
+        Clear-PupRecording -Page $script:page
     }
 
-    It "Includes hover command" {
-        $script = Convert-PupRecording -InputFile $script:testRecording
+    It "Converts events to PowerShell script" {
+        Start-PupRecording -Page $script:page
 
-        $script | Should -BeLike "*Invoke-PupElementHover*"
+        # Perform a click
+        $btn = Find-PupElements -Page $script:page -Selector "#btn-submit" -First
+        $btn | Invoke-PupElementClick
+
+        Start-Sleep -Milliseconds 100
+
+        Stop-PupRecording -Page $script:page
+        $events = Get-PupRecording -Page $script:page
+        $output = $events | ConvertTo-PupScript
+        $output | Should -BeLike "*Find-PupElements*"
+        $output | Should -BeLike "*Invoke-PupElementClick*"
+        Clear-PupRecording -Page $script:page
     }
 
-    It "Includes key command" {
-        $script = Convert-PupRecording -InputFile $script:testRecording
+    It "Includes setup code when requested" {
+        Start-PupRecording -Page $script:page
+        $btn = Find-PupElements -Page $script:page -Selector "#btn-submit" -First
+        $btn | Invoke-PupElementClick
+        Start-Sleep -Milliseconds 100
 
-        $script | Should -BeLike "*Send-PupKey*"
-        $script | Should -BeLike "*Escape*"
-    }
-
-    It "Includes setup when requested" {
-        $script = Convert-PupRecording -InputFile $script:testRecording -IncludeSetup
-
-        $script | Should -BeLike "*Start-PupBrowser*"
-        $script | Should -BeLike "*New-PupPage*"
-    }
-
-    It "Includes teardown when requested" {
-        $script = Convert-PupRecording -InputFile $script:testRecording -IncludeTeardown
-
-        $script | Should -BeLike "*Remove-PupPage*"
-        $script | Should -BeLike "*Stop-PupBrowser*"
+        Stop-PupRecording -Page $script:page
+        $events = Get-PupRecording -Page $script:page
+        # URL should be captured automatically from recording start
+        $output = $events | ConvertTo-PupScript -IncludeSetup
+        $output | Should -BeLike "*Start-PupBrowser*"
+        $output | Should -BeLike "*New-PupPage*"
+        $output | Should -BeLike "*-Url*"
+        $output | Should -BeLike "*-WaitForLoad*"
+        Clear-PupRecording -Page $script:page
     }
 
     It "Uses custom variable names" {
-        $script = Convert-PupRecording -InputFile $script:testRecording -PageVariable '$p' -BrowserVariable '$b' -IncludeSetup
+        Start-PupRecording -Page $script:page
+        $btn = Find-PupElements -Page $script:page -Selector "#btn-submit" -First
+        $btn | Invoke-PupElementClick
+        Start-Sleep -Milliseconds 100
 
-        $script | Should -BeLike '*$b = Start-PupBrowser*'
-        $script | Should -BeLike '*$p = New-PupPage*'
+        Stop-PupRecording -Page $script:page
+        $events = Get-PupRecording -Page $script:page
+        $output = $events | ConvertTo-PupScript -PageVariable '$myPage' -IncludeSetup
+        $output | Should -BeLike '*$myPage*'
+        Clear-PupRecording -Page $script:page
     }
 
-    It "Saves to output file" {
-        $outPath = Join-Path ([IO.Path]::GetTempPath()) "converted-recording.ps1"
+    It "Saves script to output file" {
+        Start-PupRecording -Page $script:page
+        $btn = Find-PupElements -Page $script:page -Selector "#btn-submit" -First
+        $btn | Invoke-PupElementClick
+        Start-Sleep -Milliseconds 100
 
-        $result = Convert-PupRecording -InputFile $script:testRecording -OutputFile $outPath
+        Stop-PupRecording -Page $script:page
+        $outPath = Join-Path ([IO.Path]::GetTempPath()) "live-recording.ps1"
+        $events = Get-PupRecording -Page $script:page
+        $events | ConvertTo-PupScript -OutputFile $outPath | Out-Null
 
         Test-Path $outPath | Should -BeTrue
         $content = Get-Content $outPath -Raw
-        $content | Should -BeLike "*Login Flow Test*"
+        $content | Should -BeLike "*Invoke-PupElementClick*"
 
         Remove-Item $outPath -ErrorAction SilentlyContinue
-    }
-
-    It "Converts from JSON string" {
-        $json = Get-Content $script:testRecording -Raw
-        $script = Convert-PupRecording -Json $json
-
-        $script | Should -BeLike "*Login Flow Test*"
+        Clear-PupRecording -Page $script:page
     }
 }

@@ -41,6 +41,13 @@ namespace Pup.Transport
         [Hidden]
         internal System.Collections.Generic.Dictionary<string, PupWebSocketEntry> WebSocketMap { get; } = new System.Collections.Generic.Dictionary<string, PupWebSocketEntry>(System.StringComparer.OrdinalIgnoreCase);
 
+        [Hidden]
+        internal object RecordingLock { get; } = new object();
+        [Hidden]
+        internal bool RecordingActive { get; set; }
+        [Hidden]
+        internal System.Collections.Generic.List<PupRecordingEvent> RecordingEvents { get; } = new System.Collections.Generic.List<PupRecordingEvent>();
+
         public PupPage(IPage page, string title)
         {
             Page = page;

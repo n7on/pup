@@ -13,7 +13,8 @@
     FunctionsToExport = @()
     CmdletsToExport = @(
         'Clear-PupPageStorage',
-        'Convert-PupRecording',
+        'Clear-PupRecording',
+        'ConvertTo-PupScript',
         'Enter-PupConsole',
         'Export-PupPagePdf',
         'Export-PupPageSession',
@@ -32,6 +33,7 @@
         'Get-PupPageScreenshot',
         'Get-PupPageSource',
         'Get-PupPageStorage',
+        'Get-PupRecording',
         'Get-PupWebSocket',
         'Import-PupPageSession',
         'Install-PupBrowser',
@@ -45,6 +47,7 @@
         'Invoke-PupPageForward',
         'Invoke-PupPageReload',
         'Invoke-PupPageScript',
+        'Invoke-PupPageScroll',
         'Move-PupPage',
         'New-PupPage',
         'Remove-PupPage',
@@ -63,7 +66,9 @@
         'Set-PupPageStorage',
         'Set-PupPageViewport',
         'Start-PupBrowser',
+        'Start-PupRecording',
         'Stop-PupBrowser',
+        'Stop-PupRecording',
         'Uninstall-PupBrowser',
         'Wait-PupElement'
     )
