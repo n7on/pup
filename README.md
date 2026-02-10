@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/n7on/Pup)](https://github.com/n7on/Pup/blob/main/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blue)](#)
 
-Pup is a native PowerShell module made for browser automation. It's build upon PuppeteerSharp, which is a Dotnet library using DevTools API in order to automate the browser. It targets the netstandard 2.0, so it's fully supported on all powershell versions. 
+Pup is a native PowerShell module made for browser automation. It's built upon PuppeteerSharp, which is a .NET library using the DevTools API to automate the browser. It targets .NET Standard 2.0, so it's fully supported on all PowerShell versions. 
 
 ## Install
 ```powershell
@@ -100,7 +100,7 @@ Install-PupBrowser
 # Use-Cases
 
 ## Web Scraping
-This example scrape Ubuntu security notices from `https://ubuntu.com/security/notices `. And return the date and link to security issues.
+This example scrapes Ubuntu security notices from `https://ubuntu.com/security/notices` and returns the date and link to security issues.
 
 
 ### Start browser 
@@ -114,7 +114,7 @@ $page = start-PupBrowser | New-PupPage -Url https://ubuntu.com/security/notices
 If you look at the opened page in the browser, you see that there are 10 notices per page. So we need a list that contains all those, so that we can iterate over it. Copy the first link name, which at this time is `USN-8015-3: Linux kernel (FIPS) vulnerabilities`.
 ```powershell
 
-# Try with different depts, and try to go as deep as possible while at same time catch all 10 items.
+# Try with different depths, and try to go as deep as possible while at the same time catching all 10 items.
 $page | find-pupelements -Text "USN-8015-3: Linux kernel (FIPS) vulnerabilities" | get-PupElementPattern -Depth 3
 
 # Type          Selector                   MatchCount Description
@@ -165,7 +165,7 @@ $linkSelector = "div.u-fixed-width > h3.u-no-margin > a"
 We need the selector to next page in order to scrape multiple pages.
 ```powershell
 # it doesn't show on the page, but if you look in source it's actually "Next page". 
-# the selector from find-pupElements doesn't look great, but if we run the element through Get-PupElementPattern we get better onces. And we can choose anyone which have 1 matches.
+# the selector from Find-PupElements doesn't look great, but if we run the element through Get-PupElementPattern we get better ones. We can choose any with 1 match.
 $page | find-pupelements -Text "Next page" | Get-PupElementPattern
 
 # Type          Selector                            MatchCount Description
@@ -179,7 +179,7 @@ $page | find-pupelements -Text "Next page" | Get-PupElementPattern
 $nextPageSelector = ".p-pagination__link--next i"
 ```
 ### Create script
-Now we have everything that is needed for the script. We only need the Ubunty Notices from 1 month back. So we'll stop when we get an older notice.
+Now we have everything that is needed for the script. We only need the Ubuntu notices from the last month, so we'll stop when we get an older notice.
 
 ```powershell
 $url = "https://ubuntu.com"
