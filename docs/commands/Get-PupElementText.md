@@ -1,7 +1,7 @@
 ---
 external help file: Pup.dll-Help.xml
-Module Name:
-online version:
+Module Name: Pup
+online version: https://github.com/n7on/Pup/blob/main/docs/commands/Get-PupElementText.md
 schema: 2.0.0
 ---
 

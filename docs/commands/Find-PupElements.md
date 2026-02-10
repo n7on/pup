@@ -1,6 +1,6 @@
 ---
 external help file: Pup.dll-Help.xml
-Module Name:
+Module Name: Pup
 online version:
 schema: 2.0.0
 ---
@@ -11,6 +11,18 @@ schema: 2.0.0
 Finds elements on a page using CSS selectors, XPath, or visible text.
 
 ## SYNTAX
+
+### FromPage
+```
+Find-PupElements -Page <PupPage> [-Selector <String>] [-XPath] [-Text <String>] [-TextContains <String>]
+ [-WaitForLoad] [-Timeout <Int32>] [-First] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+### FromElement
+```
+Find-PupElements -Element <PupElement> [-Selector <String>] [-XPath] [-Text <String>] [-TextContains <String>]
+ [-WaitForLoad] [-Timeout <Int32>] [-First] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
 
 ## DESCRIPTION
 Searches for elements matching the given selector or text content.
@@ -65,6 +77,156 @@ Finds the first button element containing "Submit" text.
 Combining selector and text search narrows results efficiently.
 
 ## PARAMETERS
+
+### -Element
+Parent element to search within
+
+```yaml
+Type: PupElement
+Parameter Sets: FromElement
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -First
+Return only the first element found
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Page
+Page to search within
+
+```yaml
+Type: PupPage
+Parameter Sets: FromPage
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Selector
+CSS selector or XPath expression to find elements
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Text
+Find elements by exact visible text match
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -TextContains
+Find elements containing this text (case-insensitive)
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Timeout
+Timeout in milliseconds to wait for elements to appear (default: 5000)
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -WaitForLoad
+Wait for elements to load before returning
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -XPath
+Use XPath expression instead of CSS selector
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).

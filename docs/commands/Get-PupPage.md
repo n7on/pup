@@ -5,57 +5,59 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-PupElementValue
+# Get-PupPage
 
 ## SYNOPSIS
-Gets the value property of a form element.
+{{ Fill in the Synopsis }}
 
 ## SYNTAX
 
 ```
-Get-PupElementValue -Element <PupElement> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Get-PupPage [[-Browser] <PupBrowser>] [-BrowserType <String>] [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Returns the current value of an input, textarea, or select element.
-Different from text content - this is the form field value.
+{{ Fill in the Description }}
 
 ## EXAMPLES
 
-### Example 1: Get input value
-```
-$input = Find-PupElements -Page $page -Selector "#username" -First
-Get-PupElementValue -Element $input
-```
-
-Gets the current value in the username field.
-
-### Example 2: Extract hidden field values
-```
-$hiddenInputs = Find-PupElements -Page $page -Selector "input[type=hidden]"
-$hiddenInputs | ForEach-Object {
-    $name = Get-PupElementAttribute -Element $_ -Name "name"
-    $value = Get-PupElementValue -Element $_
-    "$name = $value"
-}
+### Example 1
+```powershell
+PS C:\> {{ Add example code here }}
 ```
 
-Extracts all hidden form field values.
+{{ Add example description here }}
 
 ## PARAMETERS
 
-### -Element
-Element to read value from
+### -Browser
+{{ Fill Browser Description }}
 
 ```yaml
-Type: PupElement
+Type: PupBrowser
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
+Position: 0
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -BrowserType
+Name of the browser to stop (used when Browser parameter is not provided)
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
-Accept pipeline input: True (ByValue)
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
@@ -79,8 +81,10 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
+### Pup.Transport.PupBrowser
 ## OUTPUTS
 
+### Pup.Transport.PupPage
 ## NOTES
 
 ## RELATED LINKS

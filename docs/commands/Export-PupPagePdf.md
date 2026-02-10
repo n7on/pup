@@ -1,6 +1,6 @@
 ---
 external help file: Pup.dll-Help.xml
-Module Name:
+Module Name: Pup
 online version:
 schema: 2.0.0
 ---
@@ -11,6 +11,11 @@ schema: 2.0.0
 Exports the page as a PDF document.
 
 ## SYNTAX
+
+```
+Export-PupPagePdf -Page <PupPage> [-FilePath <String>] [-Landscape] [-NoPrintBackground] [-Format <String>]
+ [-Scale <Decimal>] [-PassThru] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
 
 ## DESCRIPTION
 Generates a PDF of the current page.
@@ -41,6 +46,126 @@ Export-PupPagePdf -Page $page -FilePath "report.pdf" -Landscape -PrintBackground
 Exports with landscape orientation and background colors.
 
 ## PARAMETERS
+
+### -FilePath
+Path to save the PDF file
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Format
+Paper format: A0-A6, Letter, Legal, Tabloid, Ledger (default: A4)
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Landscape
+Use landscape orientation
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -NoPrintBackground
+Print background graphics (default: true)
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Page
+Page to export as PDF
+
+```yaml
+Type: PupPage
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -PassThru
+Return PDF data as byte array
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Scale
+Scale of the page rendering (default: 1)
+
+```yaml
+Type: Decimal
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).

@@ -5,42 +5,49 @@ online version:
 schema: 2.0.0
 ---
 
-# Send-PupWebSocketMessage
+# Invoke-PupCdpMessage
 
 ## SYNOPSIS
-Sends a message through an active WebSocket connection.
+{{ Fill in the Synopsis }}
 
 ## SYNTAX
 
 ```
-Send-PupWebSocketMessage -Page <PupPage> -Message <String> [-Url <String>] [-ProgressAction <ActionPreference>]
- [<CommonParameters>]
+Invoke-PupCdpMessage [-Page] <PupPage> [-Method] <String> [[-Parameters] <Hashtable>] [-AsJson]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Injects a message into an open WebSocket connection on the page.
-Useful for testing WebSocket-based APIs and real-time features.
+{{ Fill in the Description }}
 
 ## EXAMPLES
 
-### Example 1: Send a simple message
-```
-Send-PupWebSocketMessage -Page $page -Message '{"action":"ping"}'
-```
-
-Sends a JSON message through the first available WebSocket.
-
-### Example 2: Target specific WebSocket by URL
-```
-Send-PupWebSocketMessage -Page $page -Message '{"cmd":"admin"}' -Url "api.target.com"
+### Example 1
+```powershell
+PS C:\> {{ Add example code here }}
 ```
 
-Sends a message to a specific WebSocket matching the URL pattern.
+{{ Add example description here }}
 
 ## PARAMETERS
 
-### -Message
-The message to send through the WebSocket
+### -AsJson
+Return raw JSON string instead of parsed object
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Method
+The CDP method to invoke (e.g., 'DOM.getDocument', 'Network.enable')
 
 ```yaml
 Type: String
@@ -48,14 +55,14 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: Named
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -Page
-The page containing the WebSocket connection
+The page to send the CDP message through
 
 ```yaml
 Type: PupPage
@@ -63,9 +70,24 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: Named
+Position: 0
 Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -Parameters
+Parameters to pass to the CDP method
+
+```yaml
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 2
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
@@ -84,28 +106,15 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Url
-WebSocket URL pattern to target (if multiple connections exist)
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
+### Pup.Transport.PupPage
 ## OUTPUTS
 
+### System.Management.Automation.PSObject
 ## NOTES
 
 ## RELATED LINKS

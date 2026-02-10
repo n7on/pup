@@ -1,6 +1,6 @@
 ---
 external help file: Pup.dll-Help.xml
-Module Name:
+Module Name: Pup
 online version:
 schema: 2.0.0
 ---
@@ -11,6 +11,11 @@ schema: 2.0.0
 Takes a screenshot of a specific element.
 
 ## SYNTAX
+
+```
+Get-PupElementScreenshot -Element <PupElement> [-FilePath <String>] [-PassThru]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
 
 ## DESCRIPTION
 Captures just the specified element as an image, excluding the rest of the page.
@@ -36,6 +41,66 @@ $bytes = Get-PupElementScreenshot -Element $error -PassThru
 Screenshots an error message for evidence.
 
 ## PARAMETERS
+
+### -Element
+Element to screenshot
+
+```yaml
+Type: PupElement
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -FilePath
+Path to save the screenshot file
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PassThru
+Return screenshot data as byte array
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).

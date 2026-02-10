@@ -1,6 +1,6 @@
 ---
 external help file: Pup.dll-Help.xml
-Module Name:
+Module Name: Pup
 online version:
 schema: 2.0.0
 ---
@@ -11,6 +11,11 @@ schema: 2.0.0
 Retrieves SSL/TLS certificate and security details from a page.
 
 ## SYNTAX
+
+```
+Get-PupCertificate -Page <PupPage> [-Origin <String>] [-UrlFilter <String>] [-Expired]
+ [-ExpiringWithin <Int32>] [-Unique] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
 
 ## DESCRIPTION
 Gets SSL/TLS certificate information in two modes: passive mode returns security details captured from network requests (protocol, cipher, subject, validity), while active mode fetches the full certificate chain for a specific origin via CDP.
@@ -70,6 +75,112 @@ $network | Where-Object { $_.SecurityDetails } |
 Access security details directly from network entries for per-request TLS info.
 
 ## PARAMETERS
+
+### -Expired
+Only show expired certificates
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExpiringWithin
+Show certificates expiring within N days
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Origin
+Fetch certificate for specific origin (active mode).
+Example: https://github.com
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Page
+The page to get certificates from
+
+```yaml
+Type: PupPage
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Unique
+Deduplicate results by SubjectName
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -UrlFilter
+Filter captured security details by URL pattern
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).

@@ -1,6 +1,6 @@
 ---
 external help file: Pup.dll-Help.xml
-Module Name:
+Module Name: Pup
 online version:
 schema: 2.0.0
 ---
@@ -11,6 +11,10 @@ schema: 2.0.0
 Stops recording user interactions on a browser page.
 
 ## SYNTAX
+
+```
+Stop-PupRecording -Page <PupPage> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
 
 ## DESCRIPTION
 Stops the active recording session on the specified page.
@@ -38,6 +42,36 @@ $script = $events | ConvertTo-PupScript -IncludeSetup
 Complete workflow: start recording, interact, stop, get events, and convert to script.
 
 ## PARAMETERS
+
+### -Page
+Page to stop recording on
+
+```yaml
+Type: PupPage
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).

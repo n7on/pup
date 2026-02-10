@@ -1,6 +1,6 @@
 ---
 external help file: Pup.dll-Help.xml
-Module Name:
+Module Name: Pup
 online version:
 schema: 2.0.0
 ---
@@ -11,6 +11,17 @@ schema: 2.0.0
 Sends keyboard input to the page.
 
 ## SYNTAX
+
+### SingleKey
+```
+Send-PupKey -Page <PupPage> -Key <String> [-Modifiers <String[]>] [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
+```
+
+### TypeText
+```
+Send-PupKey -Page <PupPage> -Text <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
 
 ## DESCRIPTION
 Simulates keyboard input by pressing keys or typing text.
@@ -51,6 +62,81 @@ Send-PupKey -Page $page -Key "Enter"
 Uses Tab to navigate form fields.
 
 ## PARAMETERS
+
+### -Key
+The key to press (e.g., Enter, Tab, Escape, ArrowUp, Backspace)
+
+```yaml
+Type: String
+Parameter Sets: SingleKey
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Modifiers
+Modifier keys to hold while pressing the key (e.g., Control, Shift, Alt, Meta)
+
+```yaml
+Type: String[]
+Parameter Sets: SingleKey
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Page
+The page to send keys to
+
+```yaml
+Type: PupPage
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Text
+Text to type character by character
+
+```yaml
+Type: String
+Parameter Sets: TypeText
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).

@@ -1,6 +1,6 @@
 ---
 external help file: Pup.dll-Help.xml
-Module Name:
+Module Name: Pup
 online version:
 schema: 2.0.0
 ---
@@ -11,6 +11,11 @@ schema: 2.0.0
 Gets selector patterns that match similar elements on the page.
 
 ## SYNTAX
+
+```
+Get-PupElementPattern -Element <PupElement> [-MinMatches <Int32>] [-MaxMatches <Int32>] [-Type <String>]
+ [-Depth <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
 
 ## DESCRIPTION
 Given an element, generates multiple CSS selector patterns that can match structurally similar elements.
@@ -103,6 +108,96 @@ Use -Depth to get patterns for ancestor containers.
 This is useful when you want to capture related data (title, URL, author, score) that share a common parent.
 
 ## PARAMETERS
+
+### -Depth
+Go up N levels to ancestor before generating patterns (0=element itself, 1=parent, 2=grandparent)
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Element
+The element to generate patterns for
+
+```yaml
+Type: PupElement
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -MaxMatches
+Only return patterns with at most this many matches
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -MinMatches
+Only return patterns with at least this many matches
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Type
+Filter by pattern type (ByTag, ByClass, ByParentClass, ByStructure, etc.)
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
