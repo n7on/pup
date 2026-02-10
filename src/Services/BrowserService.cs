@@ -54,6 +54,7 @@ namespace Pup.Services
 
             // Apply stealth mode - inject before any page content loads
             await ApplyStealthModeAsync(page).ConfigureAwait(false);
+            await ApplyWebSocketTrackerAsync(page).ConfigureAwait(false);
 
             // Set viewport size
             await page.SetViewportAsync(new ViewPortOptions
@@ -491,13 +492,24 @@ namespace Pup.Services
 
         private static async Task ApplyStealthModeAsync(IPage page)
         {
-            var stealthScript = EmbeddedResourceService.LoadScript("stealth.js");
+            var script = EmbeddedResourceService.LoadScript("stealth.js");
 
             // Apply to future navigations
-            await page.EvaluateExpressionOnNewDocumentAsync(stealthScript).ConfigureAwait(false);
+            await page.EvaluateExpressionOnNewDocumentAsync(script).ConfigureAwait(false);
 
             // Also apply to the current page context immediately
-            await page.EvaluateExpressionAsync(stealthScript).ConfigureAwait(false);
+            await page.EvaluateExpressionAsync(script).ConfigureAwait(false);
+        }
+
+        private static async Task ApplyWebSocketTrackerAsync(IPage page)
+        {
+            var script = EmbeddedResourceService.LoadScript("websocket-tracker.js");
+
+            // Apply to future navigations
+            await page.EvaluateExpressionOnNewDocumentAsync(script).ConfigureAwait(false);
+
+            // Also apply to the current page context immediately
+            await page.EvaluateExpressionAsync(script).ConfigureAwait(false);
         }
     }
 }
