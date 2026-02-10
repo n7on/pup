@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/n7on/Pup)](https://github.com/n7on/Pup/blob/main/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blue)](#)
 
-Pup is a native PowerShell module made for browser automation. It's built upon PuppeteerSharp, which is a .NET library using the DevTools API to automate the browser. It targets .NET Standard 2.0, so it's fully supported on all PowerShell versions. 
+A PowerShell module for browser automation using the Chrome DevTools Protocol. Built on PuppeteerSharp, it works with PowerShell 5.1+ on Windows, Linux, and macOS. 
 
 ## Install
 ```powershell
@@ -97,20 +97,20 @@ Install-PupBrowser
 - [Get-PupCertificate](./docs/commands/Get-PupCertificate.md) - Get page certificate
 - [Set-PupDialogHandler](./docs/commands/Set-PupDialogHandler.md) - Handle dialogs (alert, confirm)
 
-# Use-Cases
+## Examples
 
-## Web Scraping
+### Web Scraping
 This example scrapes Ubuntu security notices from `https://ubuntu.com/security/notices` and returns the date and link to security issues.
 
 
-### Start browser 
+#### Start browser 
 ```powershell
 Import-Module Pup
 $page = start-PupBrowser | New-PupPage -Url https://ubuntu.com/security/notices 
 ```
-### Get selectors
+#### Get selectors
 
-#### List selector
+##### List selector
 If you look at the opened page in the browser, you see that there are 10 notices per page. So we need a list that contains all those, so that we can iterate over it. Copy the first link name, which at this time is `USN-8015-3: Linux kernel (FIPS) vulnerabilities`.
 ```powershell
 
@@ -127,7 +127,7 @@ $page | find-pupelements -Text "USN-8015-3: Linux kernel (FIPS) vulnerabilities"
 
 $listSelector = "#notices-list section"
 ```
-#### Date selector
+##### Date selector
 If we first get the first element by using the `$listSelector`, we can get the element that holds the date-text, and see its selector.
 ```powershell
 $page | find-pupelements -Selector $listSelector -First | Find-PupElements -TextContains "6 february"
@@ -143,7 +143,7 @@ $page | find-pupelements -Selector $listSelector -First | Find-PupElements -Text
 
 $dateSelector = "div.row > div.col-6 > p.u-text--muted"
 ```
-#### Link selector
+##### Link selector
 
 We use the `$listSelector` again, and get the element that holds the link-text, and see its selector.
 ```powershell
@@ -161,7 +161,7 @@ $page | find-pupelements -Selector $listSelector -First | Find-PupElements -Text
 
 $linkSelector = "div.u-fixed-width > h3.u-no-margin > a"
 ```
-#### NextPage selector 
+##### NextPage selector 
 We need the selector to next page in order to scrape multiple pages.
 ```powershell
 # it doesn't show on the page, but if you look in source it's actually "Next page". 
@@ -178,7 +178,7 @@ $page | find-pupelements -Text "Next page" | Get-PupElementPattern
 
 $nextPageSelector = ".p-pagination__link--next i"
 ```
-### Create script
+#### Create script
 Now we have everything that is needed for the script. We only need the Ubuntu notices from the last month, so we'll stop when we get an older notice.
 
 ```powershell
