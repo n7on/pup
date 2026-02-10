@@ -14,6 +14,89 @@ Install-Module Pup
 Install-PupBrowser
 ```
 
+## Commands
+
+### Browser
+- [Start-PupBrowser](./docs/commands/Start-PupBrowser.md) - Launch browser instance
+- [Stop-PupBrowser](./docs/commands/Stop-PupBrowser.md) - Close browser
+- [Get-PupBrowser](./docs/commands/Get-PupBrowser.md) - Get running browsers
+- [Install-PupBrowser](./docs/commands/Install-PupBrowser.md) - Download browser
+- [Uninstall-PupBrowser](./docs/commands/Uninstall-PupBrowser.md) - Remove browser
+
+### Page
+- [New-PupPage](./docs/commands/New-PupPage.md) - Create new page/tab
+- [Get-PupPage](./docs/commands/Get-PupPage.md) - Get open pages
+- [Remove-PupPage](./docs/commands/Remove-PupPage.md) - Close page
+- [Move-PupPage](./docs/commands/Move-PupPage.md) - Navigate to URL
+- [Invoke-PupPageBack](./docs/commands/Invoke-PupPageBack.md) - Go back
+- [Invoke-PupPageForward](./docs/commands/Invoke-PupPageForward.md) - Go forward
+- [Invoke-PupPageReload](./docs/commands/Invoke-PupPageReload.md) - Reload page
+- [Invoke-PupPageScroll](./docs/commands/Invoke-PupPageScroll.md) - Scroll page
+- [Invoke-PupPageScript](./docs/commands/Invoke-PupPageScript.md) - Execute JavaScript
+- [Set-PupPageViewport](./docs/commands/Set-PupPageViewport.md) - Set viewport size
+- [Get-PupPageSource](./docs/commands/Get-PupPageSource.md) - Get page HTML
+
+### Elements
+- [Find-PupElements](./docs/commands/Find-PupElements.md) - Find elements by selector
+- [Wait-PupElement](./docs/commands/Wait-PupElement.md) - Wait for element
+- [Invoke-PupElementClick](./docs/commands/Invoke-PupElementClick.md) - Click element
+- [Invoke-PupElementHover](./docs/commands/Invoke-PupElementHover.md) - Hover over element
+- [Invoke-PupElementFocus](./docs/commands/Invoke-PupElementFocus.md) - Focus element
+- [Invoke-PupElementScroll](./docs/commands/Invoke-PupElementScroll.md) - Scroll element
+- [Set-PupElement](./docs/commands/Set-PupElement.md) - Set element text
+- [Set-PupElementValue](./docs/commands/Set-PupElementValue.md) - Set element value
+- [Set-PupElementAttribute](./docs/commands/Set-PupElementAttribute.md) - Set attribute
+- [Get-PupElementValue](./docs/commands/Get-PupElementValue.md) - Get element value
+- [Get-PupElementAttribute](./docs/commands/Get-PupElementAttribute.md) - Get attribute
+- [Get-PupElementSelector](./docs/commands/Get-PupElementSelector.md) - Get CSS selector
+- [Get-PupElementPattern](./docs/commands/Get-PupElementPattern.md) - Get selector patterns
+- [Select-PupElementOption](./docs/commands/Select-PupElementOption.md) - Select dropdown option
+
+### Recording
+- [Start-PupRecording](./docs/commands/Start-PupRecording.md) - Start recording interactions
+- [Stop-PupRecording](./docs/commands/Stop-PupRecording.md) - Stop recording
+- [Get-PupRecording](./docs/commands/Get-PupRecording.md) - Get recorded events
+- [Clear-PupRecording](./docs/commands/Clear-PupRecording.md) - Clear recorded events
+- [ConvertTo-PupScript](./docs/commands/ConvertTo-PupScript.md) - Convert events to script
+
+### Screenshots & Export
+- [Get-PupPageScreenshot](./docs/commands/Get-PupPageScreenshot.md) - Capture page screenshot
+- [Get-PupElementScreenshot](./docs/commands/Get-PupElementScreenshot.md) - Capture element screenshot
+- [Export-PupPagePdf](./docs/commands/Export-PupPagePdf.md) - Export page as PDF
+
+### Cookies & Storage
+- [Get-PupPageCookie](./docs/commands/Get-PupPageCookie.md) - Get cookies
+- [Set-PupPageCookie](./docs/commands/Set-PupPageCookie.md) - Set cookie
+- [Remove-PupPageCookie](./docs/commands/Remove-PupPageCookie.md) - Remove cookies
+- [Get-PupPageStorage](./docs/commands/Get-PupPageStorage.md) - Get local/session storage
+- [Set-PupPageStorage](./docs/commands/Set-PupPageStorage.md) - Set storage item
+- [Clear-PupPageStorage](./docs/commands/Clear-PupPageStorage.md) - Clear storage
+
+### Network
+- [Invoke-PupHttpFetch](./docs/commands/Invoke-PupHttpFetch.md) - Make HTTP request
+- [Set-PupHttpHeader](./docs/commands/Set-PupHttpHeader.md) - Set request headers
+- [Set-PupHttpAuth](./docs/commands/Set-PupHttpAuth.md) - Set HTTP authentication
+- [Get-PupPageNetwork](./docs/commands/Get-PupPageNetwork.md) - Get network requests
+
+### WebSocket
+- [Get-PupWebSocket](./docs/commands/Get-PupWebSocket.md) - Get WebSocket connections
+- [Send-PupWebSocketMessage](./docs/commands/Send-PupWebSocketMessage.md) - Send WebSocket message
+
+### Session
+- [Export-PupPageSession](./docs/commands/Export-PupPageSession.md) - Export session (cookies, storage)
+- [Import-PupPageSession](./docs/commands/Import-PupPageSession.md) - Import session
+
+### Input
+- [Send-PupKey](./docs/commands/Send-PupKey.md) - Send keyboard input
+- [Send-PupFile](./docs/commands/Send-PupFile.md) - Upload file
+
+### Console & Debugging
+- [Enter-PupConsole](./docs/commands/Enter-PupConsole.md) - Interactive console mode
+- [Get-PupPageConsole](./docs/commands/Get-PupPageConsole.md) - Get console messages
+- [Invoke-PupCdpMessage](./docs/commands/Invoke-PupCdpMessage.md) - Send raw CDP command
+- [Get-PupCertificate](./docs/commands/Get-PupCertificate.md) - Get page certificate
+- [Set-PupDialogHandler](./docs/commands/Set-PupDialogHandler.md) - Handle dialogs (alert, confirm)
+
 # Use-Cases
 
 ## Web Scraping
@@ -131,36 +214,6 @@ $browser | Stop-PupBrowser
 ```
 See more examples in [./examples](./examples/)
 
-# Development
-If you want to contribute to the source you're highly welcome! 
-## Prerequisites
+## Contributing
 
-* Dotnet 8
-* Pester
-
-## Test
-DLLs can't be unloaded from PowerShell, so you need to run tests in a different process, as below.
-``` powershell
-pwsh -Command "Invoke-Pester ./tests/Browser.Tests.ps1 -Output Detailed"
-pwsh -Command "Invoke-Pester ./tests/Page.Tests.ps1 -Output Detailed"
-pwsh -Command "Invoke-Pester ./tests/Element.Tests.ps1 -Output Detailed"
-
-# or all tests
-pwsh -Command "Invoke-Pester ./tests/ -Output Detailed"
-``` 
-
-# Troubleshooting
-
-## Windows
-Uninstall the old `Pester`that is shipped with Windows, and never updated.
-
-``` PowerShell
-$module = "C:\Program Files\WindowsPowerShell\Modules\Pester"
-takeown /F $module /A /R
-icacls $module /reset
-icacls $module /grant "*S-1-5-32-544:F" /inheritance:d /T
-Remove-Item -Path $module -Recurse -Force -Confirm:$false
-
-Install-Module -Name Pester  -MaximumVersion 4.99 -Force
-
-```
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, testing, and troubleshooting.
