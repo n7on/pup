@@ -125,7 +125,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to set cookie on
 
 ```yaml
 Type: PupPage

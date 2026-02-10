@@ -32,7 +32,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -Browser
-{{ Fill Browser Description }}
+The browser instance
 
 ```yaml
 Type: PupBrowser

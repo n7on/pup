@@ -132,7 +132,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to wait for element on
 
 ```yaml
 Type: PupPage

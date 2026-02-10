@@ -12,7 +12,8 @@ namespace Pup.Commands.Page
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
-            ValueFromPipelineByPropertyName = true)]
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The page to get HTML source from")]
         public PupPage Page { get; set; }
 
         [Parameter(HelpMessage = "Save the HTML to a file path")]

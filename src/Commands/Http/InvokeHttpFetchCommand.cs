@@ -10,29 +10,29 @@ namespace Pup.Commands.Http
     [OutputType(typeof(PupFetchResponse))]
     public class InvokeHttpFetchCommand : PSCmdlet
     {
-        [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]
+        [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true, HelpMessage = "The page context to make the request from")]
         public PupPage Page { get; set; }
 
-        [Parameter(Mandatory = true, Position = 1)]
+        [Parameter(Mandatory = true, Position = 1, HelpMessage = "The URL to fetch")]
         public string Url { get; set; }
 
-        [Parameter()]
+        [Parameter(HelpMessage = "HTTP method (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)")]
         [ValidateSet("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")]
         public string Method { get; set; } = "GET";
 
-        [Parameter()]
+        [Parameter(HelpMessage = "Request body (string or object to be serialized as JSON)")]
         public object Body { get; set; }
 
-        [Parameter()]
+        [Parameter(HelpMessage = "Additional HTTP headers as a hashtable")]
         public Hashtable Headers { get; set; }
 
-        [Parameter()]
+        [Parameter(HelpMessage = "Content-Type header value")]
         public string ContentType { get; set; }
 
-        [Parameter()]
+        [Parameter(HelpMessage = "Parse response body as JSON")]
         public SwitchParameter AsJson { get; set; }
 
-        [Parameter()]
+        [Parameter(HelpMessage = "Request timeout in milliseconds (default: 30000)")]
         public int Timeout { get; set; } = 30000;
 
         protected override void ProcessRecord()

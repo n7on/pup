@@ -81,7 +81,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to get network requests from
 
 ```yaml
 Type: PupPage

@@ -13,7 +13,8 @@ namespace Pup.Commands.Element
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
-            ValueFromPipelineByPropertyName = true)]
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The page to wait for element on")]
         public PupPage Page { get; set; }
 
         [Parameter(

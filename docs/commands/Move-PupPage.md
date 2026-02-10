@@ -48,7 +48,7 @@ Tests for open redirect vulnerabilities.
 ## PARAMETERS
 
 ### -Page
-{{ Fill Page Description }}
+The page to navigate
 
 ```yaml
 Type: PupPage

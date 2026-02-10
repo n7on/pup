@@ -57,7 +57,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to reload
 
 ```yaml
 Type: PupPage

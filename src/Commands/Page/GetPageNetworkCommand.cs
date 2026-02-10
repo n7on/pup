@@ -15,7 +15,8 @@ namespace Pup.Commands.Page
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
-            ValueFromPipelineByPropertyName = true)]
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The page to get network requests from")]
         public PupPage Page { get; set; }
 
         [Parameter(HelpMessage = "Include response bodies when possible (text only)")]

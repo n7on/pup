@@ -32,7 +32,7 @@ Closes the browser tab.
 ## PARAMETERS
 
 ### -Page
-{{ Fill Page Description }}
+The page to close
 
 ```yaml
 Type: PupPage

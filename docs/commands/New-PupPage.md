@@ -40,7 +40,7 @@ Creates a page and navigates to the target, waiting for the page to fully load.
 ## PARAMETERS
 
 ### -Browser
-{{ Fill Browser Description }}
+The browser instance
 
 ```yaml
 Type: PupBrowser

@@ -13,7 +13,8 @@ namespace Pup.Commands.Page
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
-            ValueFromPipelineByPropertyName = true)]
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The page to get storage from")]
         public PupPage Page { get; set; }
 
         [Parameter(HelpMessage = "Storage type: Local or Session (default: Local)")]

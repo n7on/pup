@@ -14,7 +14,8 @@ namespace Pup.Commands.Base
             Position = 0,
             Mandatory = false,
             ValueFromPipeline = true,
-            ValueFromPipelineByPropertyName = true)]
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The browser instance")]
         public PupBrowser Browser { get; set; }
 
         [Parameter(

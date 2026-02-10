@@ -58,7 +58,7 @@ Saves an authenticated session for reuse without logging in again.
 ## PARAMETERS
 
 ### -FilePath
-{{ Fill FilePath Description }}
+File path to save the session JSON
 
 ```yaml
 Type: String
@@ -73,7 +73,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to export session from
 
 ```yaml
 Type: PupPage
@@ -88,7 +88,7 @@ Accept wildcard characters: False
 ```
 
 ### -PassThru
-{{ Fill PassThru Description }}
+Output the session object even when saving to file
 
 ```yaml
 Type: SwitchParameter

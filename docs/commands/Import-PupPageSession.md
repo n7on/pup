@@ -70,7 +70,7 @@ Switches between different user sessions for testing access controls.
 ## PARAMETERS
 
 ### -FilePath
-{{ Fill FilePath Description }}
+Path to session JSON file
 
 ```yaml
 Type: String
@@ -85,7 +85,7 @@ Accept wildcard characters: False
 ```
 
 ### -NoCookies
-{{ Fill NoCookies Description }}
+Skip importing cookies
 
 ```yaml
 Type: SwitchParameter
@@ -100,7 +100,7 @@ Accept wildcard characters: False
 ```
 
 ### -NoLocalStorage
-{{ Fill NoLocalStorage Description }}
+Skip importing local storage
 
 ```yaml
 Type: SwitchParameter
@@ -115,7 +115,7 @@ Accept wildcard characters: False
 ```
 
 ### -NoSessionStorage
-{{ Fill NoSessionStorage Description }}
+Skip importing session storage
 
 ```yaml
 Type: SwitchParameter
@@ -130,7 +130,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to import session into
 
 ```yaml
 Type: PupPage
@@ -160,7 +160,7 @@ Accept wildcard characters: False
 ```
 
 ### -Reload
-{{ Fill Reload Description }}
+Reload the page after importing session
 
 ```yaml
 Type: SwitchParameter
@@ -175,7 +175,7 @@ Accept wildcard characters: False
 ```
 
 ### -Session
-{{ Fill Session Description }}
+Session object to import
 
 ```yaml
 Type: PupSession

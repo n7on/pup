@@ -13,7 +13,8 @@ namespace Pup.Commands.Page
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
-            ValueFromPipelineByPropertyName = true)]
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The page to scroll")]
         public PupPage Page { get; set; }
 
         [Parameter(HelpMessage = "Horizontal scroll position (pixels from left)")]

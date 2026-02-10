@@ -78,7 +78,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to capture
 
 ```yaml
 Type: PupPage

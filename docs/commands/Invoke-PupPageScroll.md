@@ -32,7 +32,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -Page
-{{ Fill Page Description }}
+The page to scroll
 
 ```yaml
 Type: PupPage

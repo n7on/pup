@@ -9,13 +9,13 @@ namespace Pup.Commands.Page
     [OutputType(typeof(PupSession))]
     public class ExportPageSessionCommand : PSCmdlet
     {
-        [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]
+        [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true, HelpMessage = "The page to export session from")]
         public PupPage Page { get; set; }
 
-        [Parameter(Position = 1)]
+        [Parameter(Position = 1, HelpMessage = "File path to save the session JSON")]
         public string FilePath { get; set; }
 
-        [Parameter()]
+        [Parameter(HelpMessage = "Output the session object even when saving to file")]
         public SwitchParameter PassThru { get; set; }
 
         protected override void ProcessRecord()

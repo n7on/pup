@@ -64,7 +64,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to get HTML source from
 
 ```yaml
 Type: PupPage

@@ -32,7 +32,7 @@ Navigates forward and waits for the page to load.
 ## PARAMETERS
 
 ### -Page
-{{ Fill Page Description }}
+The page to navigate forward
 
 ```yaml
 Type: PupPage

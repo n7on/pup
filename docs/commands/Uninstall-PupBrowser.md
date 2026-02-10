@@ -32,7 +32,7 @@ Removes the installed Chrome browser.
 ## PARAMETERS
 
 ### -Browser
-{{ Fill Browser Description }}
+The browser instance
 
 ```yaml
 Type: PupBrowser

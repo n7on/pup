@@ -129,7 +129,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to run script on
 
 ```yaml
 Type: PupPage

@@ -13,7 +13,8 @@ namespace Pup.Commands.Page
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
-            ValueFromPipelineByPropertyName = true)]
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The page to capture")]
         public PupPage Page { get; set; }
 
         [Parameter(HelpMessage = "Path to save the screenshot file (optional)")]

@@ -49,7 +49,7 @@ Searches console output for potentially sensitive information.
 ## PARAMETERS
 
 ### -Page
-{{ Fill Page Description }}
+The page to get console messages from
 
 ```yaml
 Type: PupPage

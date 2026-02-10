@@ -57,7 +57,7 @@ Captures screenshots at different responsive breakpoints.
 ## PARAMETERS
 
 ### -DeviceScaleFactor
-{{ Fill DeviceScaleFactor Description }}
+Device scale factor (default: 1)
 
 ```yaml
 Type: Double
@@ -72,7 +72,7 @@ Accept wildcard characters: False
 ```
 
 ### -HasTouch
-{{ Fill HasTouch Description }}
+Enable touch events
 
 ```yaml
 Type: SwitchParameter
@@ -87,7 +87,7 @@ Accept wildcard characters: False
 ```
 
 ### -Height
-{{ Fill Height Description }}
+Viewport height in pixels
 
 ```yaml
 Type: Int32
@@ -102,7 +102,7 @@ Accept wildcard characters: False
 ```
 
 ### -IsLandscape
-{{ Fill IsLandscape Description }}
+Use landscape orientation
 
 ```yaml
 Type: SwitchParameter
@@ -117,7 +117,7 @@ Accept wildcard characters: False
 ```
 
 ### -IsMobile
-{{ Fill IsMobile Description }}
+Emulate mobile device
 
 ```yaml
 Type: SwitchParameter
@@ -132,7 +132,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to set viewport for
 
 ```yaml
 Type: PupPage
@@ -162,7 +162,7 @@ Accept wildcard characters: False
 ```
 
 ### -Width
-{{ Fill Width Description }}
+Viewport width in pixels
 
 ```yaml
 Type: Int32

@@ -78,7 +78,7 @@ Tests if state-changing requests require CSRF protection.
 ## PARAMETERS
 
 ### -AsJson
-{{ Fill AsJson Description }}
+Parse response body as JSON
 
 ```yaml
 Type: SwitchParameter
@@ -93,7 +93,7 @@ Accept wildcard characters: False
 ```
 
 ### -Body
-{{ Fill Body Description }}
+Request body (string or object to be serialized as JSON)
 
 ```yaml
 Type: Object
@@ -108,7 +108,7 @@ Accept wildcard characters: False
 ```
 
 ### -ContentType
-{{ Fill ContentType Description }}
+Content-Type header value
 
 ```yaml
 Type: String
@@ -123,7 +123,7 @@ Accept wildcard characters: False
 ```
 
 ### -Headers
-{{ Fill Headers Description }}
+Additional HTTP headers as a hashtable
 
 ```yaml
 Type: Hashtable
@@ -138,7 +138,7 @@ Accept wildcard characters: False
 ```
 
 ### -Method
-{{ Fill Method Description }}
+HTTP method (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
 
 ```yaml
 Type: String
@@ -153,7 +153,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page context to make the request from
 
 ```yaml
 Type: PupPage
@@ -183,7 +183,7 @@ Accept wildcard characters: False
 ```
 
 ### -Timeout
-{{ Fill Timeout Description }}
+Request timeout in milliseconds (default: 30000)
 
 ```yaml
 Type: Int32
@@ -198,7 +198,7 @@ Accept wildcard characters: False
 ```
 
 ### -Url
-{{ Fill Url Description }}
+The URL to fetch
 
 ```yaml
 Type: String

@@ -66,7 +66,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-{{ Fill Page Description }}
+The page to clear storage from
 
 ```yaml
 Type: PupPage
