@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using Pup.Services;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Certificate
 {
     [Cmdlet(VerbsCommon.Get, "PupCertificate")]
     [OutputType(typeof(PupSecurityDetails), typeof(PupCertificate))]
-    public class GetCertificateCommand : PSCmdlet
+    public class GetCertificateCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

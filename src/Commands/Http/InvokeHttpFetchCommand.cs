@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Management.Automation;
 using Pup.Services;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Http
 {
     [Cmdlet(VerbsLifecycle.Invoke, "PupHttpFetch")]
     [OutputType(typeof(PupFetchResponse))]
-    public class InvokeHttpFetchCommand : PSCmdlet
+    public class InvokeHttpFetchCommand : PupBaseCommand
     {
         [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true, HelpMessage = "The page context to make the request from")]
         public PupPage Page { get; set; }

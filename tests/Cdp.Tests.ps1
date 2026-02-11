@@ -1,5 +1,5 @@
 BeforeAll {
-    Import-Module (Join-Path $PSScriptRoot "../" "output" "Pup" "Pup.psd1") -Force
+    Import-Module ([System.IO.Path]::Combine($PSScriptRoot, "..", "output", "Pup", "Pup.psd1")) -Force
     $script:browser = Start-PupBrowser -Headless
     $script:page = New-PupPage -Browser $script:browser -Url "https://example.com" -WaitForLoad
 }

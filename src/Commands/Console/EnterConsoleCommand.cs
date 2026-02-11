@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
 using System.Management.Automation.Host;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Console
 {
     [Cmdlet(VerbsCommon.Enter, "PupConsole")]
-    public class EnterConsoleCommand : PSCmdlet
+    public class EnterConsoleCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

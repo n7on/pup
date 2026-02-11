@@ -1,13 +1,15 @@
 using System;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Element
 {
     [Cmdlet(VerbsCommon.Select, "PupElementOption")]
     [OutputType(typeof(string[]))]
     [OutputType(typeof(PupSelectOption[]))]
-    public class SelectElementOptionCommand : PSCmdlet
+    public class SelectElementOptionCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -1,8 +1,8 @@
 BeforeAll {
-    Import-Module (Join-Path $PSScriptRoot "../" "output" "Pup" "Pup.psd1") -Force
+    Import-Module ([System.IO.Path]::Combine($PSScriptRoot, "..", "output", "Pup", "Pup.psd1")) -Force
     Install-PupBrowser -BrowserType Chrome
 
-    $script:testUrl = "file://" + (Join-Path $PSScriptRoot "fixtures" "test-page.html")
+    $script:testUrl = "file://" + [System.IO.Path]::Combine($PSScriptRoot, "fixtures", "test-page.html")
     $script:browser = Start-PupBrowser -Headless
 }
 

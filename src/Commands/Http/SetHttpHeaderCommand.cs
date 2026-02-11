@@ -2,13 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Http
 {
     [Cmdlet(VerbsCommon.Set, "PupHttpHeader")]
     [OutputType(typeof(void))]
-    public class SetHttpHeaderCommand : PSCmdlet
+    public class SetHttpHeaderCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

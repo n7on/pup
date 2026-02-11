@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Recording
 {
     [Cmdlet(VerbsCommon.Clear, "PupRecording")]
     [OutputType(typeof(void))]
-    public class ClearRecordingCommand : PSCmdlet
+    public class ClearRecordingCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

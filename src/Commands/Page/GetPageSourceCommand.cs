@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsCommon.Get, "PupPageSource")]
     [OutputType(typeof(string))]
-    public class GetPageSourceCommand : PSCmdlet
+    public class GetPageSourceCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

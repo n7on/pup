@@ -2,13 +2,15 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Input
 {
     [Cmdlet(VerbsCommunications.Send, "PupFile")]
     [OutputType(typeof(void))]
-    public class SendFileCommand : PSCmdlet
+    public class SendFileCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -3,12 +3,14 @@ using System.Management.Automation;
 using Pup.Transport;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsCommon.Get, "PupPageCookie")]
     [OutputType(typeof(PupCookie[]))]
-    public class GetPageCookieCommand : PSCmdlet
+    public class GetPageCookieCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsLifecycle.Invoke, "PupPageScript")]
     [OutputType(typeof(object))]
-    public class InvokePageScriptCommand : PSCmdlet
+    public class InvokePageScriptCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -2,12 +2,13 @@ using System;
 using System.Management.Automation;
 using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Input
 {
     [Cmdlet(VerbsCommon.Set, "PupDialogHandler")]
     [OutputType(typeof(void))]
-    public class SetDialogHandlerCommand : PSCmdlet
+    public class SetDialogHandlerCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

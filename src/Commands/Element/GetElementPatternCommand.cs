@@ -1,13 +1,15 @@
 using System;
 using System.Management.Automation;
 using Pup.Services;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Element
 {
     [Cmdlet(VerbsCommon.Get, "PupElementPattern")]
     [OutputType(typeof(PupElementPattern[]))]
-    public class GetElementPatternCommand : PSCmdlet
+    public class GetElementPatternCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

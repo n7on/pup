@@ -8,7 +8,7 @@ using Pup.Services;
 namespace Pup.Commands.Base
 {
 
-    public abstract class BrowserBaseCommand : PSCmdlet
+    public abstract class BrowserBaseCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

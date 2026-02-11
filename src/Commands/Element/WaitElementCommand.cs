@@ -2,12 +2,14 @@ using System;
 using System.Management.Automation;
 using System.Runtime.InteropServices.ComTypes;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Element
 {
     [Cmdlet(VerbsLifecycle.Wait, "PupElement")]
     [OutputType(typeof(PupElement))]
-    public class WaitElementCommand : PSCmdlet
+    public class WaitElementCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

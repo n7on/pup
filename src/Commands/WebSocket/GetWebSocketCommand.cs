@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.WebSocket
 {
     [Cmdlet(VerbsCommon.Get, "PupWebSocket")]
     [OutputType(typeof(PupWebSocketEntry))]
-    public class GetWebSocketCommand : PSCmdlet
+    public class GetWebSocketCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

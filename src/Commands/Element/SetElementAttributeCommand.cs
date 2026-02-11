@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Element
 {
     [Cmdlet(VerbsCommon.Set, "PupElementAttribute")]
     [OutputType(typeof(void))]
-    public class SetElementAttributeCommand : PSCmdlet
+    public class SetElementAttributeCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Recording
 {
     [Cmdlet(VerbsCommon.Get, "PupRecording")]
     [OutputType(typeof(PupRecordingEvent[]))]
-    public class GetRecordingCommand : PSCmdlet
+    public class GetRecordingCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

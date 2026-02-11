@@ -2,12 +2,13 @@ using System;
 using System.Management.Automation;
 using Pup.Transport;
 using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Browser
 {
     [Cmdlet(VerbsLifecycle.Install, "PupBrowser")]
     [OutputType(typeof(PupBrowser))]
-    public class InstallBrowserCommand : PSCmdlet
+    public class InstallBrowserCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

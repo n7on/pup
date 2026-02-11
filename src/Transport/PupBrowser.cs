@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using PuppeteerSharp;
 using System.Management.Automation;
 using Pup.Common;
@@ -47,7 +48,7 @@ namespace Pup.Transport
         public int ProcessId => Browser?.Process?.Id ?? -1;
         public string WebSocketEndpoint => Browser?.WebSocketEndpoint ?? "Unknown";
         public bool Running => Browser?.IsConnected ?? false;  // User-friendly alias
-        public int PageCount => Browser?.PagesAsync().GetAwaiter().GetResult().Length ?? 0;
+        public int PageCount => Browser != null ? Task.Run(() => Browser.PagesAsync()).GetAwaiter().GetResult().Length : 0;
 
         public override string ToString()
         {

@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Input
 {
     [Cmdlet(VerbsCommunications.Send, "PupKey")]
     [OutputType(typeof(void))]
-    public class SendKeyCommand : PSCmdlet
+    public class SendKeyCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

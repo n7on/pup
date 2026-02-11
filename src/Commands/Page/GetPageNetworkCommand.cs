@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using System.Text.Json;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsCommon.Get, "PupPageNetwork")]
     [OutputType(typeof(PupNetworkEntry))]
-    public class GetPageNetworkCommand : PSCmdlet
+    public class GetPageNetworkCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

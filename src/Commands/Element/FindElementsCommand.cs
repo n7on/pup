@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using Pup.Services;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Element
 {
     [Cmdlet(VerbsCommon.Find, "PupElements")]
     [OutputType(typeof(PupElement[]))]
-    public class FindElementsCommand : PSCmdlet
+    public class FindElementsCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -1,13 +1,15 @@
 using System;
 using System.IO;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Element
 {
     [Cmdlet(VerbsCommon.Get, "PupElementScreenshot")]
     [OutputType(typeof(byte[]))]
-    public class GetElementScreenshotCommand : PSCmdlet
+    public class GetElementScreenshotCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

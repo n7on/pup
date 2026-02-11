@@ -1,13 +1,15 @@
 using System;
 using System.Collections;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Cdp
 {
     [Cmdlet(VerbsLifecycle.Invoke, "PupCdpMessage")]
     [OutputType(typeof(PSObject))]
-    public class InvokeCdpMessageCommand : PSCmdlet
+    public class InvokeCdpMessageCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

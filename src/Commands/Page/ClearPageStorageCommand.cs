@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsCommon.Clear, "PupPageStorage")]
     [OutputType(typeof(void))]
-    public class ClearPageStorageCommand : PSCmdlet
+    public class ClearPageStorageCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

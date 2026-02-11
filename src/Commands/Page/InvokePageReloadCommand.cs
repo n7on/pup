@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsLifecycle.Invoke, "PupPageReload")]
     [OutputType(typeof(void))]
-    public class InvokePageReloadCommand : PSCmdlet
+    public class InvokePageReloadCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -2,12 +2,14 @@ using System;
 using System.Management.Automation;
 using Pup.Transport;
 using Pup.Services;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsLifecycle.Invoke, "PupPageScroll")]
     [OutputType(typeof(void))]
-    public class InvokePageScrollCommand : PSCmdlet
+    public class InvokePageScrollCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

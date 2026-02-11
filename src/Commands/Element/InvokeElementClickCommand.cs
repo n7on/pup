@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Element
 {
     [Cmdlet(VerbsLifecycle.Invoke, "PupElementClick")]
     [OutputType(typeof(void))]
-    public class InvokeElementClickCommand : PSCmdlet
+    public class InvokeElementClickCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

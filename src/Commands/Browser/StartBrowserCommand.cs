@@ -3,12 +3,13 @@ using System.Management.Automation;
 using Pup.Transport;
 using Pup.Completers;
 using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Browser
 {
     [Cmdlet(VerbsLifecycle.Start, "PupBrowser")]
     [OutputType(typeof(PupBrowser))]
-    public class StartBrowserCommand : PSCmdlet
+    public class StartBrowserCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -23,7 +23,10 @@ pwsh -Command "Invoke-Pester ./tests/Page.Tests.ps1 -Output Detailed"
 pwsh -Command "Invoke-Pester ./tests/Element.Tests.ps1 -Output Detailed"
 
 # or all tests
+# PowerShell 7+
 pwsh -Command "Invoke-Pester ./tests/ -Output Detailed"
+# PowerShell 5
+powershell.exe -Command "Invoke-Pester ./tests/ -Output Detailed"
 ```
 
 ## Generating Documentation

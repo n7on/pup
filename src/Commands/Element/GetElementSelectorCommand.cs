@@ -2,6 +2,8 @@ using System;
 using System.Management.Automation;
 using Pup.Services;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Element
 {
@@ -11,7 +13,7 @@ namespace Pup.Commands.Element
     /// </summary>
     [Cmdlet(VerbsCommon.Get, "PupElementSelector")]
     [OutputType(typeof(string))]
-    public class GetElementSelectorCommand : PSCmdlet
+    public class GetElementSelectorCommand : PupBaseCommand
     {
         [Parameter(Mandatory = true, ValueFromPipeline = true, HelpMessage = "The element to get selector for")]
         public PupElement Element { get; set; }

@@ -4,12 +4,14 @@ using System.Linq;
 using System.Management.Automation;
 using Pup.Services;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Recording
 {
     [Cmdlet(VerbsData.ConvertTo, "PupScript")]
     [OutputType(typeof(string))]
-    public class ConvertToScriptCommand : PSCmdlet
+    public class ConvertToScriptCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

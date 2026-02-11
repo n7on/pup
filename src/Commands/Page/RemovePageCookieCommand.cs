@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsCommon.Remove, "PupPageCookie")]
     [OutputType(typeof(void))]
-    public class RemovePageCookieCommand : PSCmdlet
+    public class RemovePageCookieCommand : PupBaseCommand
     {
         private const string ByFilter = "ByFilter";
         private const string ByObject = "ByObject";

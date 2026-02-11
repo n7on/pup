@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsCommon.Get, "PupPageConsole")]
     [OutputType(typeof(PupConsoleEntry[]))]
-    public class GetPageConsoleCommand : PSCmdlet
+    public class GetPageConsoleCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

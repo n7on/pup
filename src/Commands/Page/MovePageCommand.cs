@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsCommon.Move, "PupPage")]
     [OutputType(typeof(PupPage))]
-    public class MovePageCommand : PSCmdlet
+    public class MovePageCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

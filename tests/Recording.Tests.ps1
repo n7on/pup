@@ -1,12 +1,12 @@
 BeforeAll {
-    Import-Module (Join-Path $PSScriptRoot "../" "output" "Pup" "Pup.psd1") -Force
+    Import-Module ([System.IO.Path]::Combine($PSScriptRoot, "..", "output", "Pup", "Pup.psd1")) -Force
 }
 
 Describe "Live Recording" {
     BeforeAll {
         Install-PupBrowser -BrowserType Chrome
         $script:browser = Start-PupBrowser -Headless
-        $script:testUrl = "file://" + (Join-Path $PSScriptRoot "fixtures" "test-page.html")
+        $script:testUrl = "file://" + [System.IO.Path]::Combine($PSScriptRoot, "fixtures", "test-page.html")
         $script:page = New-PupPage -Browser $script:browser -Url $script:testUrl -WaitForLoad
     }
 

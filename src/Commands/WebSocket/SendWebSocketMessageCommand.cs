@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.WebSocket
 {
     [Cmdlet(VerbsCommunications.Send, "PupWebSocketMessage")]
     [OutputType(typeof(bool))]
-    public class SendWebSocketMessageCommand : PSCmdlet
+    public class SendWebSocketMessageCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -1,13 +1,15 @@
 using System;
 using System.IO;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsData.Export, "PupPagePdf")]
     [OutputType(typeof(byte[]))]
-    public class ExportPagePdfCommand : PSCmdlet
+    public class ExportPagePdfCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

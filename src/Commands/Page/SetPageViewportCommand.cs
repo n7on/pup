@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsCommon.Set, "PupPageViewport")]
     [OutputType(typeof(void))]
-    public class SetPageViewportCommand : PSCmdlet
+    public class SetPageViewportCommand : PupBaseCommand
     {
         [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true, HelpMessage = "The page to set viewport for")]
         public PupPage Page { get; set; }

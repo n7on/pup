@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsCommon.Get, "PupPageStorage")]
     [OutputType(typeof(PSObject))]
-    public class GetPageStorageCommand : PSCmdlet
+    public class GetPageStorageCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

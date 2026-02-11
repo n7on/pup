@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Http
 {
     [Cmdlet(VerbsCommon.Set, "PupHttpAuth")]
     [OutputType(typeof(void))]
-    public class SetHttpAuthCommand : PSCmdlet
+    public class SetHttpAuthCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

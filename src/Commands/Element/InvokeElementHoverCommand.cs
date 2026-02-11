@@ -1,12 +1,14 @@
 using System;
 using System.Management.Automation;
+using Pup.Common;
 using Pup.Transport;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Element
 {
     [Cmdlet(VerbsLifecycle.Invoke, "PupElementHover")]
     [OutputType(typeof(void))]
-    public class InvokeElementHoverCommand : PSCmdlet
+    public class InvokeElementHoverCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

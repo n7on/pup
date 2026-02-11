@@ -2,12 +2,14 @@ using System;
 using System.Management.Automation;
 using Pup.Services;
 using Pup.Transport;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Recording
 {
     [Cmdlet(VerbsLifecycle.Stop, "PupRecording")]
     [OutputType(typeof(void))]
-    public class StopRecordingCommand : PSCmdlet
+    public class StopRecordingCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,

@@ -2,12 +2,14 @@ using System;
 using System.Management.Automation;
 using Pup.Transport;
 using Pup.Services;
+using Pup.Common;
+using Pup.Commands.Base;
 
 namespace Pup.Commands.Page
 {
     [Cmdlet(VerbsLifecycle.Invoke, "PupPageBack")]
     [OutputType(typeof(void))]
-    public class InvokePageBackCommand : PSCmdlet
+    public class InvokePageBackCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
