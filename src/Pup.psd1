@@ -1,6 +1,6 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.3.1'
+    ModuleVersion = '0.3.2'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
@@ -82,31 +82,12 @@
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-Pup v0.3.1
+v0.3.2
+- Added -Fullscreen and -Maximized options to Start-PupBrowser
+- Browser storage moved to module-scoped static storage (no more variable collision)
+- Added HelpMessage to cmdlet parameters for better documentation
 
-Browser Automation:
-- Install, launch, and control Chrome/Chromium (headless or visible)
-- Multi-page/tab management with navigation controls
-
-Web Interaction:
-- Find elements via CSS selectors or XPath
-- Click, hover, scroll, focus, and fill forms
-- Handle dialogs, file uploads, and keyboard input
-
-Data Extraction:
-- Screenshots (page or element), PDF export
-- Extract HTML, text, attributes, and form values
-- Cookie and local/session storage management
-
-Advanced Features:
-- Network interception with custom headers and HTTP auth
-- WebSocket monitoring and messaging
-- Export/import browser sessions
-- Convert Chrome DevTools recordings to PowerShell scripts
-- Proxy support and stealth mode
-- Interactive console mode
-
-Cross-platform: Windows, Linux, macOS | PowerShell 5.1+
+See CHANGELOG.md for full version history.
 '@
         }
     }

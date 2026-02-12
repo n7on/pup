@@ -44,6 +44,25 @@ New-MarkdownHelp -Module Pup -OutputFolder ./docs/commands -Force
 New-ExternalHelp -Path ./docs/commands -OutputPath ./src/en-US -Force
 ```
 
+## Releasing a New Version
+
+1. Update version in `src/Pup.psd1`:
+   ```powershell
+   ModuleVersion = '0.3.0'
+   ```
+
+2. Update release notes in `src/Pup.psd1` (in the `PrivateData.PSData.ReleaseNotes` section)
+
+3. Commit and push the changes
+
+4. Create and push a git tag:
+   ```bash
+   git tag v0.3.0
+   git push origin v0.3.0
+   ```
+
+GitHub Actions will automatically publish to PowerShell Gallery when a tag is pushed.
+
 # Troubleshooting
 
 ## Windows
