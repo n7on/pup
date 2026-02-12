@@ -20,6 +20,12 @@ namespace Pup.Commands.Browser
         [Parameter(HelpMessage = "Run browser in headless mode (no GUI)")]
         public SwitchParameter Headless { get; set; }
 
+        [Parameter(HelpMessage = "Start browser in fullscreen mode (hides browser UI)")]
+        public SwitchParameter Fullscreen { get; set; }
+
+        [Parameter(HelpMessage = "Start browser maximized")]
+        public SwitchParameter Maximized { get; set; }
+
         [Parameter(HelpMessage = "Additional arguments to pass to the browser")]
         public string[] Arguments { get; set; }
 
@@ -61,6 +67,17 @@ namespace Pup.Commands.Browser
                     existingBrowser.Browser.CloseAsync().GetAwaiter().GetResult();
                 }
 
+                // Build arguments list
+                var args = Arguments != null ? new System.Collections.Generic.List<string>(Arguments) : new System.Collections.Generic.List<string>();
+                if (Fullscreen.IsPresent)
+                {
+                    args.Add("--start-fullscreen");
+                }
+                if (Maximized.IsPresent)
+                {
+                    args.Add("--start-maximized");
+                }
+
                 var browser = supportedBrowserService.StartBrowser(
                     BrowserType.ToPBSupportedBrowser(),
                     Headless.IsPresent,
@@ -68,7 +85,7 @@ namespace Pup.Commands.Browser
                     Height,
                     Proxy,
                     UserAgent,
-                    Arguments
+                    args.Count > 0 ? args.ToArray() : null
                 );
                 WriteObject(browser);
             }

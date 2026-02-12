@@ -149,10 +149,13 @@ namespace Pup.Services
                 args.AddRange(arguments);
             }
 
+            // If maximized or fullscreen, don't set a fixed viewport (let it match window size)
+            var isMaximizedOrFullscreen = args.Contains("--start-maximized") || args.Contains("--start-fullscreen");
+
             var launchOptions = new LaunchOptions
             {
                 Headless = headless,
-                DefaultViewport = new ViewPortOptions
+                DefaultViewport = isMaximizedOrFullscreen ? null : new ViewPortOptions
                 {
                     Width = width,
                     Height = height
