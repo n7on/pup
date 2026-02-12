@@ -5,7 +5,7 @@
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
     Copyright = '(c) 2026 Anton Lindström. All rights reserved.'
-    Description = 'Browser automation for PowerShell. Control headless or visible Chrome/Chromium browsers via the DevTools Protocol. Automate web scraping, form filling, screenshots, PDF export, network interception, WebSocket monitoring, and session management. Convert Chrome DevTools recordings to PowerShell scripts. Cross-platform support for Windows, Linux, and macOS.'
+    Description = 'Browser automation for PowerShell using the Chrome DevTools Protocol. Scrape websites, fill forms, take screenshots, export PDFs, and record interactions as replayable scripts. Works with PowerShell 5.1+ on Windows, Linux, and macOS.'
     
     PowerShellVersion = '5.1'
     DotNetFrameworkVersion = '4.6.1'
@@ -77,7 +77,7 @@
     
     PrivateData = @{
         PSData = @{
-            Tags = @('Browser', 'Automation', 'WebScraping', 'Puppeteer', 'Chrome', 'Chromium', 'Headless', 'Selenium', 'CDP', 'DevTools', 'Screenshot', 'PDF', 'Testing', 'Web')
+            Tags = @('Browser', 'Automation', 'WebScraping', 'Scraping', 'Puppeteer', 'Chrome', 'Chromium', 'Headless', 'Selenium', 'CDP', 'DevTools', 'Screenshot', 'PDF', 'Testing', 'Web', 'E2E', 'Crawler', 'RPA', 'WebDriver', 'CrossPlatform', 'Linux', 'macOS', 'Windows')
             LicenseUri = 'https://github.com/n7on/Pup/blob/main/LICENSE'
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
