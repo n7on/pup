@@ -43,7 +43,7 @@ namespace Pup.Commands.Browser
             try
             {
                 BrowserTypeValidator.Validate(BrowserType);
-                var supportedBrowserService = ServiceFactory.CreateSupportedBrowserService(SessionState);
+                var supportedBrowserService = ServiceFactory.CreateSupportedBrowserService();
                 
                 // Check if browser is already running
                 var existingBrowser = supportedBrowserService.GetBrowser(BrowserType.ToPBSupportedBrowser());

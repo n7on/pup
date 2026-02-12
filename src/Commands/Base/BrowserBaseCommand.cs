@@ -23,8 +23,8 @@ namespace Pup.Commands.Base
             Mandatory = false)]
         [ArgumentCompleter(typeof(InstalledBrowserCompleter))]
         public string BrowserType { get; set; } = "Chrome";
-        protected IBrowserService BrowserService => ServiceFactory.CreateBrowserService(Browser, SessionState);
-        protected ISupportedBrowserService SupportedBrowserService => ServiceFactory.CreateSupportedBrowserService(SessionState);
+        protected IBrowserService BrowserService => ServiceFactory.CreateBrowserService(Browser);
+        protected ISupportedBrowserService SupportedBrowserService => ServiceFactory.CreateSupportedBrowserService();
         protected PupBrowser ResolveBrowserOrThrow()
         {
 

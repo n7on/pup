@@ -3,7 +3,6 @@ using PuppeteerSharp;
 using System.IO;
 using System.Linq;
 using Pup.Transport;
-using System.Management.Automation;
 using System.Collections.Generic;
 using Pup.Common;
 
@@ -22,16 +21,21 @@ namespace Pup.Services
 
     public class SupportedBrowserService : ISupportedBrowserService
     {
-        protected readonly SessionStateService<PupBrowser> _sessionStateService;
-        private const string RunningBrowsersKey = "RunningBrowsers";
-
         // Realistic Chrome user-agent to avoid bot detection
         public const string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
-        public SupportedBrowserService(SessionState sessionState)
+        static SupportedBrowserService()
         {
-            _sessionStateService = new SessionStateService<PupBrowser>(sessionState, RunningBrowsersKey);
-            AppDomain.CurrentDomain.ProcessExit += (s, e) => Cleanup();
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => CleanupAll();
+        }
+
+        private static void CleanupAll()
+        {
+            foreach (var browser in BrowserStore.GetAll().Where(b => b.Running))
+            {
+                browser.Browser.CloseAsync().GetAwaiter().GetResult();
+            }
+            BrowserStore.Clear();
         }
 
         public bool IsBrowserTypeInstalled(PupSupportedBrowser browserType)
@@ -96,7 +100,7 @@ namespace Pup.Services
                 .Select(dir =>
                 {
                     var key = Path.GetFileName(dir);
-                    var browser = _sessionStateService.Get(key);
+                    var browser = BrowserStore.Get(key);
                     return browser ?? new PupBrowser(Path.GetFileName(dir).ToPBSupportedBrowser(), dir);
                 }).ToList();
 
@@ -204,7 +208,7 @@ namespace Pup.Services
                 path
             );
 
-            _sessionStateService.Save(browserTypeName, pbrowser);
+            BrowserStore.Save(browserTypeName, pbrowser);
 
             return pbrowser;
         }

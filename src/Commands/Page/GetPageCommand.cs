@@ -19,7 +19,7 @@ namespace Pup.Commands.Page
                 {
                     throw new InvalidOperationException("Browser is not running. Start the browser before retrieving pages.");
                 }
-                var pageService = ServiceFactory.CreateBrowserService(Browser, SessionState);
+                var pageService = ServiceFactory.CreateBrowserService(Browser);
                 var pages = pageService.GetPagesAsync().GetAwaiter().GetResult();
 
                 if (pages.Count == 0)

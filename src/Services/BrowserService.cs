@@ -3,7 +3,6 @@ using PuppeteerSharp;
 using System.IO;
 using System.Linq;
 using Pup.Transport;
-using System.Management.Automation;
 using System.Collections.Generic;
 using Pup.Common;
 using System.Threading.Tasks;
@@ -23,7 +22,7 @@ namespace Pup.Services
     {
         private readonly PupBrowser _browser;
 
-        public BrowserService(PupBrowser browser, SessionState sessionState) : base(sessionState)
+        public BrowserService(PupBrowser browser)
         {
             _browser = browser;
         }
@@ -107,7 +106,7 @@ namespace Pup.Services
 
             _browser.Browser.CloseAsync().GetAwaiter().GetResult();
 
-            _sessionStateService.Remove(_browser.BrowserType.ToString());
+            BrowserStore.Remove(_browser.BrowserType.ToString());
 
             return true;
         }

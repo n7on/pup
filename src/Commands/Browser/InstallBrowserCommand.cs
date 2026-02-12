@@ -19,7 +19,7 @@ namespace Pup.Commands.Browser
         {
             try
             {
-                var browserService = ServiceFactory.CreateSupportedBrowserService(SessionState);
+                var browserService = ServiceFactory.CreateSupportedBrowserService();
 
                 
                 // Check if browser is already installed
