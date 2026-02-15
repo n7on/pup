@@ -14,13 +14,13 @@ Sets an event handler for browser-level events.
 
 ### ScriptBlock
 ```
-Set-PupBrowserHandler [-Event] <PupBrowserEvent> [-ScriptBlock] <ScriptBlock> [[-Browser] <PupBrowser>]
+Set-PupBrowserHandler -Event <PupBrowserEvent> -ScriptBlock <ScriptBlock> [-Browser <PupBrowser>]
  [-BrowserType <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ### Action
 ```
-Set-PupBrowserHandler [-Event] <PupBrowserEvent> [-Action] <PupHandlerAction> [[-Browser] <PupBrowser>]
+Set-PupBrowserHandler -Event <PupBrowserEvent> -Action <PupHandlerAction> [-Browser <PupBrowser>]
  [-BrowserType <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
@@ -32,31 +32,31 @@ Use -Action Dismiss to auto-close popups, or -ScriptBlock for custom handling.
 
 ### Example 1: Auto-dismiss popups
 ```
-PS C:\> Set-PupBrowserHandler -Browser $browser -Event PopupCreated -Action Dismiss
+Set-PupBrowserHandler -Browser $browser -Event PopupCreated -Action Dismiss
 ```
 
 Automatically closes any popup windows opened by the page.
 
 ### Example 2: Capture popup for OAuth flow
 ```
-PS C:\> $global:popup = $null
-PS C:\> Set-PupBrowserHandler -Browser $browser -Event PopupCreated -ScriptBlock {
+$global:popup = $null
+Set-PupBrowserHandler -Browser $browser -Event PopupCreated -ScriptBlock {
     param($e)
     $global:popup = $e.Page
 }
-PS C:\> # Click button that opens OAuth popup
-PS C:\> Find-PupElements -Page $page -Selector "#login-oauth" | Invoke-PupElementClick
-PS C:\> Start-Sleep -Milliseconds 500
-PS C:\> # Now interact with the popup
-PS C:\> Find-PupElements -Page $global:popup -Selector "#approve" | Invoke-PupElementClick
+# Click button that opens OAuth popup
+Find-PupElements -Page $page -Selector "#login-oauth" | Invoke-PupElementClick
+Start-Sleep -Milliseconds 500
+# Now interact with the popup
+Find-PupElements -Page $global:popup -Selector "#approve" | Invoke-PupElementClick
 ```
 
 Captures popup windows for multi-window workflows like OAuth.
 
 ### Example 3: Track new pages
 ```
-PS C:\> $global:pages = @()
-PS C:\> Set-PupBrowserHandler -Browser $browser -Event PageCreated -ScriptBlock {
+$global:pages = @()
+Set-PupBrowserHandler -Browser $browser -Event PageCreated -ScriptBlock {
     param($e)
     $global:pages += $e.Page
     Write-Host "New page opened: $($e.Page.Url)"
@@ -64,15 +64,6 @@ PS C:\> Set-PupBrowserHandler -Browser $browser -Event PageCreated -ScriptBlock 
 ```
 
 Tracks all new pages/tabs opened in the browser.
-
-### Example 4: Handle browser disconnect
-```
-PS C:\> Set-PupBrowserHandler -Browser $browser -Event Disconnected -ScriptBlock {
-    Write-Warning "Browser disconnected!"
-}
-```
-
-Runs cleanup code when the browser disconnects.
 
 ## PARAMETERS
 
@@ -83,10 +74,9 @@ Action to take when the event occurs (Dismiss for popups)
 Type: PupHandlerAction
 Parameter Sets: Action
 Aliases:
-Accepted values: Dismiss, Accept, Ignore
 
 Required: True
-Position: 2
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -101,7 +91,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -129,10 +119,24 @@ The browser event to handle
 Type: PupBrowserEvent
 Parameter Sets: (All)
 Aliases:
-Accepted values: PopupCreated, PageCreated, PageClosed, Disconnected
 
 Required: True
-Position: 1
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -148,21 +152,6 @@ Parameter Sets: ScriptBlock
 Aliases:
 
 Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-Controls how the cmdlet responds to progress updates.
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -174,10 +163,8 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### Pup.Transport.PupBrowser
 ## OUTPUTS
 
-### System.Void
 ## NOTES
 
 ## RELATED LINKS

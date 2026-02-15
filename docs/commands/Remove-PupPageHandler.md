@@ -13,7 +13,7 @@ Removes a page event handler.
 ## SYNTAX
 
 ```
-Remove-PupPageHandler [-Page] <PupPage> [-Event] <PupPageEvent> [-ProgressAction <ActionPreference>]
+Remove-PupPageHandler -Page <PupPage> -Event <PupPageEvent> [-ProgressAction <ActionPreference>]
  [<CommonParameters>]
 ```
 
@@ -26,22 +26,11 @@ For Dialog events, this means dialogs will block until manually handled.
 
 ### Example 1: Remove dialog handler
 ```
-PS C:\> Remove-PupPageHandler -Page $page -Event Dialog
+Remove-PupPageHandler -Page $page -Event Dialog
 ```
 
 Removes the dialog handler.
 Dialogs will now require manual handling.
-
-### Example 2: Clean up console capture
-```
-PS C:\> # Start capturing console
-PS C:\> Set-PupPageHandler -Page $page -Event Console -ScriptBlock { ... }
-PS C:\> # ... run tests ...
-PS C:\> # Stop capturing
-PS C:\> Remove-PupPageHandler -Page $page -Event Console
-```
-
-Removes the console handler when logging is no longer needed.
 
 ## PARAMETERS
 
@@ -52,10 +41,9 @@ The page event to remove the handler for
 Type: PupPageEvent
 Parameter Sets: (All)
 Aliases:
-Accepted values: Dialog, Console, PageError, Load, DOMContentLoaded, Request, RequestFinished, RequestFailed, Response, FrameAttached, FrameDetached, FrameNavigated, Download, FileChooser, WorkerCreated, WorkerDestroyed, Close
 
 Required: True
-Position: 1
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -70,14 +58,14 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-Controls how the cmdlet responds to progress updates.
+{{ Fill ProgressAction Description }}
 
 ```yaml
 Type: ActionPreference
@@ -96,10 +84,8 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### Pup.Transport.PupPage
 ## OUTPUTS
 
-### System.Void
 ## NOTES
 
 ## RELATED LINKS

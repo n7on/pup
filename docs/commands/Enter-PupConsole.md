@@ -22,7 +22,7 @@ Enter-PupConsole [-Page] <PupPage> [-Prompt <String>] [-ProgressAction <ActionPr
 ## EXAMPLES
 
 ### Example 1
-```
+```powershell
 PS C:\> {{ Add example code here }}
 ```
 

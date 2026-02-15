@@ -13,7 +13,7 @@ Gets frames (iframes) from a page.
 ## SYNTAX
 
 ```
-Get-PupFrame [-Page] <PupPage> [[-Name] <String>] [-Url <String>] [-IncludeMain] [-First]
+Get-PupFrame -Page <PupPage> [-Name <String>] [-Url <String>] [-IncludeMain] [-First]
  [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
@@ -22,38 +22,37 @@ Returns child frames (iframes) from a page.
 By default excludes the main frame.
 Use -IncludeMain to include it.
 Frames can be filtered by name or URL pattern.
+The returned frame objects can be used with Find-PupElements, Wait-PupElement, Invoke-PupScript, and Get-PupSource.
 
 ## EXAMPLES
 
 ### Example 1: Get all frames from a page
 ```
-PS C:\> $frames = Get-PupFrame -Page $page
-PS C:\> $frames.Count
-2
+$frames = Get-PupFrame -Page $page
+$frames.Count
 ```
 
 Returns all child frames (iframes) from the page.
 
 ### Example 2: Get frame by name
 ```
-PS C:\> $frame = Get-PupFrame -Page $page -Name "contentFrame" -First
-PS C:\> $frame.Url
+$frame = Get-PupFrame -Page $page -Name "contentFrame" -First
 ```
 
 Gets a specific frame by its name attribute.
 
 ### Example 3: Find elements within a frame
 ```
-PS C:\> $frame = $page | Get-PupFrame -Name "loginFrame" -First
-PS C:\> $input = Find-PupElements -Frame $frame -Selector "#username" -First
-PS C:\> $input | Set-PupElement -Text "user@example.com"
+$frame = $page | Get-PupFrame -Name "loginFrame" -First
+$input = Find-PupElements -Frame $frame -Selector "#username" -First
+$input | Set-PupElement -Text "user@example.com"
 ```
 
 Gets a frame and interacts with elements inside it.
 
 ### Example 4: Filter frames by URL
 ```
-PS C:\> $frames = Get-PupFrame -Page $page -Url "*ads*"
+$frames = Get-PupFrame -Page $page -Url "*ads*"
 ```
 
 Gets all frames whose URL contains "ads".
@@ -70,7 +69,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: False
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -85,7 +84,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: False
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -99,7 +98,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 1
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -114,9 +113,24 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
@@ -135,30 +149,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ProgressAction
-Controls how the cmdlet responds to progress updates.
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
-### Pup.Transport.PupPage
 ## OUTPUTS
 
-### Pup.Transport.PupFrame
 ## NOTES
 
 ## RELATED LINKS

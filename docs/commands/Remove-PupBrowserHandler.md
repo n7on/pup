@@ -13,7 +13,7 @@ Removes a browser event handler.
 ## SYNTAX
 
 ```
-Remove-PupBrowserHandler [-Event] <PupBrowserEvent> [[-Browser] <PupBrowser>] [-BrowserType <String>]
+Remove-PupBrowserHandler -Event <PupBrowserEvent> [-Browser <PupBrowser>] [-BrowserType <String>]
  [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
@@ -25,21 +25,10 @@ After removal, the event will no longer trigger any custom behavior.
 
 ### Example 1: Remove popup handler
 ```
-PS C:\> Remove-PupBrowserHandler -Browser $browser -Event PopupCreated
+Remove-PupBrowserHandler -Browser $browser -Event PopupCreated
 ```
 
 Removes the popup handler, allowing popups to open normally again.
-
-### Example 2: Remove handler after task completion
-```
-PS C:\> # Set up handler for OAuth flow
-PS C:\> Set-PupBrowserHandler -Browser $browser -Event PopupCreated -ScriptBlock { ... }
-PS C:\> # ... perform OAuth ...
-PS C:\> # Clean up when done
-PS C:\> Remove-PupBrowserHandler -Browser $browser -Event PopupCreated
-```
-
-Removes the handler after it's no longer needed.
 
 ## PARAMETERS
 
@@ -52,7 +41,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -80,17 +69,16 @@ The browser event to remove the handler for
 Type: PupBrowserEvent
 Parameter Sets: (All)
 Aliases:
-Accepted values: PopupCreated, PageCreated, PageClosed, Disconnected
 
 Required: True
-Position: 1
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-Controls how the cmdlet responds to progress updates.
+{{ Fill ProgressAction Description }}
 
 ```yaml
 Type: ActionPreference
@@ -109,10 +97,8 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### Pup.Transport.PupBrowser
 ## OUTPUTS
 
-### System.Void
 ## NOTES
 
 ## RELATED LINKS

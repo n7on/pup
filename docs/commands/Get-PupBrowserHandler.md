@@ -13,7 +13,7 @@ Gets active browser event handlers.
 ## SYNTAX
 
 ```
-Get-PupBrowserHandler [[-Event] <PupBrowserEvent>] [[-Browser] <PupBrowser>] [-BrowserType <String>]
+Get-PupBrowserHandler [-Event <PupBrowserEvent>] [-Browser <PupBrowser>] [-BrowserType <String>]
  [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
@@ -25,20 +25,15 @@ Shows the event type, action (if using built-in action), and whether a ScriptBlo
 
 ### Example 1: Get all browser handlers
 ```
-PS C:\> Get-PupBrowserHandler -Browser $browser
-
-Event         Action HasScriptBlock
------         ------ --------------
-PopupCreated Dismiss          False
-PageCreated               True
+Get-PupBrowserHandler -Browser $browser
 ```
 
 Lists all active browser event handlers.
 
 ### Example 2: Check if specific handler exists
 ```
-PS C:\> $handler = Get-PupBrowserHandler -Browser $browser -Event PopupCreated
-PS C:\> if ($handler) { "Popup handler is set" }
+$handler = Get-PupBrowserHandler -Browser $browser -Event PopupCreated
+if ($handler) { "Popup handler is set" }
 ```
 
 Checks if a handler is registered for a specific event.
@@ -54,7 +49,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -82,17 +77,16 @@ Filter by specific event type
 Type: PupBrowserEvent
 Parameter Sets: (All)
 Aliases:
-Accepted values: PopupCreated, PageCreated, PageClosed, Disconnected
 
 Required: False
-Position: 1
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-Controls how the cmdlet responds to progress updates.
+{{ Fill ProgressAction Description }}
 
 ```yaml
 Type: ActionPreference
@@ -111,10 +105,8 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### Pup.Transport.PupBrowser
 ## OUTPUTS
 
-### System.Management.Automation.PSObject
 ## NOTES
 
 ## RELATED LINKS

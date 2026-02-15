@@ -68,6 +68,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Frame
+The frame to get HTML source from
+
+```yaml
+Type: PupFrame
+Parameter Sets: FromFrame
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
 ### -Page
 The page to get HTML source from
 
@@ -95,21 +110,6 @@ Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Frame
-The frame to get HTML source from
-
-```yaml
-Type: PupFrame
-Parameter Sets: FromFrame
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 

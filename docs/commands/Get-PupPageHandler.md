@@ -13,7 +13,7 @@ Gets active page event handlers.
 ## SYNTAX
 
 ```
-Get-PupPageHandler [-Page] <PupPage> [[-Event] <PupPageEvent>] [-ProgressAction <ActionPreference>]
+Get-PupPageHandler -Page <PupPage> [-Event <PupPageEvent>] [-ProgressAction <ActionPreference>]
  [<CommonParameters>]
 ```
 
@@ -25,20 +25,15 @@ Shows the event type, action (if using built-in action), and whether a ScriptBlo
 
 ### Example 1: Get all page handlers
 ```
-PS C:\> Get-PupPageHandler -Page $page
-
-Event   Action HasScriptBlock
------   ------ --------------
-Dialog  Accept          False
-Console               True
+Get-PupPageHandler -Page $page
 ```
 
 Lists all active page event handlers.
 
 ### Example 2: Check for dialog handler
 ```
-PS C:\> $handler = Get-PupPageHandler -Page $page -Event Dialog
-PS C:\> if (-not $handler) {
+$handler = Get-PupPageHandler -Page $page -Event Dialog
+if (-not $handler) {
     Set-PupPageHandler -Page $page -Event Dialog -Action Accept
 }
 ```
@@ -54,10 +49,9 @@ Filter by specific event type
 Type: PupPageEvent
 Parameter Sets: (All)
 Aliases:
-Accepted values: Dialog, Console, PageError, Load, DOMContentLoaded, Request, RequestFinished, RequestFailed, Response, FrameAttached, FrameDetached, FrameNavigated, Download, FileChooser, WorkerCreated, WorkerDestroyed, Close
 
 Required: False
-Position: 1
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -72,14 +66,14 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-Controls how the cmdlet responds to progress updates.
+{{ Fill ProgressAction Description }}
 
 ```yaml
 Type: ActionPreference
@@ -98,10 +92,8 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### Pup.Transport.PupPage
 ## OUTPUTS
 
-### System.Management.Automation.PSObject
 ## NOTES
 
 ## RELATED LINKS

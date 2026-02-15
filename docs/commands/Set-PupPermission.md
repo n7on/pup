@@ -8,26 +8,43 @@ schema: 2.0.0
 # Set-PupPermission
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Sets browser permissions for a page.
 
 ## SYNTAX
 
 ```
-Set-PupPermission [-Page] <PupPage> [-Permission] <String> [-State] <String> [-Origin <String>]
+Set-PupPermission -Page <PupPage> -Permission <String> -State <String> [-Origin <String>]
  [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Overrides browser permission prompts for the page.
+This allows automation of features that normally require user permission like geolocation, notifications, camera, and clipboard access.
+Permissions are set per page/origin.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### Example 1: Grant geolocation permission
+```
+Set-PupPermission -Page $page -Permission geolocation -State Granted
 ```
 
-{{ Add example description here }}
+Allows the page to access geolocation without prompting.
+
+### Example 2: Deny notification permission
+```
+Set-PupPermission -Page $page -Permission notifications -State Denied
+```
+
+Blocks notification requests from the page.
+
+### Example 3: Grant clipboard access
+```
+Set-PupPermission -Page $page -Permission clipboard-read -State Granted
+Set-PupPermission -Page $page -Permission clipboard-write -State Granted
+```
+
+Allows the page to read from and write to the clipboard.
 
 ## PARAMETERS
 
@@ -55,7 +72,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
@@ -68,26 +85,9 @@ The permission to set
 Type: String
 Parameter Sets: (All)
 Aliases:
-Accepted values: geolocation, notifications, camera, microphone, clipboard-read, clipboard-write, midi, midi-sysex, background-sync, accelerometer, gyroscope, magnetometer, accessibility-events, payment-handler, idle-detection, screen-wake-lock, storage-access
 
 Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -State
-The permission state
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-Accepted values: Granted, Denied, Prompt
-
-Required: True
-Position: 2
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -108,15 +108,28 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -State
+The permission state
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
-### Pup.Transport.PupPage
 ## OUTPUTS
 
-### System.Void
 ## NOTES
 
 ## RELATED LINKS

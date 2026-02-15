@@ -8,26 +8,45 @@ schema: 2.0.0
 # Get-PupPermission
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Gets browser permissions for a page.
 
 ## SYNTAX
 
 ```
-Get-PupPermission [-Page] <PupPage> [[-Permission] <String>] [-Origin <String>]
+Get-PupPermission -Page <PupPage> [-Permission <String>] [-Origin <String>]
  [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Queries the current state of browser permissions for the page.
+Returns granted, denied, or prompt status.
+If no specific permission is specified, returns all permissions.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### Example 1: Get all permissions
+```
+Get-PupPermission -Page $page
 ```
 
-{{ Add example description here }}
+Returns the state of all supported permissions for the page.
+
+### Example 2: Get specific permission
+```
+Get-PupPermission -Page $page -Permission geolocation
+```
+
+Returns the current state of the geolocation permission.
+
+### Example 3: Check before setting
+```
+$perm = Get-PupPermission -Page $page -Permission notifications
+if ($perm.State -eq 'prompt') {
+    Set-PupPermission -Page $page -Permission notifications -State Granted
+}
+```
+
+Only sets permission if it hasn't been set yet.
 
 ## PARAMETERS
 
@@ -55,7 +74,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
@@ -68,10 +87,9 @@ The permission to query (if not specified, returns all permissions)
 Type: String
 Parameter Sets: (All)
 Aliases:
-Accepted values: geolocation, notifications, camera, microphone, clipboard-read, clipboard-write, midi, midi-sysex, background-sync, accelerometer, gyroscope, magnetometer, accessibility-events, payment-handler, idle-detection, screen-wake-lock, storage-access
 
 Required: False
-Position: 1
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -97,10 +115,8 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### Pup.Transport.PupPage
 ## OUTPUTS
 
-### System.Management.Automation.PSObject
 ## NOTES
 
 ## RELATED LINKS
