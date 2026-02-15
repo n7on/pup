@@ -131,12 +131,12 @@ $links | ForEach-Object { $_.InnerText }</dev:code>
     </command:examples>
   </command:command>
 
-  <!-- Get-PupPageNetwork -->
+  <!-- Get-PupNetwork -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Get-PupPageNetwork</command:name>
+      <command:name>Get-PupNetwork</command:name>
       <command:verb>Get</command:verb>
-      <command:noun>PupPageNetwork</command:noun>
+      <command:noun>PupNetwork</command:noun>
       <maml:description>
         <maml:para>Retrieves captured network requests and responses from a page.</maml:para>
       </maml:description>
@@ -147,7 +147,7 @@ $links | ForEach-Object { $_.InnerText }</dev:code>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Get all network requests</maml:title>
-        <dev:code>$requests = Get-PupPageNetwork -Page $page
+        <dev:code>$requests = Get-PupNetwork -Page $page
 $requests | Format-Table Method, Status, Url</dev:code>
         <dev:remarks>
           <maml:para>Lists all captured requests with their method, status, and URL.</maml:para>
@@ -155,7 +155,7 @@ $requests | Format-Table Method, Status, Url</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 2: Get requests with response bodies</maml:title>
-        <dev:code>$requests = Get-PupPageNetwork -Page $page -IncludeContent
+        <dev:code>$requests = Get-PupNetwork -Page $page -IncludeContent
 $apiCalls = $requests | Where-Object { $_.Url -like "*api*" }
 $apiCalls | ForEach-Object { $_.Body }</dev:code>
         <dev:remarks>
@@ -164,7 +164,7 @@ $apiCalls | ForEach-Object { $_.Body }</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 3: Find requests with sensitive headers</maml:title>
-        <dev:code>$requests = Get-PupPageNetwork -Page $page
+        <dev:code>$requests = Get-PupNetwork -Page $page
 $requests | Where-Object { $_.RequestHeaders["Authorization"] } | Select-Object Url, @{N="Auth";E={$_.RequestHeaders["Authorization"]}}</dev:code>
         <dev:remarks>
           <maml:para>Finds requests containing Authorization headers for token analysis.</maml:para>
@@ -441,12 +441,12 @@ $submitBtn | Invoke-PupElementClick</dev:code>
     </command:examples>
   </command:command>
 
-  <!-- Set-PupPageCookie -->
+  <!-- Set-PupCookie -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Set-PupPageCookie</command:name>
+      <command:name>Set-PupCookie</command:name>
       <command:verb>Set</command:verb>
-      <command:noun>PupPageCookie</command:noun>
+      <command:noun>PupCookie</command:noun>
       <maml:description>
         <maml:para>Sets a cookie on the page.</maml:para>
       </maml:description>
@@ -457,14 +457,14 @@ $submitBtn | Invoke-PupElementClick</dev:code>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Set a session cookie</maml:title>
-        <dev:code>Set-PupPageCookie -Page $page -Name "session" -Value "admin_session_token" -Domain "target.com"</dev:code>
+        <dev:code>Set-PupCookie -Page $page -Name "session" -Value "admin_session_token" -Domain "target.com"</dev:code>
         <dev:remarks>
           <maml:para>Sets a session cookie to impersonate an admin user.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Set cookie with security flags</maml:title>
-        <dev:code>Set-PupPageCookie -Page $page -Name "auth" -Value "token123" -Domain "target.com" -HttpOnly -Secure -SameSite Strict</dev:code>
+        <dev:code>Set-PupCookie -Page $page -Name "auth" -Value "token123" -Domain "target.com" -HttpOnly -Secure -SameSite Strict</dev:code>
         <dev:remarks>
           <maml:para>Creates a secure cookie with HttpOnly and SameSite flags.</maml:para>
         </dev:remarks>
@@ -472,7 +472,7 @@ $submitBtn | Invoke-PupElementClick</dev:code>
       <command:example>
         <maml:title>Example 3: Test session fixation</maml:title>
         <dev:code># Set a known session ID before authentication
-Set-PupPageCookie -Page $page -Name "PHPSESSID" -Value "fixated_session_id" -Domain "target.com"
+Set-PupCookie -Page $page -Name "PHPSESSID" -Value "fixated_session_id" -Domain "target.com"
 # Navigate to login and authenticate...</dev:code>
         <dev:remarks>
           <maml:para>Tests for session fixation vulnerabilities.</maml:para>
@@ -481,12 +481,12 @@ Set-PupPageCookie -Page $page -Name "PHPSESSID" -Value "fixated_session_id" -Dom
     </command:examples>
   </command:command>
 
-  <!-- Invoke-PupPageScript -->
+  <!-- Invoke-PupScript -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Invoke-PupPageScript</command:name>
+      <command:name>Invoke-PupScript</command:name>
       <command:verb>Invoke</command:verb>
-      <command:noun>PupPageScript</command:noun>
+      <command:noun>PupScript</command:noun>
       <maml:description>
         <maml:para>Executes JavaScript code in the page context.</maml:para>
       </maml:description>
@@ -497,14 +497,14 @@ Set-PupPageCookie -Page $page -Name "PHPSESSID" -Value "fixated_session_id" -Dom
     <command:examples>
       <command:example>
         <maml:title>Example 1: Extract CSRF token</maml:title>
-        <dev:code>$csrf = Invoke-PupPageScript -Page $page -Script "() => document.querySelector('input[name=csrf]').value" -AsString</dev:code>
+        <dev:code>$csrf = Invoke-PupScript -Page $page -Script "() => document.querySelector('input[name=csrf]').value" -AsString</dev:code>
         <dev:remarks>
           <maml:para>Extracts a CSRF token from a hidden form field.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Get all form data</maml:title>
-        <dev:code>$formData = Invoke-PupPageScript -Page $page -Script @"
+        <dev:code>$formData = Invoke-PupScript -Page $page -Script @"
 () => {
     const form = document.querySelector('form');
     const data = new FormData(form);
@@ -517,7 +517,7 @@ Set-PupPageCookie -Page $page -Name "PHPSESSID" -Value "fixated_session_id" -Dom
       </command:example>
       <command:example>
         <maml:title>Example 3: Test DOM-based XSS</maml:title>
-        <dev:code>Invoke-PupPageScript -Page $page -Script "() => { document.body.innerHTML += '&lt;img src=x onerror=alert(1)&gt;'; }" -AsVoid</dev:code>
+        <dev:code>Invoke-PupScript -Page $page -Script "() => { document.body.innerHTML += '&lt;img src=x onerror=alert(1)&gt;'; }" -AsVoid</dev:code>
         <dev:remarks>
           <maml:para>Injects content to test for DOM-based XSS.</maml:para>
         </dev:remarks>
@@ -775,10 +775,10 @@ $btn | Invoke-PupElementClick</dev:code>
     </command:examples>
   </command:command>
 
-  <!-- Get-PupPageCookie -->
+  <!-- Get-PupCookie -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Get-PupPageCookie</command:name>
+      <command:name>Get-PupCookie</command:name>
       <maml:description>
         <maml:para>Gets cookies from a page.</maml:para>
       </maml:description>
@@ -789,7 +789,7 @@ $btn | Invoke-PupElementClick</dev:code>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Get all cookies</maml:title>
-        <dev:code>$cookies = Get-PupPageCookie -Page $page
+        <dev:code>$cookies = Get-PupCookie -Page $page
 $cookies | Format-Table Name, Value, Domain, HttpOnly, Secure</dev:code>
         <dev:remarks>
           <maml:para>Lists all cookies with their security flags.</maml:para>
@@ -797,7 +797,7 @@ $cookies | Format-Table Name, Value, Domain, HttpOnly, Secure</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 2: Get session cookie</maml:title>
-        <dev:code>$session = Get-PupPageCookie -Page $page -Name "session"
+        <dev:code>$session = Get-PupCookie -Page $page -Name "session"
 $session.Value</dev:code>
         <dev:remarks>
           <maml:para>Retrieves the session cookie value.</maml:para>
@@ -805,7 +805,7 @@ $session.Value</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 3: Check for insecure cookies</maml:title>
-        <dev:code>Get-PupPageCookie -Page $page | Where-Object { -not $_.HttpOnly -or -not $_.Secure } |
+        <dev:code>Get-PupCookie -Page $page | Where-Object { -not $_.HttpOnly -or -not $_.Secure } |
     Select-Object Name, HttpOnly, Secure</dev:code>
         <dev:remarks>
           <maml:para>Finds cookies missing HttpOnly or Secure flags.</maml:para>
@@ -814,10 +814,10 @@ $session.Value</dev:code>
     </command:examples>
   </command:command>
 
-  <!-- Remove-PupPageCookie -->
+  <!-- Remove-PupCookie -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Remove-PupPageCookie</command:name>
+      <command:name>Remove-PupCookie</command:name>
       <maml:description>
         <maml:para>Removes cookies from a page.</maml:para>
       </maml:description>
@@ -828,7 +828,7 @@ $session.Value</dev:code>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Remove specific cookie</maml:title>
-        <dev:code>Remove-PupPageCookie -Page $page -Name "session" -Domain "target.com"</dev:code>
+        <dev:code>Remove-PupCookie -Page $page -Name "session" -Domain "target.com"</dev:code>
         <dev:remarks>
           <maml:para>Removes the session cookie.</maml:para>
         </dev:remarks>
@@ -836,7 +836,7 @@ $session.Value</dev:code>
       <command:example>
         <maml:title>Example 2: Test session invalidation</maml:title>
         <dev:code># Remove session and verify access is denied
-Remove-PupPageCookie -Page $page -Name "auth_token" -Domain "target.com"
+Remove-PupCookie -Page $page -Name "auth_token" -Domain "target.com"
 Invoke-PupPageReload -Page $page -WaitForLoad
 # Check if redirected to login</dev:code>
         <dev:remarks>
@@ -846,10 +846,10 @@ Invoke-PupPageReload -Page $page -WaitForLoad
     </command:examples>
   </command:command>
 
-  <!-- Get-PupPageConsole -->
+  <!-- Get-PupConsole -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Get-PupPageConsole</command:name>
+      <command:name>Get-PupConsole</command:name>
       <maml:description>
         <maml:para>Gets console messages from a page.</maml:para>
       </maml:description>
@@ -860,7 +860,7 @@ Invoke-PupPageReload -Page $page -WaitForLoad
     <command:examples>
       <command:example>
         <maml:title>Example 1: Get all console messages</maml:title>
-        <dev:code>$logs = Get-PupPageConsole -Page $page
+        <dev:code>$logs = Get-PupConsole -Page $page
 $logs | Format-Table Type, Text, Url</dev:code>
         <dev:remarks>
           <maml:para>Lists all console output from the page.</maml:para>
@@ -868,14 +868,14 @@ $logs | Format-Table Type, Text, Url</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 2: Find errors</maml:title>
-        <dev:code>Get-PupPageConsole -Page $page | Where-Object { $_.Type -eq "Error" }</dev:code>
+        <dev:code>Get-PupConsole -Page $page | Where-Object { $_.Type -eq "Error" }</dev:code>
         <dev:remarks>
           <maml:para>Filters for JavaScript errors.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 3: Look for sensitive data in logs</maml:title>
-        <dev:code>Get-PupPageConsole -Page $page | Where-Object {
+        <dev:code>Get-PupConsole -Page $page | Where-Object {
     $_.Text -match "token|password|secret|key|api"
 }</dev:code>
         <dev:remarks>
@@ -922,10 +922,10 @@ $logs | Format-Table Type, Text, Url</dev:code>
     </command:examples>
   </command:command>
 
-  <!-- Get-PupPageSource -->
+  <!-- Get-PupSource -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Get-PupPageSource</command:name>
+      <command:name>Get-PupSource</command:name>
       <maml:description>
         <maml:para>Gets the HTML source of a page.</maml:para>
       </maml:description>
@@ -936,7 +936,7 @@ $logs | Format-Table Type, Text, Url</dev:code>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Get page source</maml:title>
-        <dev:code>$html = Get-PupPageSource -Page $page
+        <dev:code>$html = Get-PupSource -Page $page
 $html | Out-File "page.html"</dev:code>
         <dev:remarks>
           <maml:para>Saves the page HTML to a file.</maml:para>
@@ -944,7 +944,7 @@ $html | Out-File "page.html"</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 2: Search for comments</maml:title>
-        <dev:code>$html = Get-PupPageSource -Page $page
+        <dev:code>$html = Get-PupSource -Page $page
 [regex]::Matches($html, "&lt;!--.*?--&gt;", "Singleline") | ForEach-Object { $_.Value }</dev:code>
         <dev:remarks>
           <maml:para>Extracts HTML comments that might contain sensitive info.</maml:para>
@@ -952,7 +952,7 @@ $html | Out-File "page.html"</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 3: Find hidden inputs</maml:title>
-        <dev:code>$html = Get-PupPageSource -Page $page
+        <dev:code>$html = Get-PupSource -Page $page
 [regex]::Matches($html, '&lt;input[^&gt;]*type=["\']hidden["\'][^&gt;]*&gt;') | ForEach-Object { $_.Value }</dev:code>
         <dev:remarks>
           <maml:para>Finds hidden form fields that might contain tokens or IDs.</maml:para>
@@ -1098,10 +1098,10 @@ Select-PupElementOption -Element $select -Value "read", "write", "delete"</dev:c
     </command:examples>
   </command:command>
 
-  <!-- Get-PupPageStorage -->
+  <!-- Get-PupStorage -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Get-PupPageStorage</command:name>
+      <command:name>Get-PupStorage</command:name>
       <maml:description>
         <maml:para>Gets localStorage or sessionStorage data from a page.</maml:para>
       </maml:description>
@@ -1112,21 +1112,21 @@ Select-PupElementOption -Element $select -Value "read", "write", "delete"</dev:c
     <command:examples>
       <command:example>
         <maml:title>Example 1: Get all localStorage</maml:title>
-        <dev:code>Get-PupPageStorage -Page $page -Type Local</dev:code>
+        <dev:code>Get-PupStorage -Page $page -Type Local</dev:code>
         <dev:remarks>
           <maml:para>Returns all localStorage key-value pairs.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Get specific key</maml:title>
-        <dev:code>Get-PupPageStorage -Page $page -Type Local -Key "authToken"</dev:code>
+        <dev:code>Get-PupStorage -Page $page -Type Local -Key "authToken"</dev:code>
         <dev:remarks>
           <maml:para>Gets a specific storage value.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 3: Check for sensitive data</maml:title>
-        <dev:code>$storage = Get-PupPageStorage -Page $page -Type Local
+        <dev:code>$storage = Get-PupStorage -Page $page -Type Local
 $storage | Where-Object { $_.Key -match "token|auth|session|password" }</dev:code>
         <dev:remarks>
           <maml:para>Searches storage for potentially sensitive keys.</maml:para>
@@ -1135,10 +1135,10 @@ $storage | Where-Object { $_.Key -match "token|auth|session|password" }</dev:cod
     </command:examples>
   </command:command>
 
-  <!-- Set-PupPageStorage -->
+  <!-- Set-PupStorage -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Set-PupPageStorage</command:name>
+      <command:name>Set-PupStorage</command:name>
       <maml:description>
         <maml:para>Sets localStorage or sessionStorage data on a page.</maml:para>
       </maml:description>
@@ -1149,14 +1149,14 @@ $storage | Where-Object { $_.Key -match "token|auth|session|password" }</dev:cod
     <command:examples>
       <command:example>
         <maml:title>Example 1: Set a storage value</maml:title>
-        <dev:code>Set-PupPageStorage -Page $page -Type Local -Key "theme" -Value "dark"</dev:code>
+        <dev:code>Set-PupStorage -Page $page -Type Local -Key "theme" -Value "dark"</dev:code>
         <dev:remarks>
           <maml:para>Sets a single localStorage value.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Inject auth token</maml:title>
-        <dev:code>Set-PupPageStorage -Page $page -Type Local -Key "authToken" -Value "eyJhbGc..."
+        <dev:code>Set-PupStorage -Page $page -Type Local -Key "authToken" -Value "eyJhbGc..."
 Invoke-PupPageReload -Page $page -WaitForLoad</dev:code>
         <dev:remarks>
           <maml:para>Injects an authentication token and reloads to test access.</maml:para>
@@ -1164,7 +1164,7 @@ Invoke-PupPageReload -Page $page -WaitForLoad</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 3: Set multiple values</maml:title>
-        <dev:code>Set-PupPageStorage -Page $page -Type Session -Items @{
+        <dev:code>Set-PupStorage -Page $page -Type Session -Items @{
     "userId" = "admin"
     "role" = "administrator"
 }</dev:code>
@@ -1196,7 +1196,7 @@ Invoke-PupPageReload -Page $page -WaitForLoad</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 2: Test after modifying session</maml:title>
-        <dev:code>Set-PupPageCookie -Page $page -Name "role" -Value "admin" -Domain "target.com"
+        <dev:code>Set-PupCookie -Page $page -Name "role" -Value "admin" -Domain "target.com"
 Invoke-PupPageReload -Page $page -WaitForLoad
 # Check if admin features are now visible</dev:code>
         <dev:remarks>
@@ -1311,10 +1311,10 @@ $input.Value  # Check if form data is still there</dev:code>
     </command:examples>
   </command:command>
 
-  <!-- Export-PupPagePdf -->
+  <!-- Export-PupPdf -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Export-PupPagePdf</command:name>
+      <command:name>Export-PupPdf</command:name>
       <maml:description>
         <maml:para>Exports the page as a PDF document.</maml:para>
       </maml:description>
@@ -1325,14 +1325,14 @@ $input.Value  # Check if form data is still there</dev:code>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Save page as PDF</maml:title>
-        <dev:code>Export-PupPagePdf -Page $page -FilePath "evidence.pdf"</dev:code>
+        <dev:code>Export-PupPdf -Page $page -FilePath "evidence.pdf"</dev:code>
         <dev:remarks>
           <maml:para>Exports the page to a PDF file.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Get PDF as bytes</maml:title>
-        <dev:code>$bytes = Export-PupPagePdf -Page $page -PassThru
+        <dev:code>$bytes = Export-PupPdf -Page $page -PassThru
 [System.IO.File]::WriteAllBytes("report.pdf", $bytes)</dev:code>
         <dev:remarks>
           <maml:para>Returns PDF data for further processing.</maml:para>
@@ -1340,7 +1340,7 @@ $input.Value  # Check if form data is still there</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 3: Custom PDF settings</maml:title>
-        <dev:code>Export-PupPagePdf -Page $page -FilePath "report.pdf" -Landscape -PrintBackground</dev:code>
+        <dev:code>Export-PupPdf -Page $page -FilePath "report.pdf" -Landscape -PrintBackground</dev:code>
         <dev:remarks>
           <maml:para>Exports with landscape orientation and background colors.</maml:para>
         </dev:remarks>
@@ -1348,10 +1348,10 @@ $input.Value  # Check if form data is still there</dev:code>
     </command:examples>
   </command:command>
 
-  <!-- Clear-PupPageStorage -->
+  <!-- Clear-PupStorage -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Clear-PupPageStorage</command:name>
+      <command:name>Clear-PupStorage</command:name>
       <maml:description>
         <maml:para>Clears localStorage or sessionStorage data.</maml:para>
       </maml:description>
@@ -1362,14 +1362,14 @@ $input.Value  # Check if form data is still there</dev:code>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Clear all localStorage</maml:title>
-        <dev:code>Clear-PupPageStorage -Page $page -Type Local</dev:code>
+        <dev:code>Clear-PupStorage -Page $page -Type Local</dev:code>
         <dev:remarks>
           <maml:para>Removes all localStorage data.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Clear specific key</maml:title>
-        <dev:code>Clear-PupPageStorage -Page $page -Type Local -Key "authToken"</dev:code>
+        <dev:code>Clear-PupStorage -Page $page -Type Local -Key "authToken"</dev:code>
         <dev:remarks>
           <maml:para>Removes only the specified key.</maml:para>
         </dev:remarks>
@@ -1377,8 +1377,8 @@ $input.Value  # Check if form data is still there</dev:code>
       <command:example>
         <maml:title>Example 3: Test logout functionality</maml:title>
         <dev:code># Clear all client-side storage and verify logout
-Clear-PupPageStorage -Page $page -Type Local
-Clear-PupPageStorage -Page $page -Type Session
+Clear-PupStorage -Page $page -Type Local
+Clear-PupStorage -Page $page -Type Session
 Invoke-PupPageReload -Page $page -WaitForLoad
 # Check if user is logged out</dev:code>
         <dev:remarks>
@@ -1696,10 +1696,10 @@ $form = Find-PupElements -Page $page -Selector "form" -First
     </command:examples>
   </command:command>
 
-  <!-- Export-PupPageSession -->
+  <!-- Export-PupSession -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Export-PupPageSession</command:name>
+      <command:name>Export-PupSession</command:name>
       <maml:description>
         <maml:para>Exports browser session data (cookies, localStorage, sessionStorage) to a file or object.</maml:para>
       </maml:description>
@@ -1710,14 +1710,14 @@ $form = Find-PupElements -Page $page -Selector "form" -First
     <command:examples>
       <command:example>
         <maml:title>Example 1: Export session to file</maml:title>
-        <dev:code>Export-PupPageSession -Page $page -FilePath "authenticated-session.json"</dev:code>
+        <dev:code>Export-PupSession -Page $page -FilePath "authenticated-session.json"</dev:code>
         <dev:remarks>
           <maml:para>Saves the current session to a JSON file.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Export session to object</maml:title>
-        <dev:code>$session = Export-PupPageSession -Page $page
+        <dev:code>$session = Export-PupSession -Page $page
 $session.Cookies | Format-Table Name, Value, Domain</dev:code>
         <dev:remarks>
           <maml:para>Returns the session as an object for inspection.</maml:para>
@@ -1735,7 +1735,7 @@ $login | Invoke-PupElementClick
 Start-Sleep -Seconds 2
 
 # Save the authenticated session for reuse
-Export-PupPageSession -Page $page -FilePath "admin-session.json"</dev:code>
+Export-PupSession -Page $page -FilePath "admin-session.json"</dev:code>
         <dev:remarks>
           <maml:para>Saves an authenticated session for reuse without logging in again.</maml:para>
         </dev:remarks>
@@ -1743,10 +1743,10 @@ Export-PupPageSession -Page $page -FilePath "admin-session.json"</dev:code>
     </command:examples>
   </command:command>
 
-  <!-- Import-PupPageSession -->
+  <!-- Import-PupSession -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Import-PupPageSession</command:name>
+      <command:name>Import-PupSession</command:name>
       <maml:description>
         <maml:para>Imports browser session data from a file or object.</maml:para>
       </maml:description>
@@ -1757,24 +1757,24 @@ Export-PupPageSession -Page $page -FilePath "admin-session.json"</dev:code>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Import session from file</maml:title>
-        <dev:code>Import-PupPageSession -Page $page -FilePath "authenticated-session.json" -Reload</dev:code>
+        <dev:code>Import-PupSession -Page $page -FilePath "authenticated-session.json" -Reload</dev:code>
         <dev:remarks>
           <maml:para>Restores the session and reloads the page to apply it.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Import only cookies</maml:title>
-        <dev:code>Import-PupPageSession -Page $page -FilePath "session.json" -NoLocalStorage -NoSessionStorage</dev:code>
+        <dev:code>Import-PupSession -Page $page -FilePath "session.json" -NoLocalStorage -NoSessionStorage</dev:code>
         <dev:remarks>
           <maml:para>Imports only cookies, skipping storage data.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 3: Import from session object</maml:title>
-        <dev:code>$session = Export-PupPageSession -Page $page
+        <dev:code>$session = Export-PupSession -Page $page
 # ... do some testing ...
 # Restore the original session
-Import-PupPageSession -Page $page -Session $session -Reload</dev:code>
+Import-PupSession -Page $page -Session $session -Reload</dev:code>
         <dev:remarks>
           <maml:para>Restores a session from an in-memory object.</maml:para>
         </dev:remarks>
@@ -1782,11 +1782,11 @@ Import-PupPageSession -Page $page -Session $session -Reload</dev:code>
       <command:example>
         <maml:title>Example 4: Test with different user sessions</maml:title>
         <dev:code># Test as admin
-Import-PupPageSession -Page $page -FilePath "admin-session.json" -Reload
+Import-PupSession -Page $page -FilePath "admin-session.json" -Reload
 # ... run admin tests ...
 
 # Test as regular user
-Import-PupPageSession -Page $page -FilePath "user-session.json" -Reload
+Import-PupSession -Page $page -FilePath "user-session.json" -Reload
 # ... run user tests ...</dev:code>
         <dev:remarks>
           <maml:para>Switches between different user sessions for testing access controls.</maml:para>
@@ -1877,10 +1877,10 @@ $el | Invoke-PupElementClick</dev:code>
     </command:examples>
   </command:command>
 
-  <!-- Set-PupPageViewport -->
+  <!-- Set-PupViewport -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Set-PupPageViewport</command:name>
+      <command:name>Set-PupViewport</command:name>
       <maml:description>
         <maml:para>Sets the browser viewport size and device emulation settings.</maml:para>
       </maml:description>
@@ -1891,14 +1891,14 @@ $el | Invoke-PupElementClick</dev:code>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Set desktop viewport</maml:title>
-        <dev:code>Set-PupPageViewport -Page $page -Width 1920 -Height 1080</dev:code>
+        <dev:code>Set-PupViewport -Page $page -Width 1920 -Height 1080</dev:code>
         <dev:remarks>
           <maml:para>Sets a standard desktop viewport size.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Emulate mobile device</maml:title>
-        <dev:code>Set-PupPageViewport -Page $page -Width 375 -Height 667 -IsMobile -HasTouch -DeviceScaleFactor 2</dev:code>
+        <dev:code>Set-PupViewport -Page $page -Width 375 -Height 667 -IsMobile -HasTouch -DeviceScaleFactor 2</dev:code>
         <dev:remarks>
           <maml:para>Emulates an iPhone-like mobile device.</maml:para>
         </dev:remarks>
@@ -1906,15 +1906,15 @@ $el | Invoke-PupElementClick</dev:code>
       <command:example>
         <maml:title>Example 3: Test responsive breakpoints</maml:title>
         <dev:code># Test mobile
-Set-PupPageViewport -Page $page -Width 375 -Height 667
+Set-PupViewport -Page $page -Width 375 -Height 667
 Get-PupPageScreenshot -Page $page -FilePath "mobile.png"
 
 # Test tablet
-Set-PupPageViewport -Page $page -Width 768 -Height 1024
+Set-PupViewport -Page $page -Width 768 -Height 1024
 Get-PupPageScreenshot -Page $page -FilePath "tablet.png"
 
 # Test desktop
-Set-PupPageViewport -Page $page -Width 1920 -Height 1080
+Set-PupViewport -Page $page -Width 1920 -Height 1080
 Get-PupPageScreenshot -Page $page -FilePath "desktop.png"</dev:code>
         <dev:remarks>
           <maml:para>Captures screenshots at different responsive breakpoints.</maml:para>
@@ -1981,7 +1981,7 @@ $cert.CertificateChain.Count  # Number of certs in chain</dev:code>
       </command:example>
       <command:example>
         <maml:title>Example 6: Check certificate in network entries</maml:title>
-        <dev:code>$network = Get-PupPageNetwork -Page $page
+        <dev:code>$network = Get-PupNetwork -Page $page
 $network | Where-Object { $_.SecurityDetails } |
     Select-Object Url, @{N="TLS";E={$_.SecurityDetails.Protocol}}</dev:code>
         <dev:remarks>

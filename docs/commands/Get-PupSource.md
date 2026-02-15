@@ -5,47 +5,53 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-PupPageReload
+# Get-PupSource
 
 ## SYNOPSIS
-Reloads the current page.
+Gets the HTML source of a page.
 
 ## SYNTAX
 
 ```
-Invoke-PupPageReload -Page <PupPage> [-WaitForLoad] [-HardReload] [-ProgressAction <ActionPreference>]
- [<CommonParameters>]
+Get-PupSource -Page <PupPage> [-FilePath <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Refreshes the page, optionally waiting for the reload to complete.
-Useful after modifying cookies or storage.
+Returns the current HTML content of the page, including any dynamic changes made by JavaScript.
 
 ## EXAMPLES
 
-### Example 1: Reload and wait
+### Example 1: Get page source
 ```
-Invoke-PupPageReload -Page $page -WaitForLoad
-```
-
-Reloads the page and waits for it to fully load.
-
-### Example 2: Test after modifying session
-```
-Set-PupCookie -Page $page -Name "role" -Value "admin" -Domain "target.com"
-Invoke-PupPageReload -Page $page -WaitForLoad
-# Check if admin features are now visible
+$html = Get-PupSource -Page $page
+$html | Out-File "page.html"
 ```
 
-Reloads after cookie manipulation to test privilege escalation.
+Saves the page HTML to a file.
+
+### Example 2: Search for comments
+```
+$html = Get-PupSource -Page $page
+[regex]::Matches($html, "<!--.*?-->", "Singleline") | ForEach-Object { $_.Value }
+```
+
+Extracts HTML comments that might contain sensitive info.
+
+### Example 3: Find hidden inputs
+```
+$html = Get-PupSource -Page $page
+[regex]::Matches($html, '<input[^>]*type=["\']hidden["\'][^>]*>') | ForEach-Object { $_.Value }
+```
+
+Finds hidden form fields that might contain tokens or IDs.
 
 ## PARAMETERS
 
-### -HardReload
-Ignore cache and force reload from server
+### -FilePath
+Save the HTML to a file path
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -57,7 +63,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-The page to reload
+The page to get HTML source from
 
 ```yaml
 Type: PupPage
@@ -78,21 +84,6 @@ Accept wildcard characters: False
 Type: ActionPreference
 Parameter Sets: (All)
 Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -WaitForLoad
-Wait for page to load after reload
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
 
 Required: False
 Position: Named

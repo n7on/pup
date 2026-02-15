@@ -67,7 +67,7 @@ Deduplicates results by SubjectName to see unique certificates across all reques
 
 ### Example 6: Check certificate in network entries
 ```
-$network = Get-PupPageNetwork -Page $page
+$network = Get-PupNetwork -Page $page
 $network | Where-Object { $_.SecurityDetails } |
     Select-Object Url, @{N="TLS";E={$_.SecurityDetails.Protocol}}
 ```

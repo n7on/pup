@@ -32,9 +32,9 @@ Install-PupBrowser
 - [Invoke-PupPageForward](./docs/commands/Invoke-PupPageForward.md) - Go forward
 - [Invoke-PupPageReload](./docs/commands/Invoke-PupPageReload.md) - Reload page
 - [Invoke-PupPageScroll](./docs/commands/Invoke-PupPageScroll.md) - Scroll page
-- [Invoke-PupPageScript](./docs/commands/Invoke-PupPageScript.md) - Execute JavaScript
-- [Set-PupPageViewport](./docs/commands/Set-PupPageViewport.md) - Set viewport size
-- [Get-PupPageSource](./docs/commands/Get-PupPageSource.md) - Get page HTML
+- [Invoke-PupScript](./docs/commands/Invoke-PupScript.md) - Execute JavaScript
+- [Set-PupViewport](./docs/commands/Set-PupViewport.md) - Set viewport size
+- [Get-PupSource](./docs/commands/Get-PupSource.md) - Get page HTML
 
 ### Elements
 - [Find-PupElements](./docs/commands/Find-PupElements.md) - Find elements by selector
@@ -62,29 +62,29 @@ Install-PupBrowser
 ### Screenshots & Export
 - [Get-PupPageScreenshot](./docs/commands/Get-PupPageScreenshot.md) - Capture page screenshot
 - [Get-PupElementScreenshot](./docs/commands/Get-PupElementScreenshot.md) - Capture element screenshot
-- [Export-PupPagePdf](./docs/commands/Export-PupPagePdf.md) - Export page as PDF
+- [Export-PupPdf](./docs/commands/Export-PupPdf.md) - Export page as PDF
 
 ### Cookies & Storage
-- [Get-PupPageCookie](./docs/commands/Get-PupPageCookie.md) - Get cookies
-- [Set-PupPageCookie](./docs/commands/Set-PupPageCookie.md) - Set cookie
-- [Remove-PupPageCookie](./docs/commands/Remove-PupPageCookie.md) - Remove cookies
-- [Get-PupPageStorage](./docs/commands/Get-PupPageStorage.md) - Get local/session storage
-- [Set-PupPageStorage](./docs/commands/Set-PupPageStorage.md) - Set storage item
-- [Clear-PupPageStorage](./docs/commands/Clear-PupPageStorage.md) - Clear storage
+- [Get-PupCookie](./docs/commands/Get-PupCookie.md) - Get cookies
+- [Set-PupCookie](./docs/commands/Set-PupCookie.md) - Set cookie
+- [Remove-PupCookie](./docs/commands/Remove-PupCookie.md) - Remove cookies
+- [Get-PupStorage](./docs/commands/Get-PupStorage.md) - Get local/session storage
+- [Set-PupStorage](./docs/commands/Set-PupStorage.md) - Set storage item
+- [Clear-PupStorage](./docs/commands/Clear-PupStorage.md) - Clear storage
 
 ### Network
 - [Invoke-PupHttpFetch](./docs/commands/Invoke-PupHttpFetch.md) - Make HTTP request
 - [Set-PupHttpHeader](./docs/commands/Set-PupHttpHeader.md) - Set request headers
 - [Set-PupHttpAuth](./docs/commands/Set-PupHttpAuth.md) - Set HTTP authentication
-- [Get-PupPageNetwork](./docs/commands/Get-PupPageNetwork.md) - Get network requests
+- [Get-PupNetwork](./docs/commands/Get-PupNetwork.md) - Get network requests
 
 ### WebSocket
 - [Get-PupWebSocket](./docs/commands/Get-PupWebSocket.md) - Get WebSocket connections
 - [Send-PupWebSocketMessage](./docs/commands/Send-PupWebSocketMessage.md) - Send WebSocket message
 
 ### Session
-- [Export-PupPageSession](./docs/commands/Export-PupPageSession.md) - Export session (cookies, storage)
-- [Import-PupPageSession](./docs/commands/Import-PupPageSession.md) - Import session
+- [Export-PupSession](./docs/commands/Export-PupSession.md) - Export session (cookies, storage)
+- [Import-PupSession](./docs/commands/Import-PupSession.md) - Import session
 
 ### Input
 - [Send-PupKey](./docs/commands/Send-PupKey.md) - Send keyboard input
@@ -92,7 +92,7 @@ Install-PupBrowser
 
 ### Console & Debugging
 - [Enter-PupConsole](./docs/commands/Enter-PupConsole.md) - Interactive console mode
-- [Get-PupPageConsole](./docs/commands/Get-PupPageConsole.md) - Get console messages
+- [Get-PupConsole](./docs/commands/Get-PupConsole.md) - Get console messages
 - [Invoke-PupCdpMessage](./docs/commands/Invoke-PupCdpMessage.md) - Send raw CDP command
 - [Get-PupCertificate](./docs/commands/Get-PupCertificate.md) - Get page certificate
 - [Set-PupDialogHandler](./docs/commands/Set-PupDialogHandler.md) - Handle dialogs (alert, confirm)

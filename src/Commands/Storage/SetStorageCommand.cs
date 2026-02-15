@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Management.Automation;
 using Pup.Transport;
-using Pup.Common;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Storage
 {
-    [Cmdlet(VerbsCommon.Set, "PupPageStorage")]
+    [Cmdlet(VerbsCommon.Set, "PupStorage")]
     [OutputType(typeof(void))]
-    public class SetPageStorageCommand : PupBaseCommand
+    public class SetStorageCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -67,7 +66,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "SetPageStorageError", ErrorCategory.WriteError, null));
+                WriteError(new ErrorRecord(ex, "SetStorageError", ErrorCategory.WriteError, null));
             }
         }
     }

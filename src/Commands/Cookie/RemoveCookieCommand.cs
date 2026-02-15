@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using Pup.Transport;
-using Pup.Common;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Cookie
 {
-    [Cmdlet(VerbsCommon.Remove, "PupPageCookie")]
+    [Cmdlet(VerbsCommon.Remove, "PupCookie")]
     [OutputType(typeof(void))]
-    public class RemovePageCookieCommand : PupBaseCommand
+    public class RemoveCookieCommand : PupBaseCommand
     {
         private const string ByFilter = "ByFilter";
         private const string ByObject = "ByObject";
@@ -148,7 +147,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "RemovePageCookieError", ErrorCategory.OperationStopped, null));
+                WriteError(new ErrorRecord(ex, "RemoveCookieError", ErrorCategory.OperationStopped, null));
             }
         }
     }

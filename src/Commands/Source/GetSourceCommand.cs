@@ -1,14 +1,13 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
-using Pup.Common;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Source
 {
-    [Cmdlet(VerbsCommon.Get, "PupPageSource")]
+    [Cmdlet(VerbsCommon.Get, "PupSource")]
     [OutputType(typeof(string))]
-    public class GetPageSourceCommand : PupBaseCommand
+    public class GetSourceCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -44,7 +43,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "GetPageSourceError", ErrorCategory.ReadError, Page));
+                WriteError(new ErrorRecord(ex, "GetSourceError", ErrorCategory.ReadError, Page));
             }
         }
     }

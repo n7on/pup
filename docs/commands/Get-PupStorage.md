@@ -5,47 +5,53 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-PupPageReload
+# Get-PupStorage
 
 ## SYNOPSIS
-Reloads the current page.
+Gets localStorage or sessionStorage data from a page.
 
 ## SYNTAX
 
 ```
-Invoke-PupPageReload -Page <PupPage> [-WaitForLoad] [-HardReload] [-ProgressAction <ActionPreference>]
+Get-PupStorage -Page <PupPage> [-Type <String>] [-Key <String>] [-ProgressAction <ActionPreference>]
  [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Refreshes the page, optionally waiting for the reload to complete.
-Useful after modifying cookies or storage.
+Retrieves data stored in the browser's localStorage or sessionStorage.
+Useful for inspecting client-side data storage for sensitive information.
 
 ## EXAMPLES
 
-### Example 1: Reload and wait
+### Example 1: Get all localStorage
 ```
-Invoke-PupPageReload -Page $page -WaitForLoad
-```
-
-Reloads the page and waits for it to fully load.
-
-### Example 2: Test after modifying session
-```
-Set-PupCookie -Page $page -Name "role" -Value "admin" -Domain "target.com"
-Invoke-PupPageReload -Page $page -WaitForLoad
-# Check if admin features are now visible
+Get-PupStorage -Page $page -Type Local
 ```
 
-Reloads after cookie manipulation to test privilege escalation.
+Returns all localStorage key-value pairs.
+
+### Example 2: Get specific key
+```
+Get-PupStorage -Page $page -Type Local -Key "authToken"
+```
+
+Gets a specific storage value.
+
+### Example 3: Check for sensitive data
+```
+$storage = Get-PupStorage -Page $page -Type Local
+$storage | Where-Object { $_.Key -match "token|auth|session|password" }
+```
+
+Searches storage for potentially sensitive keys.
 
 ## PARAMETERS
 
-### -HardReload
-Ignore cache and force reload from server
+### -Key
+Specific key to retrieve
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -57,7 +63,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-The page to reload
+The page to get storage from
 
 ```yaml
 Type: PupPage
@@ -86,11 +92,11 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -WaitForLoad
-Wait for page to load after reload
+### -Type
+Storage type: Local or Session (default: Local)
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
 Aliases:
 

@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using System.Text.Json;
-using Pup.Common;
 using Pup.Transport;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Network
 {
-    [Cmdlet(VerbsCommon.Get, "PupPageNetwork")]
+    [Cmdlet(VerbsCommon.Get, "PupNetwork")]
     [OutputType(typeof(PupNetworkEntry))]
-    public class GetPageNetworkCommand : PupBaseCommand
+    public class GetNetworkCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -48,7 +47,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "GetPageNetworkError", ErrorCategory.ReadError, Page));
+                WriteError(new ErrorRecord(ex, "GetNetworkError", ErrorCategory.ReadError, Page));
             }
         }
 

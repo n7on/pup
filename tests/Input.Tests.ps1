@@ -32,7 +32,7 @@ Describe "File Upload" {
         $fileInput = Find-PupElements -Page $script:page -Selector "#file-single" -First
         Send-PupFile -Element $fileInput -FilePath $script:testFilePath
 
-        $fileName = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('file-single').files[0]?.name" -AsString
+        $fileName = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('file-single').files[0]?.name" -AsString
         $fileName | Should -Be "pup-test-upload.txt"
     }
 
@@ -40,7 +40,7 @@ Describe "File Upload" {
         $fileInput = Find-PupElements -Page $script:page -Selector "#file-multiple" -First
         Send-PupFile -Element $fileInput -FilePath $script:testFilePath, $script:testFilePath2
 
-        $fileCount = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('file-multiple').files.length" -AsNumber
+        $fileCount = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('file-multiple').files.length" -AsNumber
         $fileCount | Should -Be 2
     }
 
@@ -53,7 +53,7 @@ Describe "File Upload" {
         $fileInput = Find-PupElements -Page $script:page -Selector "#file-single" -First
         $fileInput | Send-PupFile -FilePath $script:testFilePath
 
-        $fileName = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('file-single').files[0]?.name" -AsString
+        $fileName = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('file-single').files[0]?.name" -AsString
         $fileName | Should -Be "pup-test-upload.txt"
     }
 }
@@ -67,7 +67,7 @@ Describe "Keyboard Input" {
         $el = Find-PupElements -Page $script:page -Selector "#username" -First
         $el | Invoke-PupElementFocus
         Send-PupKey -Page $script:page -Text "hello"
-        $value = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
+        $value = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
         $value | Should -Be "hello"
     }
 

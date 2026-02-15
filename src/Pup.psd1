@@ -6,65 +6,65 @@
     CompanyName = 'Anton Lindström'
     Copyright = '(c) 2026 Anton Lindström. All rights reserved.'
     Description = 'Browser automation for PowerShell using the Chrome DevTools Protocol. Scrape websites, fill forms, take screenshots, export PDFs, and record interactions as replayable scripts. Works with PowerShell 5.1+ on Windows, Linux, and macOS.'
-    
+
     PowerShellVersion = '5.1'
     DotNetFrameworkVersion = '4.6.1'
-    
+
     FunctionsToExport = @()
     CmdletsToExport = @(
-        'Clear-PupPageStorage',
         'Clear-PupRecording',
+        'Clear-PupStorage',
         'ConvertTo-PupScript',
         'Enter-PupConsole',
-        'Export-PupPagePdf',
-        'Export-PupPageSession',
+        'Export-PupPdf',
+        'Export-PupSession',
         'Find-PupElements',
         'Get-PupBrowser',
         'Get-PupCertificate',
+        'Get-PupConsole',
+        'Get-PupCookie',
         'Get-PupElementAttribute',
         'Get-PupElementPattern',
         'Get-PupElementScreenshot',
         'Get-PupElementSelector',
         'Get-PupElementValue',
+        'Get-PupNetwork',
         'Get-PupPage',
-        'Get-PupPageConsole',
-        'Get-PupPageCookie',
-        'Get-PupPageNetwork',
         'Get-PupPageScreenshot',
-        'Get-PupPageSource',
-        'Get-PupPageStorage',
         'Get-PupRecording',
+        'Get-PupSource',
+        'Get-PupStorage',
         'Get-PupWebSocket',
-        'Import-PupPageSession',
+        'Import-PupSession',
         'Install-PupBrowser',
+        'Invoke-PupCdpMessage',
         'Invoke-PupElementClick',
         'Invoke-PupElementFocus',
         'Invoke-PupElementHover',
         'Invoke-PupElementScroll',
-        'Invoke-PupCdpMessage',
         'Invoke-PupHttpFetch',
         'Invoke-PupPageBack',
         'Invoke-PupPageForward',
         'Invoke-PupPageReload',
-        'Invoke-PupPageScript',
         'Invoke-PupPageScroll',
+        'Invoke-PupScript',
         'Move-PupPage',
         'New-PupPage',
+        'Remove-PupCookie',
         'Remove-PupPage',
-        'Remove-PupPageCookie',
         'Select-PupElementOption',
         'Send-PupFile',
         'Send-PupKey',
         'Send-PupWebSocketMessage',
+        'Set-PupCookie',
         'Set-PupDialogHandler',
         'Set-PupElement',
         'Set-PupElementAttribute',
         'Set-PupElementValue',
         'Set-PupHttpAuth',
         'Set-PupHttpHeader',
-        'Set-PupPageCookie',
-        'Set-PupPageStorage',
-        'Set-PupPageViewport',
+        'Set-PupStorage',
+        'Set-PupViewport',
         'Start-PupBrowser',
         'Start-PupRecording',
         'Stop-PupBrowser',
@@ -74,7 +74,7 @@
     )
     VariablesToExport = @()
     AliasesToExport = @()
-    
+
     PrivateData = @{
         PSData = @{
             Tags = @('Browser', 'Automation', 'WebScraping', 'Scraping', 'Puppeteer', 'Chrome', 'Chromium', 'Headless', 'Selenium', 'CDP', 'DevTools', 'Screenshot', 'PDF', 'Testing', 'Web', 'E2E', 'Crawler', 'RPA', 'WebDriver', 'CrossPlatform', 'Linux', 'macOS', 'Windows')

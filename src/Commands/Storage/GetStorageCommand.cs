@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using Pup.Transport;
-using Pup.Common;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Storage
 {
-    [Cmdlet(VerbsCommon.Get, "PupPageStorage")]
+    [Cmdlet(VerbsCommon.Get, "PupStorage")]
     [OutputType(typeof(PSObject))]
-    public class GetPageStorageCommand : PupBaseCommand
+    public class GetStorageCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -57,7 +56,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "GetPageStorageError", ErrorCategory.ReadError, null));
+                WriteError(new ErrorRecord(ex, "GetStorageError", ErrorCategory.ReadError, null));
             }
         }
     }

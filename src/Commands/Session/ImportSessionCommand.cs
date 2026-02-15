@@ -2,14 +2,13 @@ using System.IO;
 using System.Management.Automation;
 using System.Text.Json;
 using Pup.Transport;
-using Pup.Common;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Session
 {
-    [Cmdlet(VerbsData.Import, "PupPageSession")]
+    [Cmdlet(VerbsData.Import, "PupSession")]
     [OutputType(typeof(void))]
-    public class ImportPageSessionCommand : PupBaseCommand
+    public class ImportSessionCommand : PupBaseCommand
     {
         [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true, HelpMessage = "The page to import session into")]
         public PupPage Page { get; set; }

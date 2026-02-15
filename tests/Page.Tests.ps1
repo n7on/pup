@@ -88,19 +88,19 @@ Describe "Page PDF Export" {
     }
 
     It "Exports PDF as bytes" {
-        $bytes = Export-PupPagePdf -Page $script:page -PassThru
+        $bytes = Export-PupPdf -Page $script:page -PassThru
         $bytes.Length | Should -BeGreaterThan 1000
     }
 
     It "Saves PDF to file" {
         $path = Join-Path ([IO.Path]::GetTempPath()) "test-export.pdf"
-        Export-PupPagePdf -Page $script:page -FilePath $path
+        Export-PupPdf -Page $script:page -FilePath $path
         Test-Path $path | Should -BeTrue
         Remove-Item $path
     }
 
     It "Gets page source" {
-        $html = Get-PupPageSource -Page $script:page
+        $html = Get-PupSource -Page $script:page
         $html | Should -BeLike "*Pup Test Page*"
         $html | Should -Match 'id=["'']title["'']'
     }
@@ -116,17 +116,17 @@ Describe "Page JavaScript" {
     }
 
     It "Executes script returning number" {
-        $result = Invoke-PupPageScript -Page $script:page -Script "() => 2 + 2" -AsNumber
+        $result = Invoke-PupScript -Page $script:page -Script "() => 2 + 2" -AsNumber
         $result | Should -Be 4
     }
 
     It "Executes script returning string" {
-        $result = Invoke-PupPageScript -Page $script:page -Script "() => document.title" -AsString
+        $result = Invoke-PupScript -Page $script:page -Script "() => document.title" -AsString
         $result | Should -Be "Pup Test Page"
     }
 
     It "Executes script returning boolean" {
-        $result = Invoke-PupPageScript -Page $script:page -Script "() => true" -AsBoolean
+        $result = Invoke-PupScript -Page $script:page -Script "() => true" -AsBoolean
         $result | Should -BeTrue
     }
 }
@@ -141,30 +141,30 @@ Describe "Page Cookies" {
     }
 
     It "Sets and gets cookie" {
-        Set-PupPageCookie -Page $script:page -Name "test" -Value "value123" -Domain "example.com"
-        $cookies = Get-PupPageCookie -Page $script:page -Name "test"
+        Set-PupCookie -Page $script:page -Name "test" -Value "value123" -Domain "example.com"
+        $cookies = Get-PupCookie -Page $script:page -Name "test"
         $cookies.Value | Should -Be "value123"
     }
 
     It "Removes cookie" {
-        Set-PupPageCookie -Page $script:page -Name "toremove" -Value "value456" -Domain "example.com"
-        Get-PupPageCookie -Page $script:page -Name "toremove" | Should -Not -BeNullOrEmpty
+        Set-PupCookie -Page $script:page -Name "toremove" -Value "value456" -Domain "example.com"
+        Get-PupCookie -Page $script:page -Name "toremove" | Should -Not -BeNullOrEmpty
 
-        Remove-PupPageCookie -Page $script:page -Name "toremove" -Domain "example.com"
+        Remove-PupCookie -Page $script:page -Name "toremove" -Domain "example.com"
 
-        $after = Get-PupPageCookie -Page $script:page -Name "toremove"
+        $after = Get-PupCookie -Page $script:page -Name "toremove"
         $after | Should -BeNullOrEmpty
     }
 
     It "Removes cookies by wildcard and domain" {
-        Set-PupPageCookie -Page $script:page -Name "session1" -Value "abc" -Domain "example.com"
-        Set-PupPageCookie -Page $script:page -Name "session2" -Value "def" -Domain "example.com"
-        Set-PupPageCookie -Page $script:page -Name "other" -Value "ghi" -Domain "example.com"
+        Set-PupCookie -Page $script:page -Name "session1" -Value "abc" -Domain "example.com"
+        Set-PupCookie -Page $script:page -Name "session2" -Value "def" -Domain "example.com"
+        Set-PupCookie -Page $script:page -Name "other" -Value "ghi" -Domain "example.com"
 
-        Remove-PupPageCookie -Page $script:page -Name "session*" -Domain "example.com"
+        Remove-PupCookie -Page $script:page -Name "session*" -Domain "example.com"
 
-        (Get-PupPageCookie -Page $script:page -Name "session*").Count | Should -Be 0
-        (Get-PupPageCookie -Page $script:page -Name "other").Count | Should -Be 1
+        (Get-PupCookie -Page $script:page -Name "session*").Count | Should -Be 0
+        (Get-PupCookie -Page $script:page -Name "other").Count | Should -Be 1
     }
 }
 
@@ -179,7 +179,7 @@ Describe "Network Capture" {
 
     It "captures requests and saves to file" {
         Invoke-PupPageReload -Page $script:netPage -WaitForLoad
-        $entries = Get-PupPageNetwork -Page $script:netPage
+        $entries = Get-PupNetwork -Page $script:netPage
 
         $entries.Count | Should -BeGreaterThan 0
         ($entries | Where-Object { $_.Url -like "*test-page.html*" }).Count | Should -BeGreaterThan 0
@@ -197,8 +197,8 @@ Describe "Console Capture" {
     }
 
     It "captures console output" {
-        Invoke-PupPageScript -Page $script:consolePage -Script "() => { console.log('hello'); console.error('boom'); }" -AsVoid
-        $logs = Get-PupPageConsole -Page $script:consolePage
+        Invoke-PupScript -Page $script:consolePage -Script "() => { console.log('hello'); console.error('boom'); }" -AsVoid
+        $logs = Get-PupConsole -Page $script:consolePage
 
         $logs | Where-Object { $_.Type -eq "Log" -and $_.Text -like "*hello*" } | Should -Not -BeNullOrEmpty
         $logs | Where-Object { $_.Type -eq "Error" -and $_.Text -like "*boom*" } | Should -Not -BeNullOrEmpty
@@ -216,25 +216,25 @@ Describe "Page Storage" {
 
     BeforeEach {
         Invoke-PupPageReload -Page $script:page -WaitForLoad
-        Clear-PupPageStorage -Page $script:page -Type Local
-        Clear-PupPageStorage -Page $script:page -Type Session
+        Clear-PupStorage -Page $script:page -Type Local
+        Clear-PupStorage -Page $script:page -Type Session
     }
 
     It "Sets and gets local storage entry" {
-        Set-PupPageStorage -Page $script:page -Type Local -Key "foo" -Value "bar"
-        $entry = Get-PupPageStorage -Page $script:page -Type Local -Key "foo"
+        Set-PupStorage -Page $script:page -Type Local -Key "foo" -Value "bar"
+        $entry = Get-PupStorage -Page $script:page -Type Local -Key "foo"
         $entry.Value | Should -Be "bar"
     }
 
     It "Clears single local storage entry" {
-        Set-PupPageStorage -Page $script:page -Type Local -Key "foo" -Value "bar"
-        Clear-PupPageStorage -Page $script:page -Type Local -Key "foo"
-        Get-PupPageStorage -Page $script:page -Type Local -Key "foo" | Should -BeNullOrEmpty
+        Set-PupStorage -Page $script:page -Type Local -Key "foo" -Value "bar"
+        Clear-PupStorage -Page $script:page -Type Local -Key "foo"
+        Get-PupStorage -Page $script:page -Type Local -Key "foo" | Should -BeNullOrEmpty
     }
 
     It "Sets multiple session storage entries" {
-        Set-PupPageStorage -Page $script:page -Type Session -Items @{ a = "1"; b = "2" }
-        $all = Get-PupPageStorage -Page $script:page -Type Session
+        Set-PupStorage -Page $script:page -Type Session -Items @{ a = "1"; b = "2" }
+        $all = Get-PupStorage -Page $script:page -Type Session
         ($all | Where-Object { $_.Key -eq "a" }).Value | Should -Be "1"
         ($all | Where-Object { $_.Key -eq "b" }).Value | Should -Be "2"
     }
@@ -253,7 +253,7 @@ Describe "Page Keyboard" {
         $el = Find-PupElements -Page $script:page -Selector "#username" -First
         $el | Invoke-PupElementFocus
         Send-PupKey -Page $script:page -Text "hello"
-        $value = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
+        $value = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
         $value | Should -Be "hello"
     }
 

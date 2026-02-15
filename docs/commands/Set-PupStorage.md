@@ -5,47 +5,71 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-PupPageReload
+# Set-PupStorage
 
 ## SYNOPSIS
-Reloads the current page.
+Sets localStorage or sessionStorage data on a page.
 
 ## SYNTAX
 
 ```
-Invoke-PupPageReload -Page <PupPage> [-WaitForLoad] [-HardReload] [-ProgressAction <ActionPreference>]
- [<CommonParameters>]
+Set-PupStorage -Page <PupPage> [-Type <String>] [-Key <String>] [-Value <String>] [-Items <Hashtable>]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Refreshes the page, optionally waiting for the reload to complete.
-Useful after modifying cookies or storage.
+Stores data in the browser's localStorage or sessionStorage.
+Can set individual keys or multiple key-value pairs at once.
 
 ## EXAMPLES
 
-### Example 1: Reload and wait
+### Example 1: Set a storage value
 ```
+Set-PupStorage -Page $page -Type Local -Key "theme" -Value "dark"
+```
+
+Sets a single localStorage value.
+
+### Example 2: Inject auth token
+```
+Set-PupStorage -Page $page -Type Local -Key "authToken" -Value "eyJhbGc..."
 Invoke-PupPageReload -Page $page -WaitForLoad
 ```
 
-Reloads the page and waits for it to fully load.
+Injects an authentication token and reloads to test access.
 
-### Example 2: Test after modifying session
+### Example 3: Set multiple values
 ```
-Set-PupCookie -Page $page -Name "role" -Value "admin" -Domain "target.com"
-Invoke-PupPageReload -Page $page -WaitForLoad
-# Check if admin features are now visible
+Set-PupStorage -Page $page -Type Session -Items @{
+    "userId" = "admin"
+    "role" = "administrator"
+}
 ```
 
-Reloads after cookie manipulation to test privilege escalation.
+Sets multiple sessionStorage values at once.
 
 ## PARAMETERS
 
-### -HardReload
-Ignore cache and force reload from server
+### -Items
+Hashtable of key/value pairs to set
 
 ```yaml
-Type: SwitchParameter
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Key
+Key to set
+
+```yaml
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -57,7 +81,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-The page to reload
+The page to set storage on
 
 ```yaml
 Type: PupPage
@@ -86,11 +110,26 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -WaitForLoad
-Wait for page to load after reload
+### -Type
+Storage type: Local or Session (default: Local)
 
 ```yaml
-Type: SwitchParameter
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Value
+Value to set
+
+```yaml
+Type: String
 Parameter Sets: (All)
 Aliases:
 

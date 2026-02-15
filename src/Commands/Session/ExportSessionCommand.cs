@@ -1,15 +1,14 @@
 using System.IO;
 using System.Management.Automation;
 using System.Text.Json;
-using Pup.Common;
 using Pup.Transport;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Session
 {
-    [Cmdlet(VerbsData.Export, "PupPageSession")]
+    [Cmdlet(VerbsData.Export, "PupSession")]
     [OutputType(typeof(PupSession))]
-    public class ExportPageSessionCommand : PupBaseCommand
+    public class ExportSessionCommand : PupBaseCommand
     {
         [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true, HelpMessage = "The page to export session from")]
         public PupPage Page { get; set; }

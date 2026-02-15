@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using System.Management.Automation;
-using Pup.Common;
 using Pup.Transport;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Pdf
 {
-    [Cmdlet(VerbsData.Export, "PupPagePdf")]
+    [Cmdlet(VerbsData.Export, "PupPdf")]
     [OutputType(typeof(byte[]))]
-    public class ExportPagePdfCommand : PupBaseCommand
+    public class ExportPdfCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -73,7 +72,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "ExportPagePdfError", ErrorCategory.WriteError, Page));
+                WriteError(new ErrorRecord(ex, "ExportPdfError", ErrorCategory.WriteError, Page));
             }
         }
     }

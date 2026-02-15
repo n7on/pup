@@ -4,11 +4,11 @@ using Pup.Transport;
 using Pup.Common;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Cookie
 {
-    [Cmdlet(VerbsCommon.Set, "PupPageCookie")]
+    [Cmdlet(VerbsCommon.Set, "PupCookie")]
     [OutputType(typeof(void))]
-    public class SetPageCookieCommand : PupBaseCommand
+    public class SetCookieCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -102,7 +102,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "SetPageCookieError", ErrorCategory.WriteError, null));
+                WriteError(new ErrorRecord(ex, "SetCookieError", ErrorCategory.WriteError, null));
             }
         }
     }

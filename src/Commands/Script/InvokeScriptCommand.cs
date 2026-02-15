@@ -1,14 +1,13 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
-using Pup.Common;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Script
 {
-    [Cmdlet(VerbsLifecycle.Invoke, "PupPageScript")]
+    [Cmdlet(VerbsLifecycle.Invoke, "PupScript")]
     [OutputType(typeof(object))]
-    public class InvokePageScriptCommand : PupBaseCommand
+    public class InvokeScriptCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -93,7 +92,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "InvokePageScriptError", ErrorCategory.OperationStopped, Script));
+                WriteError(new ErrorRecord(ex, "InvokeScriptError", ErrorCategory.OperationStopped, Script));
             }
         }
     }

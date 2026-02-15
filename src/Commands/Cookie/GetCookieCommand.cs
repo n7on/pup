@@ -1,16 +1,13 @@
 using System;
 using System.Management.Automation;
 using Pup.Transport;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
-using Pup.Common;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Cookie
 {
-    [Cmdlet(VerbsCommon.Get, "PupPageCookie")]
+    [Cmdlet(VerbsCommon.Get, "PupCookie")]
     [OutputType(typeof(PupCookie[]))]
-    public class GetPageCookieCommand : PupBaseCommand
+    public class GetCookieCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -50,7 +47,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "GetPageCookieError", ErrorCategory.ReadError, null));
+                WriteError(new ErrorRecord(ex, "GetCookieError", ErrorCategory.ReadError, null));
             }
         }
     }

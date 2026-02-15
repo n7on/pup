@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
-using Pup.Common;
 using Pup.Transport;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Console
 {
-    [Cmdlet(VerbsCommon.Get, "PupPageConsole")]
+    [Cmdlet(VerbsCommon.Get, "PupConsole")]
     [OutputType(typeof(PupConsoleEntry[]))]
-    public class GetPageConsoleCommand : PupBaseCommand
+    public class GetConsoleCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -50,7 +49,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "GetPageConsoleError", ErrorCategory.ReadError, Page));
+                WriteError(new ErrorRecord(ex, "GetConsoleError", ErrorCategory.ReadError, Page));
             }
         }
     }

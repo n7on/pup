@@ -5,47 +5,56 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-PupPageReload
+# Clear-PupStorage
 
 ## SYNOPSIS
-Reloads the current page.
+Clears localStorage or sessionStorage data.
 
 ## SYNTAX
 
 ```
-Invoke-PupPageReload -Page <PupPage> [-WaitForLoad] [-HardReload] [-ProgressAction <ActionPreference>]
+Clear-PupStorage -Page <PupPage> [-Type <String>] [-Key <String>] [-ProgressAction <ActionPreference>]
  [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Refreshes the page, optionally waiting for the reload to complete.
-Useful after modifying cookies or storage.
+Removes data from the browser's localStorage or sessionStorage.
+Can clear all data or specific keys.
 
 ## EXAMPLES
 
-### Example 1: Reload and wait
+### Example 1: Clear all localStorage
 ```
+Clear-PupStorage -Page $page -Type Local
+```
+
+Removes all localStorage data.
+
+### Example 2: Clear specific key
+```
+Clear-PupStorage -Page $page -Type Local -Key "authToken"
+```
+
+Removes only the specified key.
+
+### Example 3: Test logout functionality
+```
+# Clear all client-side storage and verify logout
+Clear-PupStorage -Page $page -Type Local
+Clear-PupStorage -Page $page -Type Session
 Invoke-PupPageReload -Page $page -WaitForLoad
+# Check if user is logged out
 ```
 
-Reloads the page and waits for it to fully load.
-
-### Example 2: Test after modifying session
-```
-Set-PupCookie -Page $page -Name "role" -Value "admin" -Domain "target.com"
-Invoke-PupPageReload -Page $page -WaitForLoad
-# Check if admin features are now visible
-```
-
-Reloads after cookie manipulation to test privilege escalation.
+Tests that clearing storage properly logs out the user.
 
 ## PARAMETERS
 
-### -HardReload
-Ignore cache and force reload from server
+### -Key
+Key to remove (omit to clear all)
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -57,7 +66,7 @@ Accept wildcard characters: False
 ```
 
 ### -Page
-The page to reload
+The page to clear storage from
 
 ```yaml
 Type: PupPage
@@ -86,11 +95,11 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -WaitForLoad
-Wait for page to load after reload
+### -Type
+Storage type: Local or Session (default: Local)
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
 Aliases:
 

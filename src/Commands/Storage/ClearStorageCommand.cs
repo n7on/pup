@@ -1,14 +1,13 @@
 using System;
 using System.Management.Automation;
-using Pup.Common;
 using Pup.Transport;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Storage
 {
-    [Cmdlet(VerbsCommon.Clear, "PupPageStorage")]
+    [Cmdlet(VerbsCommon.Clear, "PupStorage")]
     [OutputType(typeof(void))]
-    public class ClearPageStorageCommand : PupBaseCommand
+    public class ClearStorageCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -37,7 +36,7 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "ClearPageStorageError", ErrorCategory.WriteError, null));
+                WriteError(new ErrorRecord(ex, "ClearStorageError", ErrorCategory.WriteError, null));
             }
         }
     }
