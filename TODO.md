@@ -23,12 +23,27 @@ This document tracks missing functionality and enhancements.
   - `Wait-PupElement -Frame $frame -Selector "..."` - Wait for elements in frame
   - `Invoke-PupScript -Frame $frame -Script "..."` - Execute JS in frame context
   - `Get-PupSource -Frame $frame` - Get frame HTML source
-- [ ] **Multi-tab/popup handling** - Handle OAuth popups, window.open() flows
-  - `Get-PupPage -All` - List all pages/tabs
-  - Event handler for new popups
+- [x] **Multi-tab/popup handling** - Handle OAuth popups, window.open() flows
+  - `Get-PupPage` - List all pages/tabs (already existed)
+  - `Set-PupBrowserHandler -Browser $b -Event PopupCreated -Action Dismiss` - Auto-close popups
+  - `Set-PupBrowserHandler -Browser $b -Event PopupCreated -ScriptBlock { param($e) $e.Page }` - Custom popup handling
+
+## Event Handlers
+- [x] **Set-PupBrowserHandler** - Handle browser-level events with actions or script blocks
+  - Events: PopupCreated, PageCreated, PageClosed, Disconnected
+  - `Set-PupBrowserHandler -Browser $b -Event PopupCreated -ScriptBlock { param($e) Write-Host "Popup: $($e.Url)" }`
+  - `Set-PupBrowserHandler -Browser $b -Event PopupCreated -Remove` - Remove handler
+- [x] **Set-PupPageHandler** - Handle page-level events with actions or script blocks
+  - Events: Dialog, Console, PageError, Load, DOMContentLoaded, Request, RequestFinished, RequestFailed, Response, FrameAttached, FrameDetached, FrameNavigated, Download, FileChooser, WorkerCreated, WorkerDestroyed, Close
+  - `Set-PupPageHandler -Page $p -Event Dialog -Action Accept` - Auto-accept dialogs
+  - `Set-PupPageHandler -Page $p -Event Console -ScriptBlock { param($e) Write-Host "$($e.Type): $($e.Text)" }`
+  - `Set-PupPageHandler -Page $p -Event Request -ScriptBlock { param($e) if ($e.Url -match "api") { Write-Host $e.Url } }`
 
 ## Auth & Permissions
-- [ ] **Set-PupPermission** - Camera/mic/location/notifications toggles
+- [x] **Set-PupPagePermission** - Camera/mic/location/notifications toggles
+  - `Set-PupPagePermission -Page $p -Permission "geolocation" -State "Granted"`
+  - Supports: geolocation, notifications, camera, microphone, clipboard-read, clipboard-write, midi, accelerometer, gyroscope, magnetometer, and more
+  - States: Granted, Denied, Prompt
 
 ## Session Portability
 - [x] **Export/Import-PupPageSession** - Bundle cookies + storage to/from file

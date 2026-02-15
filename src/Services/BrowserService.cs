@@ -14,6 +14,8 @@ namespace Pup.Services
     {
         Task<PupPage> CreatePageAsync(string name, int width, int height, string url, bool waitForLoad);
         Task<List<PupPage>> GetPagesAsync();
+        Task<PupPage> WaitForPopupAsync(int timeout, Func<Task> triggerAction = null);
+        Task<PupPage> InitializePopupPageAsync(IPage page);
         bool RemoveBrowser();
         bool StopBrowser();
     }
@@ -109,6 +111,67 @@ namespace Pup.Services
             BrowserStore.Remove(_browser.BrowserType.ToString());
 
             return true;
+        }
+
+        public async Task<PupPage> WaitForPopupAsync(int timeout, Func<Task> triggerAction = null)
+        {
+            var tcs = new TaskCompletionSource<IPage>();
+            var cts = new System.Threading.CancellationTokenSource(timeout);
+
+            EventHandler<TargetChangedArgs> handler = null;
+            handler = async (sender, e) =>
+            {
+                // Only capture pages with an opener (true popups)
+                if (e.Target.Type == TargetType.Page && e.Target.Opener != null)
+                {
+                    try
+                    {
+                        var page = await e.Target.PageAsync().ConfigureAwait(false);
+                        if (page != null && !tcs.Task.IsCompleted)
+                        {
+                            tcs.TrySetResult(page);
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore errors getting page
+                    }
+                }
+            };
+
+            _browser.Browser.TargetCreated += handler;
+
+            try
+            {
+                // Register cancellation
+                cts.Token.Register(() => tcs.TrySetCanceled());
+
+                // Execute trigger action if provided
+                if (triggerAction != null)
+                {
+                    await triggerAction().ConfigureAwait(false);
+                }
+
+                // Wait for the new page
+                var newPage = await tcs.Task.ConfigureAwait(false);
+
+                return await InitializePopupPageAsync(newPage).ConfigureAwait(false);
+            }
+            finally
+            {
+                _browser.Browser.TargetCreated -= handler;
+                cts.Dispose();
+            }
+        }
+
+        public async Task<PupPage> InitializePopupPageAsync(IPage page)
+        {
+            var pupPage = new PupPage(page, await page.GetTitleAsync().ConfigureAwait(false));
+            await ApplyStealthModeAsync(page).ConfigureAwait(false);
+            await ApplyWebSocketTrackerAsync(page).ConfigureAwait(false);
+            await InitializePageCaptureAsync(pupPage).ConfigureAwait(false);
+            pupPage.Url = page.Url;
+            return pupPage;
         }
 
         private async Task InitializePageCaptureAsync(PupPage pupPage)

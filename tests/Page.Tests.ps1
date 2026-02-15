@@ -269,18 +269,18 @@ Describe "Page Dialog Handler" {
     }
 
     AfterAll {
-        Set-PupDialogHandler -Page $script:page -Remove
+        Remove-PupPageHandler -Page $script:page -Event Dialog -ErrorAction SilentlyContinue
         Remove-PupPage -Page $script:page
     }
 
     It "Accepts alert dialogs" {
-        Set-PupDialogHandler -Page $script:page -Action Accept
+        Set-PupPageHandler -Page $script:page -Event Dialog -Action Accept
         $btn = Find-PupElements -Page $script:page -Selector "#btn-alert" -First
         { $btn | Invoke-PupElementClick; Start-Sleep -Milliseconds 200 } | Should -Not -Throw
     }
 
     It "Dismisses confirm dialogs" {
-        Set-PupDialogHandler -Page $script:page -Action Dismiss
+        Set-PupPageHandler -Page $script:page -Event Dialog -Action Dismiss
         $btn = Find-PupElements -Page $script:page -Selector "#btn-confirm" -First
         { $btn | Invoke-PupElementClick; Start-Sleep -Milliseconds 200 } | Should -Not -Throw
     }

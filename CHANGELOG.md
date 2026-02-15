@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-02-15
+
+### Added
+- **Frame support** for working with iframes and nested frames
+  - `Get-PupFrame` - get frames from a page with filtering by `-Name`, `-Url`, `-First`, `-IncludeMain`
+  - `Find-PupElements -Frame` - find elements within a specific frame
+  - `Wait-PupElement -Frame` - wait for elements in a frame
+  - `Invoke-PupScript -Frame` - execute JavaScript in frame context
+  - `Get-PupSource -Frame` - get HTML source from a frame
+- **Event handler system** for browser and page-level events
+  - `Set-PupBrowserHandler` - register handlers for browser events (PopupCreated, PageCreated, PageClosed, Disconnected)
+  - `Get-PupBrowserHandler` - view active browser event handlers
+  - `Remove-PupBrowserHandler` - remove browser event handlers
+  - `Set-PupPageHandler` - register handlers for page events (Dialog, Console, PageError, Load, DOMContentLoaded, Request, Response, FrameNavigated, and more)
+  - `Get-PupPageHandler` - view active page event handlers
+  - `Remove-PupPageHandler` - remove page event handlers
+  - ScriptBlock support for custom event handling logic
+  - Built-in actions (Accept, Dismiss, Ignore) for common scenarios like dialog handling
+
 ## [0.3.2] - 2026-02-12
 
 ### Added

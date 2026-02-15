@@ -1,6 +1,6 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.3.2'
+    ModuleVersion = '0.4.0'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
@@ -20,6 +20,7 @@
         'Export-PupSession',
         'Find-PupElements',
         'Get-PupBrowser',
+        'Get-PupBrowserHandler',
         'Get-PupCertificate',
         'Get-PupConsole',
         'Get-PupCookie',
@@ -31,6 +32,7 @@
         'Get-PupFrame',
         'Get-PupNetwork',
         'Get-PupPage',
+        'Get-PupPageHandler',
         'Get-PupPageScreenshot',
         'Get-PupRecording',
         'Get-PupSource',
@@ -51,19 +53,23 @@
         'Invoke-PupScript',
         'Move-PupPage',
         'New-PupPage',
+        'Remove-PupBrowserHandler',
         'Remove-PupCookie',
         'Remove-PupPage',
+        'Remove-PupPageHandler',
         'Select-PupElementOption',
         'Send-PupFile',
         'Send-PupKey',
         'Send-PupWebSocketMessage',
         'Set-PupCookie',
-        'Set-PupDialogHandler',
         'Set-PupElement',
         'Set-PupElementAttribute',
         'Set-PupElementValue',
+        'Set-PupBrowserHandler',
         'Set-PupHttpAuth',
+        'Set-PupPageHandler',
         'Set-PupHttpHeader',
+        'Set-PupPagePermission',
         'Set-PupStorage',
         'Set-PupViewport',
         'Start-PupBrowser',
@@ -83,10 +89,14 @@
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-v0.3.2
-- Added -Fullscreen and -Maximized options to Start-PupBrowser
-- Browser storage moved to module-scoped static storage (no more variable collision)
-- Added HelpMessage to cmdlet parameters for better documentation
+v0.4.0
+- Added frame support: Get-PupFrame and -Frame parameter for Find-PupElements, Wait-PupElement, Invoke-PupScript, Get-PupSource
+- Added event handler system for browser and page-level events
+- New commands: Set/Get/Remove-PupBrowserHandler and Set/Get/Remove-PupPageHandler
+- Browser events: PopupCreated, PageCreated, PageClosed, Disconnected
+- Page events: Dialog, Console, PageError, Load, Request, Response, and more
+- ScriptBlock support for custom event handling
+- Built-in actions (Accept, Dismiss, Ignore) for dialogs and popups
 
 See CHANGELOG.md for full version history.
 '@
