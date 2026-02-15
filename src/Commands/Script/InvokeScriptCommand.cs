@@ -2,6 +2,7 @@ using System;
 using System.Management.Automation;
 using Pup.Transport;
 using Pup.Commands.Base;
+using Pup.Services;
 
 namespace Pup.Commands.Script
 {
@@ -11,11 +12,21 @@ namespace Pup.Commands.Script
     {
         [Parameter(
             Position = 0,
+            ParameterSetName = "FromPage",
             Mandatory = true,
             ValueFromPipeline = true,
             ValueFromPipelineByPropertyName = true,
             HelpMessage = "The page to run script on")]
         public PupPage Page { get; set; }
+
+        [Parameter(
+            Position = 0,
+            ParameterSetName = "FromFrame",
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The frame to run script on")]
+        public PupFrame Frame { get; set; }
 
         [Parameter(
             Position = 1,
@@ -44,7 +55,6 @@ namespace Pup.Commands.Script
         {
             try
             {
-                var pageService = ServiceFactory.CreatePageService(Page);
                 object result = null;
 
                 // Auto-wrap simple expressions in arrow functions if needed
@@ -56,28 +66,57 @@ namespace Pup.Commands.Script
                     WriteVerbose($"Auto-wrapped expression: {scriptToExecute}");
                 }
 
-                if (AsVoid.IsPresent)
+                if (ParameterSetName == "FromFrame")
                 {
-                    // Execute without return value
-                    pageService.ExecuteScriptAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
-                    WriteVerbose("JavaScript executed successfully (void)");
-                }
-                else if (AsString.IsPresent)
-                {
-                    result = pageService.ExecuteScriptAsync<string>(scriptToExecute, Arguments).GetAwaiter().GetResult();
-                }
-                else if (AsNumber.IsPresent)
-                {
-                    result = pageService.ExecuteScriptAsync<double>(scriptToExecute, Arguments).GetAwaiter().GetResult();
-                }
-                else if (AsBoolean.IsPresent)
-                {
-                    result = pageService.ExecuteScriptAsync<bool>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    var frameService = ServiceFactory.CreateFrameService(Frame);
+
+                    if (AsVoid.IsPresent)
+                    {
+                        frameService.ExecuteScriptAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        WriteVerbose("JavaScript executed successfully (void)");
+                    }
+                    else if (AsString.IsPresent)
+                    {
+                        result = frameService.ExecuteScriptAsync<string>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    }
+                    else if (AsNumber.IsPresent)
+                    {
+                        result = frameService.ExecuteScriptAsync<double>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    }
+                    else if (AsBoolean.IsPresent)
+                    {
+                        result = frameService.ExecuteScriptAsync<bool>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    }
+                    else
+                    {
+                        result = frameService.ExecuteScriptWithConversionAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    }
                 }
                 else
                 {
-                    // Default: execute and convert JsonElement results to PSObjects
-                    result = pageService.ExecuteScriptWithConversionAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    var pageService = ServiceFactory.CreatePageService(Page);
+
+                    if (AsVoid.IsPresent)
+                    {
+                        pageService.ExecuteScriptAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        WriteVerbose("JavaScript executed successfully (void)");
+                    }
+                    else if (AsString.IsPresent)
+                    {
+                        result = pageService.ExecuteScriptAsync<string>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    }
+                    else if (AsNumber.IsPresent)
+                    {
+                        result = pageService.ExecuteScriptAsync<double>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    }
+                    else if (AsBoolean.IsPresent)
+                    {
+                        result = pageService.ExecuteScriptAsync<bool>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    }
+                    else
+                    {
+                        result = pageService.ExecuteScriptWithConversionAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                    }
                 }
 
                 if (result != null || !AsVoid.IsPresent)

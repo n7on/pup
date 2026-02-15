@@ -17,9 +17,12 @@ This document tracks missing functionality and enhancements.
   - `Send-PupWebSocketMessage` - Send messages through WebSocket
 - [x] **In-browser HTTP requests** - Make fetch requests from browser context
   - `Invoke-PupHttpFetch -Page $p -Url "/api/data" -Method POST -Body @{...}`
-- [ ] **iframe support** - Interact with elements inside iframes
-  - `Get-PupFrame` / `Switch-PupFrame` - List and switch iframes
-  - `Find-PupElements -Frame $frame -Selector "..."`
+- [x] **iframe support** - Interact with elements inside iframes
+  - `Get-PupFrame -Page $p -Name "frameName"` - List and filter frames
+  - `Find-PupElements -Frame $frame -Selector "..."` - Find elements in frame
+  - `Wait-PupElement -Frame $frame -Selector "..."` - Wait for elements in frame
+  - `Invoke-PupScript -Frame $frame -Script "..."` - Execute JS in frame context
+  - `Get-PupSource -Frame $frame` - Get frame HTML source
 - [ ] **Multi-tab/popup handling** - Handle OAuth popups, window.open() flows
   - `Get-PupPage -All` - List all pages/tabs
   - Event handler for new popups

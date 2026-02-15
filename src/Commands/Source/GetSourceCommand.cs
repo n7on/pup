@@ -2,6 +2,7 @@ using System;
 using System.Management.Automation;
 using Pup.Transport;
 using Pup.Commands.Base;
+using Pup.Services;
 
 namespace Pup.Commands.Source
 {
@@ -11,11 +12,21 @@ namespace Pup.Commands.Source
     {
         [Parameter(
             Position = 0,
+            ParameterSetName = "FromPage",
             Mandatory = true,
             ValueFromPipeline = true,
             ValueFromPipelineByPropertyName = true,
             HelpMessage = "The page to get HTML source from")]
         public PupPage Page { get; set; }
+
+        [Parameter(
+            Position = 0,
+            ParameterSetName = "FromFrame",
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The frame to get HTML source from")]
+        public PupFrame Frame { get; set; }
 
         [Parameter(HelpMessage = "Save the HTML to a file path")]
         public string FilePath { get; set; }
@@ -24,8 +35,17 @@ namespace Pup.Commands.Source
         {
             try
             {
-                var pageService = ServiceFactory.CreatePageService(Page);
-                var html = pageService.ExecuteScriptAsync<string>("() => document.documentElement.outerHTML").GetAwaiter().GetResult();
+                string html;
+                if (ParameterSetName == "FromFrame")
+                {
+                    var frameService = ServiceFactory.CreateFrameService(Frame);
+                    html = frameService.GetSourceAsync().GetAwaiter().GetResult();
+                }
+                else
+                {
+                    var pageService = ServiceFactory.CreatePageService(Page);
+                    html = pageService.ExecuteScriptAsync<string>("() => document.documentElement.outerHTML").GetAwaiter().GetResult();
+                }
 
                 if (!string.IsNullOrEmpty(FilePath))
                 {

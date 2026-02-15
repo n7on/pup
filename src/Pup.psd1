@@ -28,6 +28,7 @@
         'Get-PupElementScreenshot',
         'Get-PupElementSelector',
         'Get-PupElementValue',
+        'Get-PupFrame',
         'Get-PupNetwork',
         'Get-PupPage',
         'Get-PupPageScreenshot',

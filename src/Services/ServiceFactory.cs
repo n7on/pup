@@ -24,6 +24,11 @@ public static class ServiceFactory
         return elementService;
     }
 
+    public static IFrameService CreateFrameService(PupFrame frame)
+    {
+        return new FrameService(frame);
+    }
+
     public static IRecordingService CreateRecordingService(PupPage page)
     {
         return new RecordingService(page);
