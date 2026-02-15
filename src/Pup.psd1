@@ -1,6 +1,6 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.4.1'
+    ModuleVersion = '0.4.2'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
@@ -90,7 +90,7 @@
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-v0.4.1
+v0.4.2
 - Added frame support: Get-PupFrame and -Frame parameter for Find-PupElements, Wait-PupElement, Invoke-PupScript, Get-PupSource
 - Added event handler system for browser and page-level events
 - New commands: Set/Get/Remove-PupBrowserHandler and Set/Get/Remove-PupPageHandler
