@@ -32,13 +32,17 @@ Install-PupBrowser
 - [Invoke-PupPageForward](./docs/commands/Invoke-PupPageForward.md) - Go forward
 - [Invoke-PupPageReload](./docs/commands/Invoke-PupPageReload.md) - Reload page
 - [Invoke-PupPageScroll](./docs/commands/Invoke-PupPageScroll.md) - Scroll page
-- [Invoke-PupScript](./docs/commands/Invoke-PupScript.md) - Execute JavaScript
+- [Invoke-PupScript](./docs/commands/Invoke-PupScript.md) - Execute JavaScript (supports `-Frame`)
 - [Set-PupViewport](./docs/commands/Set-PupViewport.md) - Set viewport size
-- [Get-PupSource](./docs/commands/Get-PupSource.md) - Get page HTML
+- [Set-PupPagePermission](./docs/commands/Set-PupPagePermission.md) - Set browser permissions
+- [Get-PupSource](./docs/commands/Get-PupSource.md) - Get page HTML (supports `-Frame`)
+
+### Frames
+- [Get-PupFrame](./docs/commands/Get-PupFrame.md) - Get frames/iframes from page
 
 ### Elements
-- [Find-PupElements](./docs/commands/Find-PupElements.md) - Find elements by selector
-- [Wait-PupElement](./docs/commands/Wait-PupElement.md) - Wait for element
+- [Find-PupElements](./docs/commands/Find-PupElements.md) - Find elements by selector (supports `-Frame`)
+- [Wait-PupElement](./docs/commands/Wait-PupElement.md) - Wait for element (supports `-Frame`)
 - [Invoke-PupElementClick](./docs/commands/Invoke-PupElementClick.md) - Click element
 - [Invoke-PupElementHover](./docs/commands/Invoke-PupElementHover.md) - Hover over element
 - [Invoke-PupElementFocus](./docs/commands/Invoke-PupElementFocus.md) - Focus element
@@ -90,12 +94,19 @@ Install-PupBrowser
 - [Send-PupKey](./docs/commands/Send-PupKey.md) - Send keyboard input
 - [Send-PupFile](./docs/commands/Send-PupFile.md) - Upload file
 
+### Event Handlers
+- [Set-PupBrowserHandler](./docs/commands/Set-PupBrowserHandler.md) - Handle browser events (popups, page created/closed)
+- [Get-PupBrowserHandler](./docs/commands/Get-PupBrowserHandler.md) - Get active browser handlers
+- [Remove-PupBrowserHandler](./docs/commands/Remove-PupBrowserHandler.md) - Remove browser handler
+- [Set-PupPageHandler](./docs/commands/Set-PupPageHandler.md) - Handle page events (dialogs, console, requests)
+- [Get-PupPageHandler](./docs/commands/Get-PupPageHandler.md) - Get active page handlers
+- [Remove-PupPageHandler](./docs/commands/Remove-PupPageHandler.md) - Remove page handler
+
 ### Console & Debugging
 - [Enter-PupConsole](./docs/commands/Enter-PupConsole.md) - Interactive console mode
 - [Get-PupConsole](./docs/commands/Get-PupConsole.md) - Get console messages
 - [Invoke-PupCdpMessage](./docs/commands/Invoke-PupCdpMessage.md) - Send raw CDP command
 - [Get-PupCertificate](./docs/commands/Get-PupCertificate.md) - Get page certificate
-- [Set-PupDialogHandler](./docs/commands/Set-PupDialogHandler.md) - Handle dialogs (alert, confirm)
 
 ## Examples
 
