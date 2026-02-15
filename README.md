@@ -34,11 +34,14 @@ Install-PupBrowser
 - [Invoke-PupPageScroll](./docs/commands/Invoke-PupPageScroll.md) - Scroll page
 - [Invoke-PupScript](./docs/commands/Invoke-PupScript.md) - Execute JavaScript (supports `-Frame`)
 - [Set-PupViewport](./docs/commands/Set-PupViewport.md) - Set viewport size
-- [Set-PupPagePermission](./docs/commands/Set-PupPagePermission.md) - Set browser permissions
 - [Get-PupSource](./docs/commands/Get-PupSource.md) - Get page HTML (supports `-Frame`)
 
 ### Frames
 - [Get-PupFrame](./docs/commands/Get-PupFrame.md) - Get frames/iframes from page
+
+### Permissions
+- [Set-PupPermission](./docs/commands/Set-PupPermission.md) - Set browser permissions (geolocation, notifications, etc.)
+- [Get-PupPermission](./docs/commands/Get-PupPermission.md) - Get browser permission state
 
 ### Elements
 - [Find-PupElements](./docs/commands/Find-PupElements.md) - Find elements by selector (supports `-Frame`)

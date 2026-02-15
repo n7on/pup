@@ -11,9 +11,9 @@ AfterAll {
     if ($script:browser.Running) { Stop-PupBrowser -Browser $script:browser }
 }
 
-Describe "Set-PupPagePermission" {
+Describe "Set-PupPermission" {
     It "Command exists with correct parameters" {
-        $cmd = Get-Command Set-PupPagePermission -ErrorAction SilentlyContinue
+        $cmd = Get-Command Set-PupPermission -ErrorAction SilentlyContinue
         $cmd | Should -Not -BeNullOrEmpty
         $cmd.Parameters.Keys | Should -Contain "Page"
         $cmd.Parameters.Keys | Should -Contain "Permission"
@@ -22,7 +22,7 @@ Describe "Set-PupPagePermission" {
     }
 
     It "Permission parameter has ValidateSet" {
-        $cmd = Get-Command Set-PupPagePermission
+        $cmd = Get-Command Set-PupPermission
         $permParam = $cmd.Parameters["Permission"]
         $validateSet = $permParam.Attributes | Where-Object { $_.TypeId.Name -eq "ValidateSetAttribute" }
         $validateSet | Should -Not -BeNullOrEmpty
@@ -33,7 +33,7 @@ Describe "Set-PupPagePermission" {
     }
 
     It "State parameter has ValidateSet" {
-        $cmd = Get-Command Set-PupPagePermission
+        $cmd = Get-Command Set-PupPermission
         $stateParam = $cmd.Parameters["State"]
         $validateSet = $stateParam.Attributes | Where-Object { $_.TypeId.Name -eq "ValidateSetAttribute" }
         $validateSet | Should -Not -BeNullOrEmpty
@@ -43,57 +43,94 @@ Describe "Set-PupPagePermission" {
     }
 
     It "Sets geolocation permission to granted" {
-        { Set-PupPagePermission -Page $script:page -Permission "geolocation" -State "Granted" } | Should -Not -Throw
+        { Set-PupPermission -Page $script:page -Permission "geolocation" -State "Granted" } | Should -Not -Throw
     }
 
     It "Sets notifications permission to denied" {
-        { Set-PupPagePermission -Page $script:page -Permission "notifications" -State "Denied" } | Should -Not -Throw
+        { Set-PupPermission -Page $script:page -Permission "notifications" -State "Denied" } | Should -Not -Throw
     }
 
     It "Sets camera permission to prompt" {
-        { Set-PupPagePermission -Page $script:page -Permission "camera" -State "Prompt" } | Should -Not -Throw
+        { Set-PupPermission -Page $script:page -Permission "camera" -State "Prompt" } | Should -Not -Throw
     }
 
     It "Sets microphone permission" {
-        { Set-PupPagePermission -Page $script:page -Permission "microphone" -State "Granted" } | Should -Not -Throw
+        { Set-PupPermission -Page $script:page -Permission "microphone" -State "Granted" } | Should -Not -Throw
     }
 
     It "Sets clipboard-read permission" {
-        { Set-PupPagePermission -Page $script:page -Permission "clipboard-read" -State "Granted" } | Should -Not -Throw
+        { Set-PupPermission -Page $script:page -Permission "clipboard-read" -State "Granted" } | Should -Not -Throw
     }
 
     It "Sets midi permission" {
-        { Set-PupPagePermission -Page $script:page -Permission "midi" -State "Granted" } | Should -Not -Throw
+        { Set-PupPermission -Page $script:page -Permission "midi" -State "Granted" } | Should -Not -Throw
     }
 
     It "Permission parameter is case-insensitive" {
-        { Set-PupPagePermission -Page $script:page -Permission "GEOLOCATION" -State "granted" } | Should -Not -Throw
+        { Set-PupPermission -Page $script:page -Permission "GEOLOCATION" -State "granted" } | Should -Not -Throw
     }
 
     It "State parameter is case-insensitive" {
-        { Set-PupPagePermission -Page $script:page -Permission "geolocation" -State "GRANTED" } | Should -Not -Throw
+        { Set-PupPermission -Page $script:page -Permission "geolocation" -State "GRANTED" } | Should -Not -Throw
     }
 
     It "Rejects invalid permission value" {
-        { Set-PupPagePermission -Page $script:page -Permission "invalid-perm" -State "Granted" } | Should -Throw
+        { Set-PupPermission -Page $script:page -Permission "invalid-perm" -State "Granted" } | Should -Throw
     }
 
     It "Rejects invalid state value" {
-        { Set-PupPagePermission -Page $script:page -Permission "geolocation" -State "allow" } | Should -Throw
+        { Set-PupPermission -Page $script:page -Permission "geolocation" -State "allow" } | Should -Throw
     }
 
     It "Supports pipeline input for Page" {
-        { $script:page | Set-PupPagePermission -Permission "geolocation" -State "Granted" } | Should -Not -Throw
+        { $script:page | Set-PupPermission -Permission "geolocation" -State "Granted" } | Should -Not -Throw
     }
 
     It "Can set permission with explicit origin" {
-        { Set-PupPagePermission -Page $script:page -Permission "geolocation" -State "Granted" -Origin "https://example.com" } | Should -Not -Throw
+        { Set-PupPermission -Page $script:page -Permission "geolocation" -State "Granted" -Origin "https://example.com" } | Should -Not -Throw
+    }
+}
+
+Describe "Get-PupPermission" {
+    It "Command exists with correct parameters" {
+        $cmd = Get-Command Get-PupPermission -ErrorAction SilentlyContinue
+        $cmd | Should -Not -BeNullOrEmpty
+        $cmd.Parameters.Keys | Should -Contain "Page"
+        $cmd.Parameters.Keys | Should -Contain "Permission"
+        $cmd.Parameters.Keys | Should -Contain "Origin"
+    }
+
+    It "Gets single permission state" {
+        Set-PupPermission -Page $script:page -Permission "notifications" -State "Denied"
+        $result = Get-PupPermission -Page $script:page -Permission "notifications"
+        $result | Should -Not -BeNullOrEmpty
+        $result.Permission | Should -Be "notifications"
+        # State should be one of: granted, denied, prompt, unsupported
+        $result.State | Should -BeIn @("granted", "denied", "prompt", "unsupported")
+    }
+
+    It "Gets all permissions when no specific permission specified" {
+        $results = Get-PupPermission -Page $script:page
+        $results | Should -Not -BeNullOrEmpty
+        $results.Count | Should -BeGreaterThan 1
+    }
+
+    It "Returns objects with Permission, State, and Origin properties" {
+        $result = Get-PupPermission -Page $script:page -Permission "notifications"
+        $result.PSObject.Properties.Name | Should -Contain "Permission"
+        $result.PSObject.Properties.Name | Should -Contain "State"
+        $result.PSObject.Properties.Name | Should -Contain "Origin"
+    }
+
+    It "Supports pipeline input for Page" {
+        $result = $script:page | Get-PupPermission -Permission "geolocation"
+        $result | Should -Not -BeNullOrEmpty
     }
 }
 
 Describe "Permission Effect Verification" {
     It "Granted geolocation allows navigator.geolocation" {
-        Set-PupPagePermission -Page $script:page -Permission "geolocation" -State "Granted"
+        Set-PupPermission -Page $script:page -Permission "geolocation" -State "Granted"
 
         # Check that geolocation API is accessible (won't throw permission error)
         $hasGeolocation = Invoke-PupScript -Page $script:page -Script "() => 'geolocation' in navigator" -AsBoolean
@@ -101,7 +138,7 @@ Describe "Permission Effect Verification" {
     }
 
     It "Can query permission state via JavaScript" {
-        Set-PupPagePermission -Page $script:page -Permission "notifications" -State "Denied"
+        Set-PupPermission -Page $script:page -Permission "notifications" -State "Denied"
 
         $state = Invoke-PupScript -Page $script:page -Script @"
             async () => {
@@ -111,5 +148,13 @@ Describe "Permission Effect Verification" {
 "@ -AsString
 
         $state | Should -Be "denied"
+    }
+
+    It "Get-PupPermission returns valid state for notifications" {
+        Set-PupPermission -Page $script:page -Permission "notifications" -State "Denied"
+
+        $pupResult = Get-PupPermission -Page $script:page -Permission "notifications"
+        # The Permissions API should return a valid state
+        $pupResult.State | Should -BeIn @("granted", "denied", "prompt", "unsupported")
     }
 }

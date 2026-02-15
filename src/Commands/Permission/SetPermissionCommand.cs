@@ -4,11 +4,11 @@ using System.Management.Automation;
 using Pup.Transport;
 using Pup.Commands.Base;
 
-namespace Pup.Commands.Page
+namespace Pup.Commands.Permission
 {
-    [Cmdlet(VerbsCommon.Set, "PupPagePermission")]
+    [Cmdlet(VerbsCommon.Set, "PupPermission")]
     [OutputType(typeof(void))]
-    public class SetPagePermissionCommand : PupBaseCommand
+    public class SetPermissionCommand : PupBaseCommand
     {
         [Parameter(
             Position = 0,
@@ -57,23 +57,11 @@ namespace Pup.Commands.Page
             try
             {
                 // Map friendly names to CDP permission names
-                var cdpPermission = MapPermissionName(Permission.ToLowerInvariant());
+                var cdpPermission = PermissionHelper.MapPermissionName(Permission.ToLowerInvariant());
                 var cdpState = State.ToLowerInvariant();
 
                 // Get origin from page if not specified
-                var origin = Origin;
-                if (string.IsNullOrEmpty(origin))
-                {
-                    var pageUrl = Page.Page.Url;
-                    if (!string.IsNullOrEmpty(pageUrl) && Uri.TryCreate(pageUrl, UriKind.Absolute, out var uri))
-                    {
-                        origin = $"{uri.Scheme}://{uri.Host}";
-                        if (!uri.IsDefaultPort)
-                        {
-                            origin += $":{uri.Port}";
-                        }
-                    }
-                }
+                var origin = Origin ?? PermissionHelper.GetOriginFromPage(Page);
 
                 // Use CDP to set permission
                 var client = Page.Page.Client;
@@ -97,11 +85,14 @@ namespace Pup.Commands.Page
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "SetPagePermissionFailed", ErrorCategory.OperationStopped, Permission));
+                WriteError(new ErrorRecord(ex, "SetPermissionFailed", ErrorCategory.OperationStopped, Permission));
             }
         }
+    }
 
-        private static string MapPermissionName(string permission)
+    internal static class PermissionHelper
+    {
+        public static string MapPermissionName(string permission)
         {
             // Modern Chrome accepts web permission API names directly
             // Only map names that differ between user-friendly and CDP format
@@ -119,5 +110,41 @@ namespace Pup.Commands.Page
                 _ => permission // Most names pass through directly
             };
         }
+
+        public static string GetOriginFromPage(PupPage page)
+        {
+            var pageUrl = page.Page.Url;
+            if (!string.IsNullOrEmpty(pageUrl) && Uri.TryCreate(pageUrl, UriKind.Absolute, out var uri))
+            {
+                var origin = $"{uri.Scheme}://{uri.Host}";
+                if (!uri.IsDefaultPort)
+                {
+                    origin += $":{uri.Port}";
+                }
+                return origin;
+            }
+            return null;
+        }
+
+        public static readonly string[] AllPermissions = new[]
+        {
+            "geolocation",
+            "notifications",
+            "camera",
+            "microphone",
+            "clipboard-read",
+            "clipboard-write",
+            "midi",
+            "midi-sysex",
+            "background-sync",
+            "accelerometer",
+            "gyroscope",
+            "magnetometer",
+            "accessibility-events",
+            "payment-handler",
+            "idle-detection",
+            "screen-wake-lock",
+            "storage-access"
+        };
     }
 }

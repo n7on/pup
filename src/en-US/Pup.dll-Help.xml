@@ -2583,40 +2583,81 @@ if (-not $handler) {
     </command:examples>
   </command:command>
 
-  <!-- Set-PupPagePermission -->
+  <!-- Set-PupPermission -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>
-      <command:name>Set-PupPagePermission</command:name>
+      <command:name>Set-PupPermission</command:name>
       <command:verb>Set</command:verb>
-      <command:noun>PupPagePermission</command:noun>
+      <command:noun>PupPermission</command:noun>
       <maml:description>
         <maml:para>Sets browser permissions for a page.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Overrides browser permission prompts for the page. This allows automation of features that normally require user permission like geolocation, notifications, camera, and clipboard access.</maml:para>
+      <maml:para>Overrides browser permission prompts for the page. This allows automation of features that normally require user permission like geolocation, notifications, camera, and clipboard access. Permissions are set per page/origin.</maml:para>
     </maml:description>
     <command:examples>
       <command:example>
         <maml:title>Example 1: Grant geolocation permission</maml:title>
-        <dev:code>Set-PupPagePermission -Page $page -Permission geolocation -State Granted</dev:code>
+        <dev:code>Set-PupPermission -Page $page -Permission geolocation -State Granted</dev:code>
         <dev:remarks>
           <maml:para>Allows the page to access geolocation without prompting.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 2: Deny notification permission</maml:title>
-        <dev:code>Set-PupPagePermission -Page $page -Permission notifications -State Denied</dev:code>
+        <dev:code>Set-PupPermission -Page $page -Permission notifications -State Denied</dev:code>
         <dev:remarks>
           <maml:para>Blocks notification requests from the page.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>Example 3: Grant clipboard access</maml:title>
-        <dev:code>Set-PupPagePermission -Page $page -Permission clipboard-read -State Granted
-Set-PupPagePermission -Page $page -Permission clipboard-write -State Granted</dev:code>
+        <dev:code>Set-PupPermission -Page $page -Permission clipboard-read -State Granted
+Set-PupPermission -Page $page -Permission clipboard-write -State Granted</dev:code>
         <dev:remarks>
           <maml:para>Allows the page to read from and write to the clipboard.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupPermission -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupPermission</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>PupPermission</command:noun>
+      <maml:description>
+        <maml:para>Gets browser permissions for a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Queries the current state of browser permissions for the page. Returns granted, denied, or prompt status. If no specific permission is specified, returns all permissions.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all permissions</maml:title>
+        <dev:code>Get-PupPermission -Page $page</dev:code>
+        <dev:remarks>
+          <maml:para>Returns the state of all supported permissions for the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Get specific permission</maml:title>
+        <dev:code>Get-PupPermission -Page $page -Permission geolocation</dev:code>
+        <dev:remarks>
+          <maml:para>Returns the current state of the geolocation permission.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Check before setting</maml:title>
+        <dev:code>$perm = Get-PupPermission -Page $page -Permission notifications
+if ($perm.State -eq 'prompt') {
+    Set-PupPermission -Page $page -Permission notifications -State Granted
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Only sets permission if it hasn't been set yet.</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
