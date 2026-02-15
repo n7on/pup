@@ -8,7 +8,7 @@ schema: 2.0.0
 # Set-PupPageHandler
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Sets an event handler for page events.
 
 ## SYNTAX
 
@@ -25,16 +25,60 @@ Set-PupPageHandler [-Page] <PupPage> [-Event] <PupPageEvent> [-Action] <PupHandl
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Registers an event handler for page-level events like dialogs, console messages, network requests, and more.
+Use -Action for built-in behaviors (Accept/Dismiss/Ignore) or -ScriptBlock for custom handling.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### Example 1: Auto-accept alert dialogs
+```
+PS C:\> Set-PupPageHandler -Page $page -Event Dialog -Action Accept
+PS C:\> # Now any alert/confirm/prompt dialogs will be automatically accepted
 ```
 
-{{ Add example description here }}
+Automatically accepts all dialogs on the page.
+
+### Example 2: Auto-dismiss dialogs
+```
+PS C:\> Set-PupPageHandler -Page $page -Event Dialog -Action Dismiss
+```
+
+Automatically dismisses (cancels) all dialogs.
+
+### Example 3: Custom dialog handler
+```
+PS C:\> Set-PupPageHandler -Page $page -Event Dialog -ScriptBlock {
+    param($e)
+    if ($e.Type -eq 'prompt') {
+        $e.Accept("my answer")
+    } else {
+        $e.Dismiss()
+    }
+}
+```
+
+Handles dialogs with custom logic based on dialog type.
+
+### Example 4: Capture console messages
+```
+PS C:\> $global:logs = @()
+PS C:\> Set-PupPageHandler -Page $page -Event Console -ScriptBlock {
+    param($e)
+    $global:logs += $e.Text
+}
+```
+
+Captures all console.log messages from the page.
+
+### Example 5: Monitor network requests
+```
+PS C:\> Set-PupPageHandler -Page $page -Event Request -ScriptBlock {
+    param($e)
+    Write-Host "Request: $($e.Method) $($e.Url)"
+}
+```
+
+Logs all network requests made by the page.
 
 ## PARAMETERS
 
@@ -102,7 +146,7 @@ Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-{{ Fill ProgressAction Description }}
+Controls how the cmdlet responds to progress updates.
 
 ```yaml
 Type: ActionPreference

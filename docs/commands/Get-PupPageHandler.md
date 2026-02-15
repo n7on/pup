@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-PupPageHandler
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Gets active page event handlers.
 
 ## SYNTAX
 
@@ -18,16 +18,32 @@ Get-PupPageHandler [-Page] <PupPage> [[-Event] <PupPageEvent>] [-ProgressAction 
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Returns information about event handlers currently registered on the page.
+Shows the event type, action (if using built-in action), and whether a ScriptBlock is attached.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### Example 1: Get all page handlers
+```
+PS C:\> Get-PupPageHandler -Page $page
+
+Event   Action HasScriptBlock
+-----   ------ --------------
+Dialog  Accept          False
+Console               True
 ```
 
-{{ Add example description here }}
+Lists all active page event handlers.
+
+### Example 2: Check for dialog handler
+```
+PS C:\> $handler = Get-PupPageHandler -Page $page -Event Dialog
+PS C:\> if (-not $handler) {
+    Set-PupPageHandler -Page $page -Event Dialog -Action Accept
+}
+```
+
+Sets a dialog handler only if one isn't already registered.
 
 ## PARAMETERS
 
@@ -63,7 +79,7 @@ Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-{{ Fill ProgressAction Description }}
+Controls how the cmdlet responds to progress updates.
 
 ```yaml
 Type: ActionPreference

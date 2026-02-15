@@ -12,8 +12,16 @@ Waits for an element to appear or meet a condition.
 
 ## SYNTAX
 
+### FromPage
 ```
 Wait-PupElement -Page <PupPage> -Selector <String> [-Timeout <Int32>] [-PollingInterval <Int32>] [-Visible]
+ [-Hidden] [-Enabled] [-Disabled] [-TextContains <String>] [-AttributeValue <String>] [-AttributeName <String>]
+ [-PassThru] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+### FromFrame
+```
+Wait-PupElement -Frame <PupFrame> -Selector <String> [-Timeout <Int32>] [-PollingInterval <Int32>] [-Visible]
  [-Hidden] [-Enabled] [-Disabled] [-TextContains <String>] [-AttributeValue <String>] [-AttributeName <String>]
  [-PassThru] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
@@ -96,7 +104,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -111,7 +119,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -126,7 +134,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -136,7 +144,7 @@ The page to wait for element on
 
 ```yaml
 Type: PupPage
-Parameter Sets: (All)
+Parameter Sets: FromPage
 Aliases:
 
 Required: True
@@ -156,7 +164,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -246,8 +254,23 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Frame
+The frame to wait for element on
+
+```yaml
+Type: PupFrame
+Parameter Sets: FromFrame
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 

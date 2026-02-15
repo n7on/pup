@@ -12,9 +12,16 @@ Executes JavaScript code in the page context.
 
 ## SYNTAX
 
+### FromPage
 ```
 Invoke-PupScript -Page <PupPage> -Script <String> [-Arguments <Object[]>] [-AsString] [-AsNumber] [-AsBoolean]
  [-AsVoid] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+### FromFrame
+```
+Invoke-PupScript -Frame <PupFrame> -Script <String> [-Arguments <Object[]>] [-AsString] [-AsNumber]
+ [-AsBoolean] [-AsVoid] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -78,7 +85,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -93,7 +100,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -108,7 +115,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -123,7 +130,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -133,7 +140,7 @@ The page to run script on
 
 ```yaml
 Type: PupPage
-Parameter Sets: (All)
+Parameter Sets: FromPage
 Aliases:
 
 Required: True
@@ -170,6 +177,21 @@ Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Frame
+The frame to run script on
+
+```yaml
+Type: PupFrame
+Parameter Sets: FromFrame
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 

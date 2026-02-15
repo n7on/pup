@@ -8,7 +8,7 @@ schema: 2.0.0
 # Remove-PupPageHandler
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Removes a page event handler.
 
 ## SYNTAX
 
@@ -18,16 +18,30 @@ Remove-PupPageHandler [-Page] <PupPage> [-Event] <PupPageEvent> [-ProgressAction
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Removes a previously registered event handler from the page.
+After removal, the event will no longer trigger any custom behavior.
+For Dialog events, this means dialogs will block until manually handled.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### Example 1: Remove dialog handler
+```
+PS C:\> Remove-PupPageHandler -Page $page -Event Dialog
 ```
 
-{{ Add example description here }}
+Removes the dialog handler.
+Dialogs will now require manual handling.
+
+### Example 2: Clean up console capture
+```
+PS C:\> # Start capturing console
+PS C:\> Set-PupPageHandler -Page $page -Event Console -ScriptBlock { ... }
+PS C:\> # ... run tests ...
+PS C:\> # Stop capturing
+PS C:\> Remove-PupPageHandler -Page $page -Event Console
+```
+
+Removes the console handler when logging is no longer needed.
 
 ## PARAMETERS
 
@@ -63,7 +77,7 @@ Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-{{ Fill ProgressAction Description }}
+Controls how the cmdlet responds to progress updates.
 
 ```yaml
 Type: ActionPreference

@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-PupBrowserHandler
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Gets active browser event handlers.
 
 ## SYNTAX
 
@@ -18,16 +18,30 @@ Get-PupBrowserHandler [[-Event] <PupBrowserEvent>] [[-Browser] <PupBrowser>] [-B
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Returns information about event handlers currently registered on the browser.
+Shows the event type, action (if using built-in action), and whether a ScriptBlock is attached.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### Example 1: Get all browser handlers
+```
+PS C:\> Get-PupBrowserHandler -Browser $browser
+
+Event         Action HasScriptBlock
+-----         ------ --------------
+PopupCreated Dismiss          False
+PageCreated               True
 ```
 
-{{ Add example description here }}
+Lists all active browser event handlers.
+
+### Example 2: Check if specific handler exists
+```
+PS C:\> $handler = Get-PupBrowserHandler -Browser $browser -Event PopupCreated
+PS C:\> if ($handler) { "Popup handler is set" }
+```
+
+Checks if a handler is registered for a specific event.
 
 ## PARAMETERS
 
@@ -78,7 +92,7 @@ Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-{{ Fill ProgressAction Description }}
+Controls how the cmdlet responds to progress updates.
 
 ```yaml
 Type: ActionPreference

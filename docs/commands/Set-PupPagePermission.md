@@ -8,7 +8,7 @@ schema: 2.0.0
 # Set-PupPagePermission
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Sets browser permissions for a page.
 
 ## SYNTAX
 
@@ -18,16 +18,40 @@ Set-PupPagePermission [-Page] <PupPage> [-Permission] <String> [-State] <String>
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Overrides browser permission prompts for the page.
+This allows automation of features that normally require user permission like geolocation, notifications, camera, and clipboard access.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### Example 1: Grant geolocation permission
+```
+PS C:\> Set-PupPagePermission -Page $page -Permission geolocation -State Granted
 ```
 
-{{ Add example description here }}
+Allows the page to access geolocation without prompting.
+
+### Example 2: Deny notification permission
+```
+PS C:\> Set-PupPagePermission -Page $page -Permission notifications -State Denied
+```
+
+Blocks notification requests from the page.
+
+### Example 3: Grant clipboard access
+```
+PS C:\> Set-PupPagePermission -Page $page -Permission clipboard-read -State Granted
+PS C:\> Set-PupPagePermission -Page $page -Permission clipboard-write -State Granted
+```
+
+Allows the page to read from and write to the clipboard.
+
+### Example 4: Grant camera and microphone
+```
+PS C:\> Set-PupPagePermission -Page $page -Permission camera -State Granted
+PS C:\> Set-PupPagePermission -Page $page -Permission microphone -State Granted
+```
+
+Allows the page to access camera and microphone for video calls.
 
 ## PARAMETERS
 
@@ -94,7 +118,7 @@ Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-{{ Fill ProgressAction Description }}
+Controls how the cmdlet responds to progress updates.
 
 ```yaml
 Type: ActionPreference

@@ -8,7 +8,7 @@ schema: 2.0.0
 # Remove-PupBrowserHandler
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Removes a browser event handler.
 
 ## SYNTAX
 
@@ -18,16 +18,28 @@ Remove-PupBrowserHandler [-Event] <PupBrowserEvent> [[-Browser] <PupBrowser>] [-
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Removes a previously registered event handler from the browser.
+After removal, the event will no longer trigger any custom behavior.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### Example 1: Remove popup handler
+```
+PS C:\> Remove-PupBrowserHandler -Browser $browser -Event PopupCreated
 ```
 
-{{ Add example description here }}
+Removes the popup handler, allowing popups to open normally again.
+
+### Example 2: Remove handler after task completion
+```
+PS C:\> # Set up handler for OAuth flow
+PS C:\> Set-PupBrowserHandler -Browser $browser -Event PopupCreated -ScriptBlock { ... }
+PS C:\> # ... perform OAuth ...
+PS C:\> # Clean up when done
+PS C:\> Remove-PupBrowserHandler -Browser $browser -Event PopupCreated
+```
+
+Removes the handler after it's no longer needed.
 
 ## PARAMETERS
 
@@ -78,7 +90,7 @@ Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-{{ Fill ProgressAction Description }}
+Controls how the cmdlet responds to progress updates.
 
 ```yaml
 Type: ActionPreference

@@ -37,11 +37,8 @@ Documentation is generated using [PlatyPS](https://github.com/PowerShell/platyPS
 Install-Module PlatyPS -Scope CurrentUser
 
 # Generate markdown from loaded module
-Import-Module ./output/Pup/Pup.psd1
-New-MarkdownHelp -Module Pup -OutputFolder ./docs/commands -Force
+pwsh -Command "Import-Module ./output/Pup/Pup.psd1; New-MarkdownHelp -Module Pup -OutputFolder ./docs/commands -Force"
 
-# Generate MAML from markdown (for Get-Help)
-New-ExternalHelp -Path ./docs/commands -OutputPath ./src/en-US -Force
 ```
 
 ## Releasing a New Version

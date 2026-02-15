@@ -2303,4 +2303,323 @@ $script = $events | ConvertTo-PupScript</dev:code>
     </command:examples>
   </command:command>
 
+  <!-- Get-PupFrame -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupFrame</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>PupFrame</command:noun>
+      <maml:description>
+        <maml:para>Gets frames (iframes) from a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns child frames (iframes) from a page. By default excludes the main frame. Use -IncludeMain to include it. Frames can be filtered by name or URL pattern. The returned frame objects can be used with Find-PupElements, Wait-PupElement, Invoke-PupScript, and Get-PupSource.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all frames from a page</maml:title>
+        <dev:code>$frames = Get-PupFrame -Page $page
+$frames.Count</dev:code>
+        <dev:remarks>
+          <maml:para>Returns all child frames (iframes) from the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Get frame by name</maml:title>
+        <dev:code>$frame = Get-PupFrame -Page $page -Name "contentFrame" -First</dev:code>
+        <dev:remarks>
+          <maml:para>Gets a specific frame by its name attribute.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Find elements within a frame</maml:title>
+        <dev:code>$frame = $page | Get-PupFrame -Name "loginFrame" -First
+$input = Find-PupElements -Frame $frame -Selector "#username" -First
+$input | Set-PupElement -Text "user@example.com"</dev:code>
+        <dev:remarks>
+          <maml:para>Gets a frame and interacts with elements inside it.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Filter frames by URL</maml:title>
+        <dev:code>$frames = Get-PupFrame -Page $page -Url "*ads*"</dev:code>
+        <dev:remarks>
+          <maml:para>Gets all frames whose URL contains "ads".</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupBrowserHandler -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupBrowserHandler</command:name>
+      <command:verb>Set</command:verb>
+      <command:noun>PupBrowserHandler</command:noun>
+      <maml:description>
+        <maml:para>Sets an event handler for browser-level events.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Registers an event handler for browser-level events like popup windows, new pages, page closures, and disconnection. Use -Action Dismiss to auto-close popups, or -ScriptBlock for custom handling.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Auto-dismiss popups</maml:title>
+        <dev:code>Set-PupBrowserHandler -Browser $browser -Event PopupCreated -Action Dismiss</dev:code>
+        <dev:remarks>
+          <maml:para>Automatically closes any popup windows opened by the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Capture popup for OAuth flow</maml:title>
+        <dev:code>$global:popup = $null
+Set-PupBrowserHandler -Browser $browser -Event PopupCreated -ScriptBlock {
+    param($e)
+    $global:popup = $e.Page
+}
+# Click button that opens OAuth popup
+Find-PupElements -Page $page -Selector "#login-oauth" | Invoke-PupElementClick
+Start-Sleep -Milliseconds 500
+# Now interact with the popup
+Find-PupElements -Page $global:popup -Selector "#approve" | Invoke-PupElementClick</dev:code>
+        <dev:remarks>
+          <maml:para>Captures popup windows for multi-window workflows like OAuth.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Track new pages</maml:title>
+        <dev:code>$global:pages = @()
+Set-PupBrowserHandler -Browser $browser -Event PageCreated -ScriptBlock {
+    param($e)
+    $global:pages += $e.Page
+    Write-Host "New page opened: $($e.Page.Url)"
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Tracks all new pages/tabs opened in the browser.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupBrowserHandler -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupBrowserHandler</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>PupBrowserHandler</command:noun>
+      <maml:description>
+        <maml:para>Gets active browser event handlers.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns information about event handlers currently registered on the browser. Shows the event type, action (if using built-in action), and whether a ScriptBlock is attached.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all browser handlers</maml:title>
+        <dev:code>Get-PupBrowserHandler -Browser $browser</dev:code>
+        <dev:remarks>
+          <maml:para>Lists all active browser event handlers.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Check if specific handler exists</maml:title>
+        <dev:code>$handler = Get-PupBrowserHandler -Browser $browser -Event PopupCreated
+if ($handler) { "Popup handler is set" }</dev:code>
+        <dev:remarks>
+          <maml:para>Checks if a handler is registered for a specific event.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Remove-PupBrowserHandler -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Remove-PupBrowserHandler</command:name>
+      <command:verb>Remove</command:verb>
+      <command:noun>PupBrowserHandler</command:noun>
+      <maml:description>
+        <maml:para>Removes a browser event handler.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Removes a previously registered event handler from the browser. After removal, the event will no longer trigger any custom behavior.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Remove popup handler</maml:title>
+        <dev:code>Remove-PupBrowserHandler -Browser $browser -Event PopupCreated</dev:code>
+        <dev:remarks>
+          <maml:para>Removes the popup handler, allowing popups to open normally again.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupPageHandler -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupPageHandler</command:name>
+      <command:verb>Set</command:verb>
+      <command:noun>PupPageHandler</command:noun>
+      <maml:description>
+        <maml:para>Sets an event handler for page events.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Registers an event handler for page-level events like dialogs, console messages, network requests, and more. Use -Action for built-in behaviors (Accept/Dismiss/Ignore) or -ScriptBlock for custom handling.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Auto-accept alert dialogs</maml:title>
+        <dev:code>Set-PupPageHandler -Page $page -Event Dialog -Action Accept</dev:code>
+        <dev:remarks>
+          <maml:para>Automatically accepts all dialogs on the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Auto-dismiss dialogs</maml:title>
+        <dev:code>Set-PupPageHandler -Page $page -Event Dialog -Action Dismiss</dev:code>
+        <dev:remarks>
+          <maml:para>Automatically dismisses (cancels) all dialogs.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Custom dialog handler</maml:title>
+        <dev:code>Set-PupPageHandler -Page $page -Event Dialog -ScriptBlock {
+    param($e)
+    if ($e.Type -eq 'prompt') {
+        $e.Accept("my answer")
+    } else {
+        $e.Dismiss()
+    }
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Handles dialogs with custom logic based on dialog type.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Capture console messages</maml:title>
+        <dev:code>$global:logs = @()
+Set-PupPageHandler -Page $page -Event Console -ScriptBlock {
+    param($e)
+    $global:logs += $e.Text
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Captures all console.log messages from the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 5: Monitor network requests</maml:title>
+        <dev:code>Set-PupPageHandler -Page $page -Event Request -ScriptBlock {
+    param($e)
+    Write-Host "Request: $($e.Method) $($e.Url)"
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Logs all network requests made by the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Get-PupPageHandler -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-PupPageHandler</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>PupPageHandler</command:noun>
+      <maml:description>
+        <maml:para>Gets active page event handlers.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns information about event handlers currently registered on the page. Shows the event type, action (if using built-in action), and whether a ScriptBlock is attached.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Get all page handlers</maml:title>
+        <dev:code>Get-PupPageHandler -Page $page</dev:code>
+        <dev:remarks>
+          <maml:para>Lists all active page event handlers.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Check for dialog handler</maml:title>
+        <dev:code>$handler = Get-PupPageHandler -Page $page -Event Dialog
+if (-not $handler) {
+    Set-PupPageHandler -Page $page -Event Dialog -Action Accept
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Sets a dialog handler only if one isn't already registered.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Remove-PupPageHandler -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Remove-PupPageHandler</command:name>
+      <command:verb>Remove</command:verb>
+      <command:noun>PupPageHandler</command:noun>
+      <maml:description>
+        <maml:para>Removes a page event handler.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Removes a previously registered event handler from the page. After removal, the event will no longer trigger any custom behavior. For Dialog events, this means dialogs will block until manually handled.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Remove dialog handler</maml:title>
+        <dev:code>Remove-PupPageHandler -Page $page -Event Dialog</dev:code>
+        <dev:remarks>
+          <maml:para>Removes the dialog handler. Dialogs will now require manual handling.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupPagePermission -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupPagePermission</command:name>
+      <command:verb>Set</command:verb>
+      <command:noun>PupPagePermission</command:noun>
+      <maml:description>
+        <maml:para>Sets browser permissions for a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Overrides browser permission prompts for the page. This allows automation of features that normally require user permission like geolocation, notifications, camera, and clipboard access.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Grant geolocation permission</maml:title>
+        <dev:code>Set-PupPagePermission -Page $page -Permission geolocation -State Granted</dev:code>
+        <dev:remarks>
+          <maml:para>Allows the page to access geolocation without prompting.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Deny notification permission</maml:title>
+        <dev:code>Set-PupPagePermission -Page $page -Permission notifications -State Denied</dev:code>
+        <dev:remarks>
+          <maml:para>Blocks notification requests from the page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Grant clipboard access</maml:title>
+        <dev:code>Set-PupPagePermission -Page $page -Permission clipboard-read -State Granted
+Set-PupPagePermission -Page $page -Permission clipboard-write -State Granted</dev:code>
+        <dev:remarks>
+          <maml:para>Allows the page to read from and write to the clipboard.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
 </helpItems>

@@ -8,7 +8,7 @@ schema: 2.0.0
 # Set-PupBrowserHandler
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Sets an event handler for browser-level events.
 
 ## SYNTAX
 
@@ -25,16 +25,54 @@ Set-PupBrowserHandler [-Event] <PupBrowserEvent> [-Action] <PupHandlerAction> [[
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Registers an event handler for browser-level events like popup windows, new pages, page closures, and disconnection.
+Use -Action Dismiss to auto-close popups, or -ScriptBlock for custom handling.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### Example 1: Auto-dismiss popups
+```
+PS C:\> Set-PupBrowserHandler -Browser $browser -Event PopupCreated -Action Dismiss
 ```
 
-{{ Add example description here }}
+Automatically closes any popup windows opened by the page.
+
+### Example 2: Capture popup for OAuth flow
+```
+PS C:\> $global:popup = $null
+PS C:\> Set-PupBrowserHandler -Browser $browser -Event PopupCreated -ScriptBlock {
+    param($e)
+    $global:popup = $e.Page
+}
+PS C:\> # Click button that opens OAuth popup
+PS C:\> Find-PupElements -Page $page -Selector "#login-oauth" | Invoke-PupElementClick
+PS C:\> Start-Sleep -Milliseconds 500
+PS C:\> # Now interact with the popup
+PS C:\> Find-PupElements -Page $global:popup -Selector "#approve" | Invoke-PupElementClick
+```
+
+Captures popup windows for multi-window workflows like OAuth.
+
+### Example 3: Track new pages
+```
+PS C:\> $global:pages = @()
+PS C:\> Set-PupBrowserHandler -Browser $browser -Event PageCreated -ScriptBlock {
+    param($e)
+    $global:pages += $e.Page
+    Write-Host "New page opened: $($e.Page.Url)"
+}
+```
+
+Tracks all new pages/tabs opened in the browser.
+
+### Example 4: Handle browser disconnect
+```
+PS C:\> Set-PupBrowserHandler -Browser $browser -Event Disconnected -ScriptBlock {
+    Write-Warning "Browser disconnected!"
+}
+```
+
+Runs cleanup code when the browser disconnects.
 
 ## PARAMETERS
 
@@ -117,7 +155,7 @@ Accept wildcard characters: False
 ```
 
 ### -ProgressAction
-{{ Fill ProgressAction Description }}
+Controls how the cmdlet responds to progress updates.
 
 ```yaml
 Type: ActionPreference

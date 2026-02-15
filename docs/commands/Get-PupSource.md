@@ -12,8 +12,14 @@ Gets the HTML source of a page.
 
 ## SYNTAX
 
+### FromPage
 ```
 Get-PupSource -Page <PupPage> [-FilePath <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+### FromFrame
+```
+Get-PupSource -Frame <PupFrame> [-FilePath <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -67,7 +73,7 @@ The page to get HTML source from
 
 ```yaml
 Type: PupPage
-Parameter Sets: (All)
+Parameter Sets: FromPage
 Aliases:
 
 Required: True
@@ -89,6 +95,21 @@ Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Frame
+The frame to get HTML source from
+
+```yaml
+Type: PupFrame
+Parameter Sets: FromFrame
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 

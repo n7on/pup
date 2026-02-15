@@ -23,7 +23,7 @@ Invoke-PupPageScroll [-Page] <PupPage> [-X <Double>] [-Y <Double>] [-Smooth]
 ## EXAMPLES
 
 ### Example 1
-```powershell
+```
 PS C:\> {{ Add example code here }}
 ```
 
@@ -56,7 +56,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
