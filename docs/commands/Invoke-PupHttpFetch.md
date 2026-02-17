@@ -12,9 +12,23 @@ Makes an HTTP request from within the browser context.
 
 ## SYNTAX
 
+### Default (Default)
+```
+Invoke-PupHttpFetch -Page <PupPage> -Url <String> [-Method <String>] [-Body <Object>] [-Headers <Hashtable>]
+ [-ContentType <String>] [-Timeout <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+### AsJson
 ```
 Invoke-PupHttpFetch -Page <PupPage> -Url <String> [-Method <String>] [-Body <Object>] [-Headers <Hashtable>]
  [-ContentType <String>] [-AsJson] [-Timeout <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+### OutFile
+```
+Invoke-PupHttpFetch -Page <PupPage> -Url <String> [-Method <String>] [-Body <Object>] [-Headers <Hashtable>]
+ [-ContentType <String>] [-OutFile <String>] [-Timeout <Int32>] [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -75,6 +89,15 @@ $response = Invoke-PupFetch -Page $page -Url "/api/account/email" -Method PUT -B
 
 Tests if state-changing requests require CSRF protection.
 
+### Example 6: Download a binary file
+```
+$src = Get-PupElementAttribute -Page $page -Selector 'img.hero' -Attribute src
+Invoke-PupHttpFetch -Page $page -Url $src -OutFile "C:\images\hero.png"
+```
+
+Downloads a binary file (image, PDF, ZIP, etc.) and saves it to disk.
+The -OutFile parameter uses base64 encoding internally to safely transfer binary data.
+
 ## PARAMETERS
 
 ### -AsJson
@@ -82,7 +105,7 @@ Parse response body as JSON
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: AsJson
 Aliases:
 
 Required: False
@@ -143,6 +166,21 @@ HTTP method (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
 ```yaml
 Type: String
 Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OutFile
+Save response body to a file (binary-safe)
+
+```yaml
+Type: String
+Parameter Sets: OutFile
 Aliases:
 
 Required: False
