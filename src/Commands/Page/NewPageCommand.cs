@@ -19,11 +19,11 @@ namespace Pup.Commands.Page
         [Parameter(HelpMessage = "Wait for page to load completely before returning")]
         public SwitchParameter WaitForLoad { get; set; }
 
-        [Parameter(HelpMessage = "Page width (default: 1280)")]
-        public int Width { get; set; } = 1280;
+        [Parameter(HelpMessage = "Page width (if not specified, viewport auto-resizes with the browser window)")]
+        public int? Width { get; set; }
 
-        [Parameter(HelpMessage = "Page height (default: 720)")]
-        public int Height { get; set; } = 720;
+        [Parameter(HelpMessage = "Page height (if not specified, viewport auto-resizes with the browser window)")]
+        public int? Height { get; set; }
 
         protected override void ProcessRecord()
         {

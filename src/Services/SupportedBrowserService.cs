@@ -17,7 +17,7 @@ namespace Pup.Services
         PupBrowser GetBrowser(PupSupportedBrowser browserType);
         List<PupBrowser> GetBrowsers();
         bool IsBrowserTypeInstalled(PupSupportedBrowser browserType);
-        PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height, string proxy = null, string userAgent = null, string[] arguments = null);
+        PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int? width, int? height, string proxy = null, string userAgent = null, string[] arguments = null);
     }
 
     public class SupportedBrowserService : ISupportedBrowserService
@@ -119,7 +119,7 @@ namespace Pup.Services
             return GetBrowser(browserType);
         }
 
-        public PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int width, int height, string proxy = null, string userAgent = null, string[] arguments = null)
+        public PupBrowser StartBrowser(PupSupportedBrowser browserType, bool headless, int? width, int? height, string proxy = null, string userAgent = null, string[] arguments = null)
         {
             var path = GetBrowserTypeInstallPath(browserType);
             var browserTypeName = browserType.ToString();
@@ -148,11 +148,13 @@ namespace Pup.Services
             var launchOptions = new LaunchOptions
             {
                 Headless = headless,
-                DefaultViewport = new ViewPortOptions
-                {
-                    Width = width,
-                    Height = height
-                },
+                DefaultViewport = (width.HasValue || height.HasValue)
+                    ? new ViewPortOptions
+                    {
+                        Width = width ?? 1280,
+                        Height = height ?? 720
+                    }
+                    : null,
                 Args = args.ToArray()
             };
 

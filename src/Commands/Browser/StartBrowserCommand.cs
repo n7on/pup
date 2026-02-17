@@ -29,11 +29,11 @@ namespace Pup.Commands.Browser
         [Parameter(HelpMessage = "Custom User-Agent string. Defaults to a realistic Chrome UA. Use 'none' for the browser's native UA.")]
         public string UserAgent { get; set; }
 
-        [Parameter(HelpMessage = "Window width (default: 1280)")]
-        public int Width { get; set; } = 1280;
+        [Parameter(HelpMessage = "Viewport width (if not specified, viewport auto-resizes with the browser window)")]
+        public int? Width { get; set; }
 
-        [Parameter(HelpMessage = "Window height (default: 720)")]
-        public int Height { get; set; } = 720;
+        [Parameter(HelpMessage = "Viewport height (if not specified, viewport auto-resizes with the browser window)")]
+        public int? Height { get; set; }
 
         [Parameter(HelpMessage = "Force start a new browser even if one is already running")]
         public SwitchParameter Force { get; set; }

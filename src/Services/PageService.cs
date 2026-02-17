@@ -815,6 +815,43 @@ async (url, options, timeout) => {
 
         public async Task SetViewportAsync(int width, int height, double deviceScaleFactor = 1, bool isMobile = false, bool hasTouch = false, bool isLandscape = false)
         {
+            // Resize the browser window to match the viewport
+            try
+            {
+                var client = _page.Page.Client;
+
+                // Clear any existing viewport emulation so we can measure true window dimensions
+                await client.SendAsync("Emulation.clearDeviceMetricsOverride").ConfigureAwait(false);
+
+                // Measure chrome dimensions (difference between outer window and inner content area)
+                var dims = await _page.Page.EvaluateFunctionAsync<int[]>(
+                    "() => [window.outerWidth, window.outerHeight, window.innerWidth, window.innerHeight]"
+                ).ConfigureAwait(false);
+
+                var chromeWidth = dims[0] - dims[2];
+                var chromeHeight = dims[1] - dims[3];
+
+                // Get the window ID for this page's target
+                var windowResult = await client.SendAsync("Browser.getWindowForTarget").ConfigureAwait(false);
+                var windowId = windowResult.Value.GetProperty("windowId").GetInt32();
+
+                // Resize window to fit the desired viewport + chrome
+                await client.SendAsync("Browser.setWindowBounds", new
+                {
+                    windowId,
+                    bounds = new
+                    {
+                        width = width + chromeWidth,
+                        height = height + chromeHeight
+                    }
+                }).ConfigureAwait(false);
+            }
+            catch
+            {
+                // Silently ignore window resize failures (e.g., headless mode)
+            }
+
+            // Set viewport emulation
             await _page.Page.SetViewportAsync(new ViewPortOptions
             {
                 Width = width,

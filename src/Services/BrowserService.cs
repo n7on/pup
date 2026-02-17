@@ -13,7 +13,7 @@ namespace Pup.Services
 {
     public interface IBrowserService
     {
-        Task<PupPage> CreatePageAsync(string name, int width, int height, string url, bool waitForLoad);
+        Task<PupPage> CreatePageAsync(string name, int? width, int? height, string url, bool waitForLoad);
         Task<List<PupPage>> GetPagesAsync();
         bool RemoveBrowser();
         bool StopBrowser();
@@ -44,7 +44,7 @@ namespace Pup.Services
             return pupPages;
         }
 
-        public async Task<PupPage> CreatePageAsync(string name, int width, int height, string url, bool waitForLoad)
+        public async Task<PupPage> CreatePageAsync(string name, int? width, int? height, string url, bool waitForLoad)
         {
             var pages = await _browser.Browser.PagesAsync().ConfigureAwait(false);
             string pageName = string.IsNullOrEmpty(name) ? $"Page{pages.Length + 1}" : name;
@@ -56,12 +56,15 @@ namespace Pup.Services
             await ApplyStealthModeAsync(page).ConfigureAwait(false);
             await ApplyWebSocketTrackerAsync(page).ConfigureAwait(false);
 
-            // Set viewport size
-            await page.SetViewportAsync(new ViewPortOptions
+            // Set viewport size only if explicitly specified, otherwise viewport auto-resizes with the window
+            if (width.HasValue || height.HasValue)
             {
-                Width = width,
-                Height = height
-            }).ConfigureAwait(false);
+                await page.SetViewportAsync(new ViewPortOptions
+                {
+                    Width = width ?? 1280,
+                    Height = height ?? 720
+                }).ConfigureAwait(false);
+            }
 
             await InitializePageCaptureAsync(pupPage).ConfigureAwait(false);
 

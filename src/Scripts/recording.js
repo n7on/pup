@@ -59,44 +59,74 @@
         console.log(PREFIX + JSON.stringify(data));
     }
 
-    // Click
+    // Track Enter keydown to suppress synthetic clicks
+    let lastEnterTarget = null;
+    let lastEnterTime = 0;
+
+    // Click - skip synthetic clicks caused by Enter on buttons/links
     document.addEventListener('click', e => {
+        if (lastEnterTarget && Date.now() - lastEnterTime < 50 && (lastEnterTarget === e.target || lastEnterTarget.contains(e.target))) {
+            lastEnterTarget = null;
+            return;
+        }
         emit({ type: 'click', selector: generateSelector(e.target), clickCount: e.detail, tagName: e.target.tagName });
     }, true);
 
-    // Change (checkboxes, selects, etc.)
+    // Change - only for checkboxes, radios, selects (text inputs are handled by input tracking)
     document.addEventListener('change', e => {
-        const t = e.target, type = (t.type || '').toLowerCase() || t.tagName.toLowerCase();
-        let value = t.value;
-        if (type === 'checkbox' || type === 'radio') value = String(t.checked);
-        else if (t.tagName === 'SELECT') value = [...t.selectedOptions].map(o => o.value).join(',');
-        emit({ type: 'change', selector: generateSelector(t), value: value, inputType: type });
+        const t = e.target, type = (t.type || '').toLowerCase();
+        if (type === 'checkbox' || type === 'radio' || t.tagName === 'SELECT') {
+            let value = t.value;
+            if (type === 'checkbox' || type === 'radio') value = String(t.checked);
+            else if (t.tagName === 'SELECT') value = [...t.selectedOptions].map(o => o.value).join(',');
+            emit({ type: 'change', selector: generateSelector(t), value: value, inputType: type });
+        }
     }, true);
 
-    // Input (text fields) - debounced
-    let inputTimeout = null;
-    let lastInputTarget = null;
-    let lastInputValue = null;
+    // Input - track pending value, only emit when field loses focus or an action key is pressed
+    let pendingInput = null;
+    function flushPendingInput() {
+        if (pendingInput) {
+            emit({ type: 'input', selector: generateSelector(pendingInput.target), value: pendingInput.value, inputType: pendingInput.target.type || 'text' });
+            pendingInput = null;
+        }
+    }
+
     document.addEventListener('input', e => {
         const t = e.target;
         if (['checkbox','radio'].includes(t.type) || t.tagName === 'SELECT') return;
-
-        lastInputTarget = t;
-        lastInputValue = t.value;
-        clearTimeout(inputTimeout);
-        inputTimeout = setTimeout(() => {
-            if (lastInputTarget && lastInputValue !== null) {
-                emit({ type: 'input', selector: generateSelector(lastInputTarget), value: lastInputValue, inputType: lastInputTarget.type || 'text' });
-                lastInputTarget = null;
-                lastInputValue = null;
-            }
-        }, 500);
+        pendingInput = { target: t, value: t.value };
     }, true);
 
-    // Special keys (Enter, Tab, etc.)
+    // Flush pending input when field loses focus (click away, tab out, etc.)
+    document.addEventListener('focusout', e => {
+        if (pendingInput && pendingInput.target === e.target) {
+            flushPendingInput();
+        }
+    }, true);
+
+    // Special keys - flush pending input before action keys, skip bare modifier keys
     document.addEventListener('keydown', e => {
-        const special = ['Enter','Tab','Escape','Backspace','Delete','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
-        if (special.includes(e.key) || e.ctrlKey || e.metaKey) {
+        // Skip bare modifier keys (not useful for replay)
+        if (['Control','Shift','Alt','Meta'].includes(e.key)) return;
+
+        const actionKeys = ['Enter','Tab','Escape'];
+        const isActionKey = actionKeys.includes(e.key);
+        // Ctrl combos but not AltGr (Ctrl+Alt on Windows, used for characters like @)
+        const isModifierCombo = ((e.ctrlKey && !e.altKey) || e.metaKey);
+
+        if (isActionKey || isModifierCombo) {
+            // Flush pending input before action keys so the input event comes first
+            if (isActionKey) {
+                flushPendingInput();
+            }
+
+            // Track Enter to suppress the synthetic click that follows
+            if (e.key === 'Enter') {
+                lastEnterTarget = e.target;
+                lastEnterTime = Date.now();
+            }
+
             const mods = [];
             if (e.ctrlKey) mods.push('Control');
             if (e.shiftKey) mods.push('Shift');
@@ -196,9 +226,9 @@
     });
 
     window.__pup_recording_cleanup = () => {
+        flushPendingInput();
         window.__pup_recording_active = false;
         history.pushState = origPush;
         history.replaceState = origReplace;
-        clearTimeout(inputTimeout);
     };
 })();
