@@ -1,6 +1,6 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.4.2'
+    ModuleVersion = '0.4.3'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
@@ -92,14 +92,15 @@
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-v0.4.2
-- Added frame support: Get-PupFrame and -Frame parameter for Find-PupElements, Wait-PupElement, Invoke-PupScript, Get-PupSource
-- Added event handler system for browser and page-level events
-- New commands: Set/Get/Remove-PupBrowserHandler and Set/Get/Remove-PupPageHandler
-- Browser events: PopupCreated, PageCreated, PageClosed, Disconnected
-- Page events: Dialog, Console, PageError, Load, Request, Response, and more
-- ScriptBlock support for custom event handling
-- Built-in actions (Accept, Dismiss, Ignore) for dialogs and popups
+v0.4.3
+- Invoke-PupRecording: replay recorded interactions on a page
+- Set-PupDownloadPath: configure browser download directory
+- Invoke-PupHttpFetch -OutFile: binary-safe file downloads (images, PDFs, ZIPs)
+- Download event handler now fully functional with state tracking and file renaming
+- Set-PupViewport now also resizes the browser window to match the viewport
+- -Width/-Height on Start-PupBrowser and New-PupPage are now optional (viewport auto-resizes with window)
+- -Fullscreen and -Maximized on Start-PupBrowser now work correctly with auto-resizing viewport
+- Recording fixes: better input capture, suppressed synthetic clicks from Enter key, AltGr handling
 
 See CHANGELOG.md for full version history.
 '@

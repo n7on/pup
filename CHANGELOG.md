@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-02-17
+
+### Added
+- `Invoke-PupRecording` - replay recorded interactions on a page with optional `-Delay` between actions
+- `Set-PupDownloadPath` - configure browser download directory or disable downloads with `-Deny`
+- `-OutFile` parameter on `Invoke-PupHttpFetch` for binary-safe file downloads (images, PDFs, ZIPs, etc.)
+- Download event handler now fully functional in `Set-PupPageHandler -Event Download` with state tracking, file renaming, and ScriptBlock callbacks
+
+### Changed
+- `Set-PupViewport` now also resizes the browser window to match the requested viewport dimensions
+- `-Width` and `-Height` on `Start-PupBrowser` and `New-PupPage` are now optional — when omitted, the viewport auto-resizes with the browser window instead of defaulting to 1280x720
+- `-Fullscreen` and `-Maximized` on `Start-PupBrowser` now work correctly with auto-resizing viewport
+
+### Fixed
+- Recording: suppressed synthetic click events caused by Enter key on buttons/links
+- Recording: text input now captured on focus-out instead of a debounce timer, preventing missed or partial values
+- Recording: pending input is flushed before action keys (Enter, Tab, Escape) and before `Stop-PupRecording`
+- Recording: bare modifier keys (Ctrl, Shift, Alt, Meta) are no longer recorded as keydown events
+- Recording: AltGr key combinations (used for characters like @ on some keyboards) no longer incorrectly recorded as Ctrl combos
+
 ## [0.4.0] - 2026-02-15
 
 ### Added
