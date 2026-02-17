@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Management.Automation;
+using System.Text.Json;
 using PuppeteerSharp;
 using Pup.Transport;
 using Pup.Commands.Base;
@@ -428,9 +431,72 @@ namespace Pup.Commands.Handlers
 
         private void SetupDownloadHandler(PageEventHandler handler)
         {
-            // Download events require CDP - we'll use a simplified approach
-            // Note: Full download handling would require Page.Client CDP session
-            WriteWarning("Download event handler requires additional CDP setup. Use Page.Client for full download control.");
+            var downloads = new ConcurrentDictionary<string, PupDownloadEvent>();
+
+            EventHandler<MessageEventArgs> nativeHandler = (sender, e) =>
+            {
+                try
+                {
+                    if (e.MessageID == "Browser.downloadWillBegin")
+                    {
+                        var guid = e.MessageData.GetProperty("guid").GetString();
+                        var eventData = new PupDownloadEvent
+                        {
+                            Guid = guid,
+                            Url = e.MessageData.GetProperty("url").GetString(),
+                            SuggestedFilename = e.MessageData.GetProperty("suggestedFilename").GetString(),
+                            State = "started"
+                        };
+                        downloads[guid] = eventData;
+
+                        handler.ScriptBlock?.Invoke(eventData);
+                    }
+                    else if (e.MessageID == "Browser.downloadProgress")
+                    {
+                        var guid = e.MessageData.GetProperty("guid").GetString();
+                        var state = e.MessageData.GetProperty("state").GetString();
+
+                        if (state == "completed" || state == "canceled")
+                        {
+                            downloads.TryGetValue(guid, out var startEvent);
+
+                            var eventData = new PupDownloadEvent
+                            {
+                                Guid = guid,
+                                Url = startEvent?.Url,
+                                SuggestedFilename = startEvent?.SuggestedFilename,
+                                State = state,
+                                TotalBytes = e.MessageData.TryGetProperty("totalBytes", out var tb) ? (long?)tb.GetInt64() : null
+                            };
+
+                            if (state == "completed" && Page.DownloadPath != null && startEvent?.SuggestedFilename != null)
+                            {
+                                var guidPath = System.IO.Path.Combine(Page.DownloadPath, guid);
+                                var finalPath = System.IO.Path.Combine(Page.DownloadPath, startEvent.SuggestedFilename);
+                                try
+                                {
+                                    if (File.Exists(finalPath))
+                                        File.Delete(finalPath);
+                                    if (File.Exists(guidPath))
+                                        File.Move(guidPath, finalPath);
+                                    eventData.Path = finalPath;
+                                }
+                                catch
+                                {
+                                    eventData.Path = File.Exists(guidPath) ? guidPath : null;
+                                }
+                            }
+
+                            handler.ScriptBlock?.Invoke(eventData);
+                            downloads.TryRemove(guid, out _);
+                        }
+                    }
+                }
+                catch { }
+            };
+
+            Page.Page.Client.MessageReceived += nativeHandler;
+            handler.NativeHandler = nativeHandler;
         }
 
         private void SetupFileChooserHandler(PageEventHandler handler)
@@ -557,6 +623,10 @@ namespace Pup.Commands.Handlers
                     case PupPageEvent.FrameNavigated:
                         if (existing.NativeHandler is EventHandler<FrameNavigatedEventArgs> fnHandler)
                             Page.Page.FrameNavigated -= fnHandler;
+                        break;
+                    case PupPageEvent.Download:
+                        if (existing.NativeHandler is EventHandler<MessageEventArgs> dlHandler)
+                            Page.Page.Client.MessageReceived -= dlHandler;
                         break;
                     case PupPageEvent.FileChooser:
                         // FileChooser uses WaitForFileChooserAsync, not events - nothing to remove

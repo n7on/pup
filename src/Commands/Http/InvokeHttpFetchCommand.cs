@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Management.Automation;
 using Pup.Services;
 using Pup.Transport;
@@ -8,7 +10,7 @@ using Pup.Commands.Base;
 
 namespace Pup.Commands.Http
 {
-    [Cmdlet(VerbsLifecycle.Invoke, "PupHttpFetch")]
+    [Cmdlet(VerbsLifecycle.Invoke, "PupHttpFetch", DefaultParameterSetName = "Default")]
     [OutputType(typeof(PupFetchResponse))]
     public class InvokeHttpFetchCommand : PupBaseCommand
     {
@@ -31,8 +33,11 @@ namespace Pup.Commands.Http
         [Parameter(HelpMessage = "Content-Type header value")]
         public string ContentType { get; set; }
 
-        [Parameter(HelpMessage = "Parse response body as JSON")]
+        [Parameter(ParameterSetName = "AsJson", HelpMessage = "Parse response body as JSON")]
         public SwitchParameter AsJson { get; set; }
+
+        [Parameter(ParameterSetName = "OutFile", HelpMessage = "Save response body to a file (binary-safe)")]
+        public string OutFile { get; set; }
 
         [Parameter(HelpMessage = "Request timeout in milliseconds (default: 30000)")]
         public int Timeout { get; set; } = 30000;
@@ -52,8 +57,25 @@ namespace Pup.Commands.Http
                 }
             }
 
-            var response = service.FetchAsync(Url, Method, Body, headerDict, ContentType, Timeout, AsJson.IsPresent)
+            bool asBinary = !string.IsNullOrEmpty(OutFile);
+            string resolvedPath = null;
+            if (asBinary)
+            {
+                resolvedPath = GetUnresolvedProviderPathFromPSPath(OutFile);
+            }
+
+            var response = service.FetchAsync(Url, Method, Body, headerDict, ContentType, Timeout, AsJson.IsPresent, asBinary)
                 .GetAwaiter().GetResult();
+
+            if (asBinary)
+            {
+                if (!string.IsNullOrEmpty(response.Body))
+                {
+                    var bytes = Convert.FromBase64String(response.Body);
+                    File.WriteAllBytes(resolvedPath, bytes);
+                }
+                response.Body = null;
+            }
 
             WriteObject(response);
         }

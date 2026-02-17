@@ -66,6 +66,8 @@ namespace Pup.Transport
         [Hidden]
         internal bool RecordingActive { get; set; }
         [Hidden]
+        internal string DownloadPath { get; set; }
+        [Hidden]
         internal List<PupRecordingEvent> RecordingEvents { get; } = new List<PupRecordingEvent>();
 
         public PupPage(IPage page, string title)

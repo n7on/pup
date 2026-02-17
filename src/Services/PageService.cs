@@ -74,7 +74,7 @@ namespace Pup.Services
         Task ClearAuthenticationAsync();
 
         // HTTP Fetch
-        Task<PupFetchResponse> FetchAsync(string url, string method, object body, Dictionary<string, string> headers, string contentType, int timeout, bool parseJsonBody = false);
+        Task<PupFetchResponse> FetchAsync(string url, string method, object body, Dictionary<string, string> headers, string contentType, int timeout, bool parseJsonBody = false, bool asBinary = false);
 
         // Viewport
         Task SetViewportAsync(int width, int height, double deviceScaleFactor = 1, bool isMobile = false, bool hasTouch = false, bool isLandscape = false);
@@ -683,7 +683,7 @@ namespace Pup.Services
             await _page.Page.AuthenticateAsync(null).ConfigureAwait(false);
         }
 
-        public async Task<PupFetchResponse> FetchAsync(string url, string method, object body, Dictionary<string, string> headers, string contentType, int timeout, bool parseJsonBody = false)
+        public async Task<PupFetchResponse> FetchAsync(string url, string method, object body, Dictionary<string, string> headers, string contentType, int timeout, bool parseJsonBody = false, bool asBinary = false)
         {
             // Build fetch options
             var fetchOptions = new Dictionary<string, object>
@@ -736,7 +736,49 @@ namespace Pup.Services
                 fetchOptions["headers"] = headerDict;
             }
 
-            var script = @"
+            var script = asBinary ? @"
+async (url, options, timeout) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+        const fetchOptions = { ...options, signal: controller.signal };
+        const response = await fetch(url, fetchOptions);
+        clearTimeout(timeoutId);
+
+        const headers = {};
+        response.headers.forEach((v, k) => headers[k] = v);
+
+        let body = '';
+        try {
+            const buf = await response.arrayBuffer();
+            const bytes = new Uint8Array(buf);
+            let binary = '';
+            const chunkSize = 8192;
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                binary += String.fromCharCode.apply(null, bytes.slice(i, i + chunkSize));
+            }
+            body = btoa(binary);
+        } catch (e) {
+            // Body may not be readable
+        }
+
+        return {
+            status: response.status,
+            statusText: response.statusText,
+            headers: headers,
+            body: body,
+            ok: response.ok,
+            url: response.url
+        };
+    } catch (e) {
+        clearTimeout(timeoutId);
+        if (e.name === 'AbortError') {
+            throw new Error('Request timed out');
+        }
+        throw e;
+    }
+}" : @"
 async (url, options, timeout) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);

@@ -307,6 +307,14 @@ if ($response.Ok) {
           <maml:para>Tests if state-changing requests require CSRF protection.</maml:para>
         </dev:remarks>
       </command:example>
+      <command:example>
+        <maml:title>Example 6: Download a binary file</maml:title>
+        <dev:code>$src = Get-PupElementAttribute -Page $page -Selector 'img.hero' -Attribute src
+Invoke-PupHttpFetch -Page $page -Url $src -OutFile "C:\images\hero.png"</dev:code>
+        <dev:remarks>
+          <maml:para>Downloads a binary file (image, PDF, ZIP, etc.) and saves it to disk. The -OutFile parameter uses base64 encoding internally to safely transfer binary data.</maml:para>
+        </dev:remarks>
+      </command:example>
     </command:examples>
   </command:command>
 
@@ -2711,6 +2719,49 @@ if ($perm.State -eq 'prompt') {
 }</dev:code>
         <dev:remarks>
           <maml:para>Only sets permission if it hasn't been set yet.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
+  <!-- Set-PupDownloadPath -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-PupDownloadPath</command:name>
+      <command:verb>Set</command:verb>
+      <command:noun>PupDownloadPath</command:noun>
+      <maml:description>
+        <maml:para>Configures the download directory for a page, or disables downloads.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Sets the download behavior for a browser page via the Chrome DevTools Protocol. When a path is specified, files downloaded by the page are saved to that directory. Use -Deny to disable downloads. Pair with Set-PupPageHandler -Event Download to receive notifications when downloads start or complete.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Enable downloads to a directory</maml:title>
+        <dev:code>$page | Set-PupDownloadPath -Path "C:\downloads\"</dev:code>
+        <dev:remarks>
+          <maml:para>Configures the page to save downloaded files to C:\downloads\.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Handle download completion</maml:title>
+        <dev:code>$page | Set-PupDownloadPath -Path "C:\downloads\"
+$page | Set-PupPageHandler -Event Download -ScriptBlock {
+    if ($_.State -eq "completed") {
+        Write-Host "Downloaded: $($_.SuggestedFilename) ($($_.TotalBytes) bytes)"
+    }
+}</dev:code>
+        <dev:remarks>
+          <maml:para>Sets up a download directory and a handler that reports when downloads finish.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Disable downloads</maml:title>
+        <dev:code>$page | Set-PupDownloadPath -Deny</dev:code>
+        <dev:remarks>
+          <maml:para>Disables file downloads for the page.</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>

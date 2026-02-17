@@ -163,6 +163,9 @@ namespace Pup.Transport
         public string Url { get; set; }
         public string SuggestedFilename { get; set; }
         public string Guid { get; set; }
+        public string State { get; set; }
+        public string Path { get; set; }
+        public long? TotalBytes { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }
 

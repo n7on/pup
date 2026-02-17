@@ -64,6 +64,7 @@
         'Send-PupKey',
         'Send-PupWebSocketMessage',
         'Set-PupCookie',
+        'Set-PupDownloadPath',
         'Set-PupElement',
         'Set-PupElementAttribute',
         'Set-PupElementValue',
