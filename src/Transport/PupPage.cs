@@ -2,9 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using PuppeteerSharp;
+using Pup.Common;
 
 namespace Pup.Transport
 {
+    /// <summary>
+    /// Stores handler configuration for a page event
+    /// </summary>
+    internal class PageEventHandler
+    {
+        public PupPageEvent Event { get; set; }
+        public ScriptBlock ScriptBlock { get; set; }
+        public SessionState SessionState { get; set; }
+        public PupHandlerAction? Action { get; set; }
+        public object NativeHandler { get; set; }
+    }
+
     /// <summary>
     /// PowerShell-friendly wrapper for IPage with additional metadata
     /// </summary>
@@ -16,6 +29,13 @@ namespace Pup.Transport
         public string Url { get; internal set; }
         public string Title { get; internal set; }
 
+        // Event handlers storage
+        [Hidden]
+        internal object HandlersLock { get; } = new object();
+        [Hidden]
+        internal Dictionary<PupPageEvent, PageEventHandler> EventHandlers { get; } = new Dictionary<PupPageEvent, PageEventHandler>();
+
+        // Legacy dialog handler for PageService compatibility
         [Hidden]
         internal EventHandler<DialogEventArgs> DialogHandler { get; set; }
 
@@ -26,27 +46,27 @@ namespace Pup.Transport
         [Hidden]
         internal object NetworkLock { get; } = new object();
         [Hidden]
-        internal System.Collections.Generic.List<PupConsoleEntry> ConsoleEntries { get; } = new System.Collections.Generic.List<PupConsoleEntry>();
+        internal List<PupConsoleEntry> ConsoleEntries { get; } = new List<PupConsoleEntry>();
         [Hidden]
-        internal System.Collections.Generic.List<PupNetworkEntry> NetworkEntries { get; } = new System.Collections.Generic.List<PupNetworkEntry>();
+        internal List<PupNetworkEntry> NetworkEntries { get; } = new List<PupNetworkEntry>();
         [Hidden]
-        internal System.Collections.Generic.Dictionary<string, PupNetworkEntry> NetworkMap { get; } = new System.Collections.Generic.Dictionary<string, PupNetworkEntry>(System.StringComparer.OrdinalIgnoreCase);
+        internal Dictionary<string, PupNetworkEntry> NetworkMap { get; } = new Dictionary<string, PupNetworkEntry>(StringComparer.OrdinalIgnoreCase);
         [Hidden]
-        internal PuppeteerSharp.ICDPSession NetworkSession { get; set; }
+        internal ICDPSession NetworkSession { get; set; }
 
         [Hidden]
         internal object WebSocketLock { get; } = new object();
         [Hidden]
-        internal System.Collections.Generic.List<PupWebSocketEntry> WebSocketEntries { get; } = new System.Collections.Generic.List<PupWebSocketEntry>();
+        internal List<PupWebSocketEntry> WebSocketEntries { get; } = new List<PupWebSocketEntry>();
         [Hidden]
-        internal System.Collections.Generic.Dictionary<string, PupWebSocketEntry> WebSocketMap { get; } = new System.Collections.Generic.Dictionary<string, PupWebSocketEntry>(System.StringComparer.OrdinalIgnoreCase);
+        internal Dictionary<string, PupWebSocketEntry> WebSocketMap { get; } = new Dictionary<string, PupWebSocketEntry>(StringComparer.OrdinalIgnoreCase);
 
         [Hidden]
         internal object RecordingLock { get; } = new object();
         [Hidden]
         internal bool RecordingActive { get; set; }
         [Hidden]
-        internal System.Collections.Generic.List<PupRecordingEvent> RecordingEvents { get; } = new System.Collections.Generic.List<PupRecordingEvent>();
+        internal List<PupRecordingEvent> RecordingEvents { get; } = new List<PupRecordingEvent>();
 
         public PupPage(IPage page, string title)
         {

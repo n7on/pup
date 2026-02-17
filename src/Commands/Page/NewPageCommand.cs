@@ -31,7 +31,7 @@ namespace Pup.Commands.Page
             {
                 var browser = ResolveBrowserOrThrow();
 
-                var browserService = ServiceFactory.CreateBrowserService(browser, SessionState);
+                var browserService = ServiceFactory.CreateBrowserService(browser);
                 var browserPage = browserService.CreatePageAsync(
                     Name,
                     Width,

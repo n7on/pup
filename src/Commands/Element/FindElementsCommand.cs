@@ -23,12 +23,21 @@ namespace Pup.Commands.Element
 
         [Parameter(
             Position = 0,
-            ParameterSetName = "FromElement", 
+            ParameterSetName = "FromElement",
             Mandatory = true,
             ValueFromPipeline = true,
             ValueFromPipelineByPropertyName = true,
             HelpMessage = "Parent element to search within")]
         public PupElement Element { get; set; }
+
+        [Parameter(
+            Position = 0,
+            ParameterSetName = "FromFrame",
+            Mandatory = true,
+            ValueFromPipeline = true,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "Frame to search within")]
+        public PupFrame Frame { get; set; }
 
         [Parameter(
             Position = 1,
@@ -135,6 +144,45 @@ namespace Pup.Commands.Element
                                 ? elementService.FindElementsByXPathAsync(Selector).GetAwaiter().GetResult()
                                 : elementService.FindElementsBySelectorAsync(Selector).GetAwaiter().GetResult();
                             results.AddRange(childElements);
+                        }
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Either -Selector, -Text, or -TextContains must be specified.");
+                    }
+                }
+                else if (ParameterSetName == "FromFrame")
+                {
+                    var frameService = ServiceFactory.CreateFrameService(Frame);
+
+                    if (isTextSearch)
+                    {
+                        bool exactMatch = !string.IsNullOrEmpty(Text);
+                        string searchText = exactMatch ? Text : TextContains;
+                        results = frameService.FindElementsByTextAsync(searchText, exactMatch, Selector).GetAwaiter().GetResult();
+
+                        if (First.IsPresent && results.Count > 0)
+                        {
+                            results = new List<PupElement> { results[0] };
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(Selector))
+                    {
+                        if (First.IsPresent)
+                        {
+                            var frameElement = XPath.IsPresent
+                                ? frameService.FindElementByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
+                                : frameService.FindElementBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
+                            if (frameElement != null)
+                            {
+                                results.Add(frameElement);
+                            }
+                        }
+                        else
+                        {
+                            results = XPath.IsPresent
+                                ? frameService.FindElementsByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
+                                : frameService.FindElementsBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
                         }
                     }
                     else

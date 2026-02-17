@@ -13,9 +13,9 @@ Starts a new browser instance for web automation and pentesting.
 ## SYNTAX
 
 ```
-Start-PupBrowser [-BrowserType <String>] [-Headless] [-Arguments <String[]>] [-Proxy <String>]
- [-UserAgent <String>] [-Width <Int32>] [-Height <Int32>] [-Force] [-ProgressAction <ActionPreference>]
- [<CommonParameters>]
+Start-PupBrowser [-BrowserType <String>] [-Headless] [-Fullscreen] [-Maximized] [-Arguments <String[]>]
+ [-Proxy <String>] [-UserAgent <String>] [-Width <Int32>] [-Height <Int32>] [-Force]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -92,6 +92,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Fullscreen
+Start browser in fullscreen mode (hides browser UI)
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Headless
 Run browser in headless mode (no GUI)
 
@@ -112,6 +127,21 @@ Window height (default: 720)
 
 ```yaml
 Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Maximized
+Start browser maximized
+
+```yaml
+Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:
 

@@ -24,6 +24,12 @@ Find-PupElements -Element <PupElement> [-Selector <String>] [-XPath] [-Text <Str
  [-WaitForLoad] [-Timeout <Int32>] [-First] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
+### FromFrame
+```
+Find-PupElements -Frame <PupFrame> [-Selector <String>] [-XPath] [-Text <String>] [-TextContains <String>]
+ [-WaitForLoad] [-Timeout <Int32>] [-First] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
 ## DESCRIPTION
 Searches for elements matching the given selector or text content.
 Returns element objects that can be used for interaction (click, type, etc.).
@@ -105,6 +111,21 @@ Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Frame
+Frame to search within
+
+```yaml
+Type: PupFrame
+Parameter Sets: FromFrame
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 

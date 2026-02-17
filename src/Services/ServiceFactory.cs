@@ -1,19 +1,15 @@
-using System.ComponentModel.DataAnnotations;
-using System.Management.Automation;
 using Pup.Services;
 using Pup.Transport;
 
 public static class ServiceFactory
 {
-    public static ISupportedBrowserService CreateSupportedBrowserService(SessionState sessionState)
+    public static ISupportedBrowserService CreateSupportedBrowserService()
     {
-        var supportedBrowserService = new SupportedBrowserService(sessionState);
-        return supportedBrowserService;
+        return new SupportedBrowserService();
     }
-    public static IBrowserService CreateBrowserService(PupBrowser browser, SessionState sessionState)
+    public static IBrowserService CreateBrowserService(PupBrowser browser)
     {
-        var browserService = new BrowserService(browser, sessionState);
-        return browserService;
+        return new BrowserService(browser);
     }
 
     public static IPageService CreatePageService(PupPage page)
@@ -26,6 +22,11 @@ public static class ServiceFactory
     {
         var elementService = new ElementService(element);
         return elementService;
+    }
+
+    public static IFrameService CreateFrameService(PupFrame frame)
+    {
+        return new FrameService(frame);
     }
 
     public static IRecordingService CreateRecordingService(PupPage page)

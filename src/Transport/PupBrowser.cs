@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using PuppeteerSharp;
 using System.Management.Automation;
@@ -7,11 +8,23 @@ using Pup.Common;
 namespace Pup.Transport
 {
     /// <summary>
+    /// Stores handler configuration for a browser event
+    /// </summary>
+    internal class BrowserEventHandler
+    {
+        public PupBrowserEvent Event { get; set; }
+        public ScriptBlock ScriptBlock { get; set; }
+        public SessionState SessionState { get; set; }
+        public PupHandlerAction? Action { get; set; }
+        public object NativeHandler { get; set; }
+    }
+
+    /// <summary>
     /// PowerShell-friendly wrapper for IBrowser with additional metadata
     /// </summary>
     public class PupBrowser
     {
-    
+
         [Hidden]
         public IBrowser Browser { get; set; }
         public PupSupportedBrowser BrowserType { get; set; }
@@ -22,6 +35,12 @@ namespace Pup.Transport
         // Additional properties for Get-Browser display
         public string Size { get; set; }
         public string Path { get; set; }
+
+        // Event handlers storage
+        [Hidden]
+        internal object HandlersLock { get; } = new object();
+        [Hidden]
+        internal Dictionary<PupBrowserEvent, BrowserEventHandler> EventHandlers { get; } = new Dictionary<PupBrowserEvent, BrowserEventHandler>();
 
         public PupBrowser(IBrowser browser, bool headless, string windowSize, string path)
         {

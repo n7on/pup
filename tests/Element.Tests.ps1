@@ -82,7 +82,7 @@ Describe "Element Interaction" {
     It "Types text" {
         $el = Find-PupElements -Page $script:page -Selector "#username" -First
         Set-PupElement -Element $el -Text "testuser"
-        $val = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
+        $val = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
         $val | Should -Be "testuser"
     }
 
@@ -90,21 +90,21 @@ Describe "Element Interaction" {
         $el = Find-PupElements -Page $script:page -Selector "#username" -First
         Set-PupElement -Element $el -Text "first"
         Set-PupElement -Element $el -Text "second" -Clear
-        $val = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
+        $val = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
         $val | Should -Be "second"
     }
 
     It "Sets value directly" {
         $el = Find-PupElements -Page $script:page -Selector "#username" -First
         Set-PupElement -Element $el -Value "direct"
-        $val = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
+        $val = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('username').value" -AsString
         $val | Should -Be "direct"
     }
 
     It "Focuses element" {
         $el = Find-PupElements -Page $script:page -Selector "#password" -First
         $el | Invoke-PupElementFocus
-        $activeId = Invoke-PupPageScript -Page $script:page -Script "() => document.activeElement.id" -AsString
+        $activeId = Invoke-PupScript -Page $script:page -Script "() => document.activeElement.id" -AsString
         $activeId | Should -Be "password"
     }
 
@@ -168,28 +168,28 @@ Describe "Wait Element" {
     }
 
     It "Waits for element to become visible" {
-        Invoke-PupPageScript -Page $script:page -Script "() => { document.getElementById('status').style.display='none'; setTimeout(function(){ document.getElementById('status').style.display='block';}, 100); }" -AsVoid
+        Invoke-PupScript -Page $script:page -Script "() => { document.getElementById('status').style.display='none'; setTimeout(function(){ document.getElementById('status').style.display='block';}, 100); }" -AsVoid
         { Wait-PupElement -Page $script:page -Selector "#status" -Visible -Timeout 2000 -PollingInterval 50 } | Should -Not -Throw
     }
 
     It "Waits for element to become enabled" {
-        Invoke-PupPageScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('delayed-btn').disabled=false;}, 100); }" -AsVoid
+        Invoke-PupScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('delayed-btn').disabled=false;}, 100); }" -AsVoid
         { Wait-PupElement -Page $script:page -Selector "#delayed-btn" -Enabled -Timeout 2000 -PollingInterval 50 } | Should -Not -Throw
     }
 
     It "Waits for element to become disabled" {
-        Invoke-PupPageScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('toggle-btn').disabled=true;}, 100); }" -AsVoid
+        Invoke-PupScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('toggle-btn').disabled=true;}, 100); }" -AsVoid
         { Wait-PupElement -Page $script:page -Selector "#toggle-btn" -Disabled -Timeout 2000 -PollingInterval 50 } | Should -Not -Throw
     }
 
     It "Waits for text to appear" {
-        Invoke-PupPageScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('status').innerText='ready';}, 100); }" -AsVoid
+        Invoke-PupScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('status').innerText='ready';}, 100); }" -AsVoid
         $el = Wait-PupElement -Page $script:page -Selector "#status" -TextContains "ready" -Timeout 2000 -PollingInterval 50 -PassThru
         $el | Should -Not -BeNullOrEmpty
     }
 
     It "Waits for attribute value" {
-        Invoke-PupPageScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('attr-target').setAttribute('data-state','ready');}, 100); }" -AsVoid
+        Invoke-PupScript -Page $script:page -Script "() => { setTimeout(function(){ document.getElementById('attr-target').setAttribute('data-state','ready');}, 100); }" -AsVoid
         { Wait-PupElement -Page $script:page -Selector "#attr-target" -AttributeName "data-state" -AttributeValue "ready" -Timeout 2000 -PollingInterval 50 } | Should -Not -Throw
     }
 }
@@ -208,28 +208,28 @@ Describe "Select Element" {
     It "Selects by value" {
         $sel = Find-PupElements -Page $script:page -Selector "#country" -First
         Select-PupElementOption -Element $sel -Value "uk"
-        $val = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('country').value" -AsString
+        $val = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('country').value" -AsString
         $val | Should -Be "uk"
     }
 
     It "Selects by text" {
         $sel = Find-PupElements -Page $script:page -Selector "#country" -First
         Select-PupElementOption -Element $sel -Text "Canada"
-        $val = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('country').value" -AsString
+        $val = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('country').value" -AsString
         $val | Should -Be "ca"
     }
 
     It "Selects by index" {
         $sel = Find-PupElements -Page $script:page -Selector "#country" -First
         Select-PupElementOption -Element $sel -Index 1
-        $val = Invoke-PupPageScript -Page $script:page -Script "() => document.getElementById('country').value" -AsString
+        $val = Invoke-PupScript -Page $script:page -Script "() => document.getElementById('country').value" -AsString
         $val | Should -Be "us"
     }
 
     It "Multi-selects" {
         $sel = Find-PupElements -Page $script:page -Selector "#colors" -First
         Select-PupElementOption -Element $sel -Value "red", "blue"
-        $vals = Invoke-PupPageScript -Page $script:page -Script "() => Array.from(document.getElementById('colors').selectedOptions).map(o => o.value).join(',')" -AsString
+        $vals = Invoke-PupScript -Page $script:page -Script "() => Array.from(document.getElementById('colors').selectedOptions).map(o => o.value).join(',')" -AsString
         $vals | Should -BeLike "*red*"
         $vals | Should -BeLike "*blue*"
     }
@@ -284,11 +284,11 @@ Describe "Element Scroll" {
 
 Describe "Page Viewport" {
     It "Sets viewport size" {
-        { Set-PupPageViewport -Page $script:page -Width 1920 -Height 1080 } | Should -Not -Throw
+        { Set-PupViewport -Page $script:page -Width 1920 -Height 1080 } | Should -Not -Throw
     }
 
     It "Sets mobile viewport" {
-        { Set-PupPageViewport -Page $script:page -Width 375 -Height 667 -IsMobile -HasTouch } | Should -Not -Throw
+        { Set-PupViewport -Page $script:page -Width 375 -Height 667 -IsMobile -HasTouch } | Should -Not -Throw
     }
 }
 

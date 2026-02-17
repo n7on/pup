@@ -120,13 +120,13 @@ Describe "Get-PupCertificate Active Mode" {
 
 Describe "SecurityDetails in Network Entries" {
     It "Network entries have SecurityDetails for HTTPS" {
-        $network = Get-PupPageNetwork -Page $script:page
+        $network = Get-PupNetwork -Page $script:page
         $httpsEntry = $network | Where-Object { $_.Url -like "https://*" } | Select-Object -First 1
         $httpsEntry.SecurityDetails | Should -Not -BeNullOrEmpty
     }
 
     It "SecurityDetails has expected properties" {
-        $network = Get-PupPageNetwork -Page $script:page
+        $network = Get-PupNetwork -Page $script:page
         $httpsEntry = $network | Where-Object { $_.Url -like "https://*" } | Select-Object -First 1
         $httpsEntry.SecurityDetails.Protocol | Should -Not -BeNullOrEmpty
         $httpsEntry.SecurityDetails.SubjectName | Should -Not -BeNullOrEmpty

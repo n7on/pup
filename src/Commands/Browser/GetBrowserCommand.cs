@@ -14,7 +14,7 @@ namespace Pup.Commands.Browser
         {
             try
             {
-                var browsers = ServiceFactory.CreateSupportedBrowserService(SessionState).GetBrowsers();
+                var browsers = ServiceFactory.CreateSupportedBrowserService().GetBrowsers();
 
                 if (browsers.Count == 0)
                 {

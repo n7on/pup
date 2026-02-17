@@ -32,7 +32,7 @@ Reloads the page and waits for it to fully load.
 
 ### Example 2: Test after modifying session
 ```
-Set-PupPageCookie -Page $page -Name "role" -Value "admin" -Domain "target.com"
+Set-PupCookie -Page $page -Name "role" -Value "admin" -Domain "target.com"
 Invoke-PupPageReload -Page $page -WaitForLoad
 # Check if admin features are now visible
 ```

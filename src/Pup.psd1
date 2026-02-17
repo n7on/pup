@@ -1,70 +1,78 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.3.1'
+    ModuleVersion = '0.4.2'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
     Copyright = '(c) 2026 Anton Lindström. All rights reserved.'
-    Description = 'Browser automation for PowerShell. Control headless or visible Chrome/Chromium browsers via the DevTools Protocol. Automate web scraping, form filling, screenshots, PDF export, network interception, WebSocket monitoring, and session management. Convert Chrome DevTools recordings to PowerShell scripts. Cross-platform support for Windows, Linux, and macOS.'
-    
+    Description = 'Browser automation for PowerShell using the Chrome DevTools Protocol. Scrape websites, fill forms, take screenshots, export PDFs, and record interactions as replayable scripts. Works with PowerShell 5.1+ on Windows, Linux, and macOS.'
+
     PowerShellVersion = '5.1'
     DotNetFrameworkVersion = '4.6.1'
-    
+
     FunctionsToExport = @()
     CmdletsToExport = @(
-        'Clear-PupPageStorage',
         'Clear-PupRecording',
+        'Clear-PupStorage',
         'ConvertTo-PupScript',
         'Enter-PupConsole',
-        'Export-PupPagePdf',
-        'Export-PupPageSession',
+        'Export-PupPdf',
+        'Export-PupSession',
         'Find-PupElements',
         'Get-PupBrowser',
+        'Get-PupBrowserHandler',
         'Get-PupCertificate',
+        'Get-PupConsole',
+        'Get-PupCookie',
         'Get-PupElementAttribute',
         'Get-PupElementPattern',
         'Get-PupElementScreenshot',
         'Get-PupElementSelector',
         'Get-PupElementValue',
+        'Get-PupFrame',
+        'Get-PupNetwork',
         'Get-PupPage',
-        'Get-PupPageConsole',
-        'Get-PupPageCookie',
-        'Get-PupPageNetwork',
+        'Get-PupPageHandler',
         'Get-PupPageScreenshot',
-        'Get-PupPageSource',
-        'Get-PupPageStorage',
+        'Get-PupPermission',
         'Get-PupRecording',
+        'Get-PupSource',
+        'Get-PupStorage',
         'Get-PupWebSocket',
-        'Import-PupPageSession',
+        'Import-PupSession',
         'Install-PupBrowser',
+        'Invoke-PupCdpMessage',
         'Invoke-PupElementClick',
         'Invoke-PupElementFocus',
         'Invoke-PupElementHover',
         'Invoke-PupElementScroll',
-        'Invoke-PupCdpMessage',
         'Invoke-PupHttpFetch',
         'Invoke-PupPageBack',
         'Invoke-PupPageForward',
         'Invoke-PupPageReload',
-        'Invoke-PupPageScript',
         'Invoke-PupPageScroll',
+        'Invoke-PupScript',
         'Move-PupPage',
         'New-PupPage',
+        'Remove-PupBrowserHandler',
+        'Remove-PupCookie',
         'Remove-PupPage',
-        'Remove-PupPageCookie',
+        'Remove-PupPageHandler',
         'Select-PupElementOption',
         'Send-PupFile',
         'Send-PupKey',
         'Send-PupWebSocketMessage',
-        'Set-PupDialogHandler',
+        'Set-PupCookie',
         'Set-PupElement',
         'Set-PupElementAttribute',
         'Set-PupElementValue',
+        'Set-PupBrowserHandler',
         'Set-PupHttpAuth',
+        'Set-PupPageHandler',
         'Set-PupHttpHeader',
-        'Set-PupPageCookie',
-        'Set-PupPageStorage',
-        'Set-PupPageViewport',
+        'Set-PupPermission',
+        'Set-PupStorage',
+        'Set-PupViewport',
         'Start-PupBrowser',
         'Start-PupRecording',
         'Stop-PupBrowser',
@@ -74,39 +82,24 @@
     )
     VariablesToExport = @()
     AliasesToExport = @()
-    
+
     PrivateData = @{
         PSData = @{
-            Tags = @('Browser', 'Automation', 'WebScraping', 'Puppeteer', 'Chrome', 'Chromium', 'Headless', 'Selenium', 'CDP', 'DevTools', 'Screenshot', 'PDF', 'Testing', 'Web')
+            Tags = @('Browser', 'Automation', 'WebScraping', 'Scraping', 'Puppeteer', 'Chrome', 'Chromium', 'Headless', 'Selenium', 'CDP', 'DevTools', 'Screenshot', 'PDF', 'Testing', 'Web', 'E2E', 'Crawler', 'RPA', 'WebDriver', 'CrossPlatform', 'Linux', 'macOS', 'Windows')
             LicenseUri = 'https://github.com/n7on/Pup/blob/main/LICENSE'
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-Pup v0.3.1
+v0.4.2
+- Added frame support: Get-PupFrame and -Frame parameter for Find-PupElements, Wait-PupElement, Invoke-PupScript, Get-PupSource
+- Added event handler system for browser and page-level events
+- New commands: Set/Get/Remove-PupBrowserHandler and Set/Get/Remove-PupPageHandler
+- Browser events: PopupCreated, PageCreated, PageClosed, Disconnected
+- Page events: Dialog, Console, PageError, Load, Request, Response, and more
+- ScriptBlock support for custom event handling
+- Built-in actions (Accept, Dismiss, Ignore) for dialogs and popups
 
-Browser Automation:
-- Install, launch, and control Chrome/Chromium (headless or visible)
-- Multi-page/tab management with navigation controls
-
-Web Interaction:
-- Find elements via CSS selectors or XPath
-- Click, hover, scroll, focus, and fill forms
-- Handle dialogs, file uploads, and keyboard input
-
-Data Extraction:
-- Screenshots (page or element), PDF export
-- Extract HTML, text, attributes, and form values
-- Cookie and local/session storage management
-
-Advanced Features:
-- Network interception with custom headers and HTTP auth
-- WebSocket monitoring and messaging
-- Export/import browser sessions
-- Convert Chrome DevTools recordings to PowerShell scripts
-- Proxy support and stealth mode
-- Interactive console mode
-
-Cross-platform: Windows, Linux, macOS | PowerShell 5.1+
+See CHANGELOG.md for full version history.
 '@
         }
     }
