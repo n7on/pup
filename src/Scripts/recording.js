@@ -225,6 +225,8 @@
         }
     });
 
+    window.__pup_flush_pending_input = flushPendingInput;
+
     window.__pup_recording_cleanup = () => {
         flushPendingInput();
         window.__pup_recording_active = false;

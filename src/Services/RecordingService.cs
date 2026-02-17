@@ -80,13 +80,14 @@ namespace Pup.Services
             if (_page == null)
                 throw new InvalidOperationException("RecordingService requires a page for live recording.");
 
-            _page.RecordingActive = false;
-
+            // Flush any pending input before stopping, so the final value is captured
             await _page.Page.EvaluateExpressionAsync(@"
-                if (window.__pup_recording_cleanup) {
-                    window.__pup_recording_cleanup();
+                if (window.__pup_flush_pending_input) {
+                    window.__pup_flush_pending_input();
                 }
             ").ConfigureAwait(false);
+
+            _page.RecordingActive = false;
         }
 
         private string GenerateRecordingScript(RecordingOptions options)
