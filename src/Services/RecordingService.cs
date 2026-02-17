@@ -13,6 +13,7 @@ namespace Pup.Services
         Task StartRecordingAsync(RecordingOptions options);
         Task StopRecordingAsync();
         string ConvertEventsToScript(List<PupRecordingEvent> events, RecordingConvertOptions options);
+        Task ReplayEventsAsync(PupRecordingEvent[] events, int delay);
     }
 
     public class RecordingConvertOptions
@@ -88,6 +89,122 @@ namespace Pup.Services
             ").ConfigureAwait(false);
 
             _page.RecordingActive = false;
+        }
+
+        public async Task ReplayEventsAsync(PupRecordingEvent[] events, int delay)
+        {
+            if (_page == null)
+                throw new InvalidOperationException("RecordingService requires a page for replay.");
+
+            var filtered = FilterAndDeduplicateEvents(new List<PupRecordingEvent>(events));
+            var pageService = ServiceFactory.CreatePageService(_page);
+
+            foreach (var evt in filtered)
+            {
+                var type = evt.Type?.ToLowerInvariant();
+
+                // Skip start events - the page is already on the target URL
+                if (type == "start")
+                    continue;
+
+                switch (type)
+                {
+                    case "navigate":
+                        await pageService.NavigatePageAsync(evt.Url, waitForLoad: true).ConfigureAwait(false);
+                        break;
+
+                    case "back":
+                        await pageService.NavigateBackAsync(waitForLoad: true).ConfigureAwait(false);
+                        break;
+
+                    case "forward":
+                        await pageService.NavigateForwardAsync(waitForLoad: true).ConfigureAwait(false);
+                        break;
+
+                    case "click":
+                        await ReplayClickAsync(pageService, evt).ConfigureAwait(false);
+                        break;
+
+                    case "input":
+                    case "change":
+                        await ReplayInputAsync(pageService, evt).ConfigureAwait(false);
+                        break;
+
+                    case "keydown":
+                        await pageService.SendKeyAsync(evt.Key, evt.Modifiers).ConfigureAwait(false);
+                        break;
+
+                    case "scroll":
+                        await ReplayScrollAsync(pageService, evt).ConfigureAwait(false);
+                        break;
+
+                    case "wait":
+                        if (int.TryParse(evt.Value, out var ms))
+                            await Task.Delay(ms).ConfigureAwait(false);
+                        break;
+                }
+
+                if (delay > 0)
+                    await Task.Delay(delay).ConfigureAwait(false);
+            }
+        }
+
+        private async Task ReplayClickAsync(IPageService pageService, PupRecordingEvent evt)
+        {
+            if (string.IsNullOrEmpty(evt.Selector))
+                throw new InvalidOperationException("Click event has no selector.");
+
+            var element = await pageService.FindElementBySelectorAsync(evt.Selector, false, 0).ConfigureAwait(false);
+            if (element == null)
+                throw new InvalidOperationException($"Element not found: {evt.Selector}");
+
+            var elementService = ServiceFactory.CreateElementService(element);
+            var waitForLoad = string.Equals(evt.TagName, "A", StringComparison.OrdinalIgnoreCase);
+            await elementService.ClickElementAsync(evt.ClickCount ?? 1, waitForLoad).ConfigureAwait(false);
+        }
+
+        private async Task ReplayInputAsync(IPageService pageService, PupRecordingEvent evt)
+        {
+            if (string.IsNullOrEmpty(evt.Selector))
+                throw new InvalidOperationException("Input event has no selector.");
+
+            var element = await pageService.FindElementBySelectorAsync(evt.Selector, false, 0).ConfigureAwait(false);
+            if (element == null)
+                throw new InvalidOperationException($"Element not found: {evt.Selector}");
+
+            var elementService = ServiceFactory.CreateElementService(element);
+
+            if (evt.InputType == "checkbox" || evt.InputType == "radio")
+            {
+                var isChecked = evt.Value == "true";
+                await elementService.SetElementFormValueAsync(isChecked, triggerChange: true).ConfigureAwait(false);
+            }
+            else
+            {
+                // Clear existing value, then set new text
+                await pageService.ExecuteScriptAsync("(el) => { el.value = ''; }", element.Element).ConfigureAwait(false);
+                await elementService.SetElementTextAsync(evt.Value ?? "").ConfigureAwait(false);
+            }
+        }
+
+        private async Task ReplayScrollAsync(IPageService pageService, PupRecordingEvent evt)
+        {
+            var x = evt.ScrollX ?? 0;
+            var y = evt.ScrollY ?? 0;
+
+            if (!string.IsNullOrEmpty(evt.Selector))
+            {
+                // Element scroll
+                var selector = evt.Selector.Replace("'", "\\'");
+                var xStr = x.ToString(CultureInfo.InvariantCulture);
+                var yStr = y.ToString(CultureInfo.InvariantCulture);
+                await pageService.ExecuteScriptAsync($"() => document.querySelector('{selector}')?.scrollTo({xStr}, {yStr})").ConfigureAwait(false);
+            }
+            else
+            {
+                // Page scroll
+                await pageService.ScrollToAsync(x, y).ConfigureAwait(false);
+            }
         }
 
         private string GenerateRecordingScript(RecordingOptions options)

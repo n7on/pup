@@ -64,6 +64,7 @@ Install-PupBrowser
 - [Stop-PupRecording](./docs/commands/Stop-PupRecording.md) - Stop recording
 - [Get-PupRecording](./docs/commands/Get-PupRecording.md) - Get recorded events
 - [Clear-PupRecording](./docs/commands/Clear-PupRecording.md) - Clear recorded events
+- [Invoke-PupRecording](./docs/commands/Invoke-PupRecording.md) - Replay recorded interactions
 - [ConvertTo-PupScript](./docs/commands/ConvertTo-PupScript.md) - Convert events to script
 
 ### Screenshots & Export

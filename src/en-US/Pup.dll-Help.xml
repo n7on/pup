@@ -2247,6 +2247,59 @@ $session2 = Get-PupRecording -Page $page</dev:code>
     </command:examples>
   </command:command>
 
+  <!-- Invoke-PupRecording -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Invoke-PupRecording</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>PupRecording</command:noun>
+      <maml:description>
+        <maml:para>Replays recorded browser interactions on a page.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Replays an array of recorded events on the specified page. Events are obtained from Get-PupRecording and can include clicks, typing, navigation, scrolling, and key presses. Duplicate and redundant events are automatically filtered out during replay. Use -Delay to add a fixed pause between each action.</maml:para>
+    </maml:description>
+    <command:examples>
+      <command:example>
+        <maml:title>Example 1: Record and replay interactions</maml:title>
+        <dev:code>Start-PupRecording -Page $page
+# ... interact with the browser ...
+Stop-PupRecording -Page $page
+$recording = $page | Get-PupRecording
+$page | Invoke-PupRecording -Recording $recording</dev:code>
+        <dev:remarks>
+          <maml:para>Records browser interactions and replays them on the same page.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 2: Replay with timing from original session</maml:title>
+        <dev:code>$recording = $page | Get-PupRecording -IncludeWaits
+$page | Invoke-PupRecording -Recording $recording</dev:code>
+        <dev:remarks>
+          <maml:para>Includes wait events based on the actual timing between actions during recording, preserving the original pace.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 3: Replay with a fixed delay between actions</maml:title>
+        <dev:code>$recording = $page | Get-PupRecording
+$page | Invoke-PupRecording -Recording $recording -Delay 200</dev:code>
+        <dev:remarks>
+          <maml:para>Adds a 200ms pause between each replayed action.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>Example 4: Replay a recording on a different page</maml:title>
+        <dev:code>$recording = $page1 | Get-PupRecording
+$page2 = New-PupPage -Browser $browser -Url "https://example.com" -WaitForLoad
+$page2 | Invoke-PupRecording -Recording $recording</dev:code>
+        <dev:remarks>
+          <maml:para>Replays interactions recorded on one page onto a different page.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+
   <!-- ConvertTo-PupScript -->
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
     <command:details>

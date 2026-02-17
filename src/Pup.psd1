@@ -47,6 +47,7 @@
         'Invoke-PupElementHover',
         'Invoke-PupElementScroll',
         'Invoke-PupHttpFetch',
+        'Invoke-PupRecording',
         'Invoke-PupPageBack',
         'Invoke-PupPageForward',
         'Invoke-PupPageReload',

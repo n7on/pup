@@ -70,7 +70,7 @@ Accept wildcard characters: False
 ```
 
 ### -Height
-Page height (default: 720)
+Page height (if not specified, viewport auto-resizes with the browser window)
 
 ```yaml
 Type: Int32
@@ -145,7 +145,7 @@ Accept wildcard characters: False
 ```
 
 ### -Width
-Page width (default: 1280)
+Page width (if not specified, viewport auto-resizes with the browser window)
 
 ```yaml
 Type: Int32
