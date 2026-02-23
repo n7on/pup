@@ -60,6 +60,7 @@
         'Remove-PupPage',
         'Remove-PupPageHandler',
         'Select-PupElementOption',
+        'Select-PupText',
         'Send-PupFile',
         'Send-PupKey',
         'Send-PupWebSocketMessage',

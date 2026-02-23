@@ -21,15 +21,9 @@ Describe "Stealth" {
         Start-Sleep -Seconds 10
 
         # Extract the fingerprint authenticity percentage from the page
-        $score = Invoke-PupScript -Page $script:page -Script @"
-() => {
-    const text = document.body.innerText;
-    const match = text.match(/Browser\s*fingerprint\s*authenticity[:\s]*(\d+)%/i);
-    return match ? parseInt(match[1], 10) : -1;
-}
-"@
+        $score = Select-PupText -Page $script:page -Pattern 'Browser\s*fingerprint\s*authenticity[:\s]*(\d+)%'
 
-        $score | Should -BeGreaterOrEqual 90 -Because "browser fingerprint authenticity should be at least 90%"
+        [int]$score | Should -BeGreaterOrEqual 90 -Because "browser fingerprint authenticity should be at least 90%"
     }
 
     It "Passes iphey.com trust check" {
@@ -39,13 +33,7 @@ Describe "Stealth" {
         Start-Sleep -Seconds 15
 
         # Extract the trust verdict from the page
-        $verdict = Invoke-PupScript -Page $script:page -Script @"
-() => {
-    const text = document.body.innerText;
-    const match = text.match(/\b(Trustworthy|Suspicious|Unreliable)\b/i);
-    return match ? match[1] : 'not found';
-}
-"@
+        $verdict = Select-PupText -Page $script:page -Pattern '\b(Trustworthy|Suspicious|Unreliable)\b'
 
         $verdict | Should -Be "Trustworthy" -Because "iphey.com should report the browser as Trustworthy"
     }
