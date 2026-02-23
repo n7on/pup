@@ -55,6 +55,7 @@ namespace Pup.Services
 
             // Apply stealth mode - inject before any page content loads
             await ApplyStealthModeAsync(page).ConfigureAwait(false);
+            await ApplyUserAgentOverrideAsync(page).ConfigureAwait(false);
             await ApplyWebSocketTrackerAsync(page).ConfigureAwait(false);
 
             // Set viewport size only if explicitly specified, otherwise viewport auto-resizes with the window
@@ -171,6 +172,7 @@ namespace Pup.Services
         {
             var pupPage = new PupPage(page, await page.GetTitleAsync().ConfigureAwait(false));
             await ApplyStealthModeAsync(page).ConfigureAwait(false);
+            await ApplyUserAgentOverrideAsync(page).ConfigureAwait(false);
             await ApplyWebSocketTrackerAsync(page).ConfigureAwait(false);
             await InitializePageCaptureAsync(pupPage).ConfigureAwait(false);
             pupPage.Url = page.Url;
@@ -564,6 +566,44 @@ namespace Pup.Services
 
             // Also apply to the current page context immediately
             await page.EvaluateExpressionAsync(script).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Override user-agent client hints at CDP level so HTTP sec-ch-ua headers
+        /// report "Google Chrome" instead of "HeadlessChrome".
+        /// </summary>
+        private async Task ApplyUserAgentOverrideAsync(IPage page)
+        {
+            var ua = _browser.EffectiveUserAgent;
+            var buildId = _browser.BrowserVersion;
+            if (string.IsNullOrEmpty(ua) || string.IsNullOrEmpty(buildId))
+            {
+                return;
+            }
+
+            var majorVersion = buildId.Split('.')[0];
+
+            await page.SetUserAgentAsync(ua, new UserAgentMetadata
+            {
+                Brands = new[]
+                {
+                    new UserAgentBrandVersion { Brand = "Not)A;Brand", Version = "8" },
+                    new UserAgentBrandVersion { Brand = "Chromium", Version = majorVersion },
+                    new UserAgentBrandVersion { Brand = "Google Chrome", Version = majorVersion }
+                },
+                FullVersion = buildId,
+                Platform = "Windows",
+                PlatformVersion = "10.0.0",
+                Architecture = "x86",
+                Model = "",
+                Mobile = false
+            }).ConfigureAwait(false);
+
+            // Chrome with a fresh profile omits Accept-Language, which is a bot signal
+            await page.SetExtraHttpHeadersAsync(new Dictionary<string, string>
+            {
+                ["Accept-Language"] = "en-US,en;q=0.9"
+            }).ConfigureAwait(false);
         }
 
         private static async Task ApplyWebSocketTrackerAsync(IPage page)

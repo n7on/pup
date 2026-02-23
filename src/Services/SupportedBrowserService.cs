@@ -21,8 +21,12 @@ namespace Pup.Services
 
     public class SupportedBrowserService : ISupportedBrowserService
     {
-        // Realistic Chrome user-agent to avoid bot detection
-        public const string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+        // Build a realistic Chrome user-agent that matches the actual browser version
+        public static string BuildDefaultUserAgent(string buildId)
+        {
+            var majorVersion = buildId?.Split('.')[0] ?? "131";
+            return $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{majorVersion}.0.0.0 Safari/537.36";
+        }
 
         static SupportedBrowserService()
         {
@@ -128,44 +132,7 @@ namespace Pup.Services
             var path = GetBrowserTypeInstallPath(browserType);
             var browserTypeName = browserType.ToString();
 
-            // Build browser arguments
-            var args = new List<string>();
-            if (!string.IsNullOrEmpty(proxy))
-            {
-                args.Add($"--proxy-server={proxy}");
-            }
-
-            // Use realistic UA by default, custom if specified, or "none" to use browser's native UA
-            var effectiveUserAgent = string.Equals(userAgent, "none", StringComparison.OrdinalIgnoreCase)
-                ? null
-                : (string.IsNullOrEmpty(userAgent) ? DefaultUserAgent : userAgent);
-            if (!string.IsNullOrEmpty(effectiveUserAgent))
-            {
-                args.Add($"--user-agent=\"{effectiveUserAgent}\"");
-            }
-
-            if (arguments != null)
-            {
-                args.AddRange(arguments);
-            }
-
-            // If maximized or fullscreen, don't set a fixed viewport (let it match window size)
-            var isMaximizedOrFullscreen = args.Contains("--start-maximized") || args.Contains("--start-fullscreen");
-
-            var launchOptions = new LaunchOptions
-            {
-                Headless = headless,
-                DefaultViewport = (width.HasValue || height.HasValue)
-                    ? new ViewPortOptions
-                    {
-                        Width = width ?? 1280,
-                        Height = height ?? 720
-                    }
-                    : null,
-                Args = args.ToArray()
-            };
-
-            // Set the executable path using BrowserFetcher
+            // Discover installed browser first (need version for user-agent)
             var browserFetcher = new BrowserFetcher(new BrowserFetcherOptions
             {
                 Path = path,
@@ -191,6 +158,50 @@ namespace Pup.Services
                     "Run Install-PupBrowser to install the full browser, or use -Headless.");
             }
 
+            // Build browser arguments
+            var args = new List<string>
+            {
+                "--disable-blink-features=AutomationControlled"
+            };
+            if (!string.IsNullOrEmpty(proxy))
+            {
+                args.Add($"--proxy-server={proxy}");
+            }
+
+            // Use realistic UA matching actual browser version by default,
+            // custom if specified, or "none" to use browser's native UA
+            var effectiveUserAgent = string.Equals(userAgent, "none", StringComparison.OrdinalIgnoreCase)
+                ? null
+                : (string.IsNullOrEmpty(userAgent) ? BuildDefaultUserAgent(browserInfo.BuildId) : userAgent);
+            if (!string.IsNullOrEmpty(effectiveUserAgent))
+            {
+                args.Add($"--user-agent=\"{effectiveUserAgent}\"");
+            }
+
+            if (arguments != null)
+            {
+                args.AddRange(arguments);
+            }
+
+            // If maximized or fullscreen, don't set a fixed viewport (let it match window size)
+            var isMaximizedOrFullscreen = args.Contains("--start-maximized") || args.Contains("--start-fullscreen");
+
+            var launchOptions = new LaunchOptions
+            {
+                Headless = headless,
+                DefaultViewport = (width.HasValue || height.HasValue)
+                    ? new ViewPortOptions
+                    {
+                        Width = width ?? 1280,
+                        Height = height ?? 720
+                    }
+                    : null,
+                Args = args.ToArray(),
+                // PuppeteerSharp adds --enable-automation by default, which is
+                // detectable by bot protection services like DataDome
+                IgnoredDefaultArgs = new[] { "--enable-automation" }
+            };
+
             launchOptions.ExecutablePath = browserInfo.GetExecutablePath();
 
             var browser = Puppeteer.LaunchAsync(launchOptions).GetAwaiter().GetResult();
@@ -211,7 +222,11 @@ namespace Pup.Services
                 headless,
                 $"{width}x{height}",
                 path
-            );
+            )
+            {
+                EffectiveUserAgent = effectiveUserAgent,
+                BrowserVersion = browserInfo.BuildId
+            };
 
             BrowserStore.Save(browserTypeName, pbrowser);
 

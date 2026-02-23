@@ -36,6 +36,12 @@ namespace Pup.Transport
         public string Size { get; set; }
         public string Path { get; set; }
 
+        // Stealth: effective user-agent and version for client hints
+        [Hidden]
+        public string EffectiveUserAgent { get; set; }
+        [Hidden]
+        public string BrowserVersion { get; set; }
+
         // Event handlers storage
         [Hidden]
         internal object HandlersLock { get; } = new object();
