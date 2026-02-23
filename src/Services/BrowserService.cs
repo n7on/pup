@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using PuppeteerSharp;
 using System.IO;
 using System.Linq;
@@ -583,6 +584,27 @@ namespace Pup.Services
 
             var majorVersion = buildId.Split('.')[0];
 
+            string platform, platformVersion, architecture;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                platform = "macOS";
+                platformVersion = "15.3.0";
+                architecture = RuntimeInformation.ProcessArchitecture ==
+                    Architecture.Arm64 ? "arm" : "x86";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                platform = "Linux";
+                platformVersion = "";
+                architecture = "x86";
+            }
+            else
+            {
+                platform = "Windows";
+                platformVersion = "10.0.0";
+                architecture = "x86";
+            }
+
             await page.SetUserAgentAsync(ua, new UserAgentMetadata
             {
                 Brands = new[]
@@ -592,9 +614,9 @@ namespace Pup.Services
                     new UserAgentBrandVersion { Brand = "Google Chrome", Version = majorVersion }
                 },
                 FullVersion = buildId,
-                Platform = "Windows",
-                PlatformVersion = "10.0.0",
-                Architecture = "x86",
+                Platform = platform,
+                PlatformVersion = platformVersion,
+                Architecture = architecture,
                 Model = "",
                 Mobile = false
             }).ConfigureAwait(false);

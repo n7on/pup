@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using PuppeteerSharp;
 using System.IO;
 using System.Linq;
@@ -21,11 +22,18 @@ namespace Pup.Services
 
     public class SupportedBrowserService : ISupportedBrowserService
     {
-        // Build a realistic Chrome user-agent that matches the actual browser version
+        // Build a realistic Chrome user-agent that matches the actual browser version and OS
         public static string BuildDefaultUserAgent(string buildId)
         {
             var majorVersion = buildId?.Split('.')[0] ?? "131";
-            return $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{majorVersion}.0.0.0 Safari/537.36";
+            string platformToken;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                platformToken = "Macintosh; Intel Mac OS X 10_15_7";
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                platformToken = "X11; Linux x86_64";
+            else
+                platformToken = "Windows NT 10.0; Win64; x64";
+            return $"Mozilla/5.0 ({platformToken}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{majorVersion}.0.0.0 Safari/537.36";
         }
 
         static SupportedBrowserService()
@@ -145,9 +153,9 @@ namespace Pup.Services
                 throw new InvalidOperationException($"No browser installations found in {path}");
             }
 
-            // Select the correct browser: ChromeHeadlessShell for headless, Chrome for headful
-            var targetBrowser = headless ? SupportedBrowser.ChromeHeadlessShell : SupportedBrowser.Chrome;
-            var browserInfo = installedBrowsers.FirstOrDefault(b => b.Browser == targetBrowser)
+            // Prefer full Chrome (even for headless) for better stealth; fall back to
+            // ChromeHeadlessShell only when the full browser isn't installed.
+            var browserInfo = installedBrowsers.FirstOrDefault(b => b.Browser == SupportedBrowser.Chrome)
                 ?? installedBrowsers[0];
 
             // Error if user wants GUI but only headless shell is available
@@ -161,8 +169,18 @@ namespace Pup.Services
             // Build browser arguments
             var args = new List<string>
             {
-                "--disable-blink-features=AutomationControlled"
+                "--disable-blink-features=AutomationControlled",
+                // Set Chrome locale to en-US so Intl APIs match navigator.languages
+                "--lang=en-US"
             };
+            // Use the real GPU to avoid SwiftShader fingerprint detection.
+            // On macOS, explicitly request Metal; on other platforms let Chrome
+            // pick the best available backend (D3D11 on Windows, EGL on Linux).
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                args.Add("--use-gl=angle");
+                args.Add("--use-angle=metal");
+            }
             if (!string.IsNullOrEmpty(proxy))
             {
                 args.Add($"--proxy-server={proxy}");
