@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-02-23
+
+### Added
+- `Select-PupText` - extract text from a page or frame using a regex pattern, returning the first capture group (or full match if no groups)
+- Stealth documentation (`docs/stealth.md`)
+- Stealth tests against browserscan.net and iphey.com (`tests/Stealth.Tests.ps1`)
+
+### Changed
+- Major stealth improvements — scores 100% on browserscan.net fingerprint authenticity
+  - User-agent now built dynamically from the actual installed Chrome version and OS instead of a hardcoded string
+  - CDP-level client hints override (`sec-ch-ua` headers) replaces `HeadlessChrome` with `Google Chrome`
+  - `Accept-Language` header injected to avoid fresh-profile bot signal
+  - `navigator.webdriver` override moved to `Navigator.prototype` to survive property descriptor inspection
+  - `navigator.platform` spoofed to match user-agent OS
+  - WebGL renderer override when SwiftShader (headless software renderer) is detected
+  - Screen dimensions, `outerWidth`/`outerHeight`, `devicePixelRatio`, and `colorDepth` patched for headless consistency
+  - `navigator.connection` (Network Information API) mocked
+  - `navigator.mimeTypes` mocked to match plugin list
+  - `Notification.permission` fixed to return `default` instead of `denied`
+  - `navigator.userAgentData` and `getHighEntropyValues()` patched to hide HeadlessChrome
+  - `window.chrome.app`, `chrome.csi`, and `chrome.loadTimes` stubs added
+  - Plugin list updated to match modern Chrome (5 PDF viewer entries)
+  - `Function.prototype.toString` patch improved with a `Set` of patched getters
+- Browser launch now uses full Chrome instead of ChromeHeadlessShell for better stealth
+- `--enable-automation` removed from default launch args via `IgnoredDefaultArgs`
+- `--disable-blink-features=AutomationControlled` and `--lang=en-US` added to launch args
+- GPU acceleration enabled (Metal on macOS) to avoid SwiftShader fingerprint
+
 ## [0.4.3] - 2026-02-17
 
 ### Added

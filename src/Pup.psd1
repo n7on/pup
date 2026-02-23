@@ -1,6 +1,6 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.4.3'
+    ModuleVersion = '0.4.4'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
@@ -93,15 +93,14 @@
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-v0.4.3
-- Invoke-PupRecording: replay recorded interactions on a page
-- Set-PupDownloadPath: configure browser download directory
-- Invoke-PupHttpFetch -OutFile: binary-safe file downloads (images, PDFs, ZIPs)
-- Download event handler now fully functional with state tracking and file renaming
-- Set-PupViewport now also resizes the browser window to match the viewport
-- -Width/-Height on Start-PupBrowser and New-PupPage are now optional (viewport auto-resizes with window)
-- -Fullscreen and -Maximized on Start-PupBrowser now work correctly with auto-resizing viewport
-- Recording fixes: better input capture, suppressed synthetic clicks from Enter key, AltGr handling
+v0.4.4
+- Select-PupText: extract text from a page or frame using a regex pattern
+- Major stealth improvements — scores 100% on browserscan.net fingerprint authenticity
+- User-agent now built dynamically from the actual installed Chrome version and OS
+- CDP-level client hints override (sec-ch-ua headers) to hide HeadlessChrome
+- WebGL, screen dimensions, devicePixelRatio, plugins, and other fingerprints patched for headless
+- Uses full Chrome instead of ChromeHeadlessShell for better stealth
+- Removed --enable-automation flag, added --disable-blink-features=AutomationControlled
 
 See CHANGELOG.md for full version history.
 '@
