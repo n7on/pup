@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Pup.Common;
 using Pup.Transport;
+using PuppeteerSharp;
 
 namespace Pup.Services
 {
@@ -15,11 +16,16 @@ namespace Pup.Services
 
     public class CdpService : ICdpService
     {
-        private readonly PupPage _page;
+        private readonly ICDPConnection _client;
 
         public CdpService(PupPage page)
         {
-            _page = page;
+            _client = page.Page.Client;
+        }
+
+        public CdpService(ICDPConnection client)
+        {
+            _client = client;
         }
 
         public async Task<object> SendAsync(string method, object parameters = null)
@@ -42,17 +48,15 @@ namespace Pup.Services
 
         private async Task<JsonElement> SendInternalAsync(string method, object parameters)
         {
-            var client = _page.Page.Client;
-
             JsonElement? response;
             if (parameters == null)
             {
-                response = await client.SendAsync(method).ConfigureAwait(false);
+                response = await _client.SendAsync(method).ConfigureAwait(false);
             }
             else
             {
                 var converted = ConvertParameters(parameters);
-                response = await client.SendAsync(method, converted).ConfigureAwait(false);
+                response = await _client.SendAsync(method, converted).ConfigureAwait(false);
             }
 
             return response ?? default;

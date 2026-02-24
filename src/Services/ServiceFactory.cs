@@ -44,6 +44,12 @@ public static class ServiceFactory
         return new CdpService(page);
     }
 
+    public static ICdpService CreateCdpService(PupBrowser browser)
+    {
+        var session = browser.Browser.Target.CreateCDPSessionAsync().GetAwaiter().GetResult();
+        return new CdpService(session);
+    }
+
     public static ICertificateService CreateCertificateService(PupPage page)
     {
         var cdpService = CreateCdpService(page);
