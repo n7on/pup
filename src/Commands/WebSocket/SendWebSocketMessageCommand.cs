@@ -39,11 +39,12 @@ namespace Pup.Commands.WebSocket
                     (function() {{
                         const urlPattern = '{escapedUrl}';
                         const message = '{escapedMessage}';
-                        const websockets = window.__pup_websockets || [];
+                        const websockets = window[Symbol.for('__pup_ws')] || [];
+                        const getUrl = window[Symbol.for('__pup_wsu')] || (() => null);
 
                         let ws = null;
                         if (urlPattern) {{
-                            ws = websockets.find(w => w.__pup_url && w.__pup_url.includes(urlPattern) && w.readyState === WebSocket.OPEN);
+                            ws = websockets.find(w => {{ const u = getUrl(w); return u && u.includes(urlPattern) && w.readyState === WebSocket.OPEN; }});
                         }} else {{
                             ws = websockets.find(w => w.readyState === WebSocket.OPEN);
                         }}

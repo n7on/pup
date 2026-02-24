@@ -1,6 +1,6 @@
 (function() {
-    if (window.__pup_recording_active) return;
-    window.__pup_recording_active = true;
+    if (window[Symbol.for('__pup_rec')]) return;
+    Object.defineProperty(window, Symbol.for('__pup_rec'), { value: true, configurable: true });
 
     const PREFIX = '__PUP_RECORDING__:';
     // Placeholders replaced by C# at runtime
@@ -225,12 +225,15 @@
         }
     });
 
-    window.__pup_flush_pending_input = flushPendingInput;
+    Object.defineProperty(window, Symbol.for('__pup_flush'), { value: flushPendingInput, configurable: true });
 
-    window.__pup_recording_cleanup = () => {
-        flushPendingInput();
-        window.__pup_recording_active = false;
-        history.pushState = origPush;
-        history.replaceState = origReplace;
-    };
+    Object.defineProperty(window, Symbol.for('__pup_rec_cleanup'), {
+        value: () => {
+            flushPendingInput();
+            Object.defineProperty(window, Symbol.for('__pup_rec'), { value: false, configurable: true });
+            history.pushState = origPush;
+            history.replaceState = origReplace;
+        },
+        configurable: true
+    });
 })();

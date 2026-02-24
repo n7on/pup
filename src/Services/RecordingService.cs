@@ -83,9 +83,8 @@ namespace Pup.Services
 
             // Flush any pending input before stopping, so the final value is captured
             await _page.Page.EvaluateExpressionAsync(@"
-                if (window.__pup_flush_pending_input) {
-                    window.__pup_flush_pending_input();
-                }
+                const fn = window[Symbol.for('__pup_flush')];
+                if (fn) fn();
             ").ConfigureAwait(false);
 
             _page.RecordingActive = false;

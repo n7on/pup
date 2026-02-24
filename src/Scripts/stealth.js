@@ -84,6 +84,20 @@ const _colorDepth = _isMac ? 30 : 24;
 Object.defineProperty(screen, 'colorDepth', { get: () => _colorDepth, configurable: true });
 Object.defineProperty(screen, 'pixelDepth', { get: () => _colorDepth, configurable: true });
 
+// Spoof navigator.hardwareConcurrency (headless often reports 1 or 0)
+Object.defineProperty(Navigator.prototype, 'hardwareConcurrency', {
+    get: () => _isMac ? 8 : 4,
+    enumerable: true,
+    configurable: true
+});
+
+// Spoof navigator.deviceMemory (not present in all browsers, but Chrome exposes it)
+Object.defineProperty(Navigator.prototype, 'deviceMemory', {
+    get: () => 8,
+    enumerable: true,
+    configurable: true
+});
+
 // Mock navigator.connection (Network Information API)
 if (!navigator.connection) {
     Object.defineProperty(navigator, 'connection', {
@@ -258,20 +272,53 @@ Object.defineProperty(HTMLIFrameElement.prototype, 'contentWindow', {
     }
 });
 
-// Patch toString to hide native code modifications
+// Patch toString to hide native code modifications.
+// Uses a Map<Function, string> so each patched function returns the correct native signature.
 const originalToString = Function.prototype.toString;
-const patchedGetters = new Set([
+const nativeSigs = new Map();
+
+// Patched property getters
+for (const fn of [
     Object.getOwnPropertyDescriptor(Navigator.prototype, 'webdriver')?.get,
     Object.getOwnPropertyDescriptor(Navigator.prototype, 'platform')?.get,
+    Object.getOwnPropertyDescriptor(Navigator.prototype, 'hardwareConcurrency')?.get,
+    Object.getOwnPropertyDescriptor(Navigator.prototype, 'deviceMemory')?.get,
     Object.getOwnPropertyDescriptor(navigator, 'plugins')?.get,
     Object.getOwnPropertyDescriptor(navigator, 'mimeTypes')?.get,
     Object.getOwnPropertyDescriptor(navigator, 'languages')?.get,
     Object.getOwnPropertyDescriptor(navigator, 'connection')?.get,
-    Object.getOwnPropertyDescriptor(navigator, 'userAgentData')?.get
-].filter(Boolean));
-Function.prototype.toString = function() {
-    if (patchedGetters.has(this)) {
-        return 'function get () { [native code] }';
+    Object.getOwnPropertyDescriptor(navigator, 'userAgentData')?.get,
+    Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'contentWindow')?.get,
+    Object.getOwnPropertyDescriptor(Notification, 'permission')?.get,
+    Object.getOwnPropertyDescriptor(window, 'devicePixelRatio')?.get,
+    Object.getOwnPropertyDescriptor(window, 'outerWidth')?.get,
+    Object.getOwnPropertyDescriptor(window, 'outerHeight')?.get,
+    Object.getOwnPropertyDescriptor(screen, 'width')?.get,
+    Object.getOwnPropertyDescriptor(screen, 'height')?.get,
+    Object.getOwnPropertyDescriptor(screen, 'availWidth')?.get,
+    Object.getOwnPropertyDescriptor(screen, 'availHeight')?.get,
+    Object.getOwnPropertyDescriptor(screen, 'colorDepth')?.get,
+    Object.getOwnPropertyDescriptor(screen, 'pixelDepth')?.get
+].filter(Boolean)) {
+    nativeSigs.set(fn, 'function get () { [native code] }');
+}
+
+// Patched method-style functions
+if (navigator.permissions?.query) nativeSigs.set(navigator.permissions.query, 'function query() { [native code] }');
+if (window.chrome) {
+    if (chrome.csi) nativeSigs.set(chrome.csi, 'function csi() { [native code] }');
+    if (chrome.loadTimes) nativeSigs.set(chrome.loadTimes, 'function loadTimes() { [native code] }');
+    if (chrome.app) {
+        for (const [name, fn] of Object.entries(chrome.app)) {
+            if (typeof fn === 'function') nativeSigs.set(fn, `function ${name}() { [native code] }`);
+        }
     }
+}
+
+const patchedToString = function toString() {
+    if (this === patchedToString) return 'function toString() { [native code] }';
+    const sig = nativeSigs.get(this);
+    if (sig) return sig;
     return originalToString.call(this);
 };
+Function.prototype.toString = patchedToString;
