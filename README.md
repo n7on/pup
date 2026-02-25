@@ -35,6 +35,7 @@ Install-PupBrowser
 - [Invoke-PupScript](./docs/commands/Invoke-PupScript.md) - Execute JavaScript (supports `-Frame`)
 - [Set-PupViewport](./docs/commands/Set-PupViewport.md) - Set viewport size
 - [Get-PupSource](./docs/commands/Get-PupSource.md) - Get page HTML (supports `-Frame`)
+- [Set-PupDownloadPath](./docs/commands/Set-PupDownloadPath.md) - Set download directory
 
 ### Frames
 - [Get-PupFrame](./docs/commands/Get-PupFrame.md) - Get frames/iframes from page
@@ -58,6 +59,7 @@ Install-PupBrowser
 - [Get-PupElementSelector](./docs/commands/Get-PupElementSelector.md) - Get CSS selector
 - [Get-PupElementPattern](./docs/commands/Get-PupElementPattern.md) - Get selector patterns
 - [Select-PupElementOption](./docs/commands/Select-PupElementOption.md) - Select dropdown option
+- [Select-PupText](./docs/commands/Select-PupText.md) - Select text by pattern (supports `-Frame`)
 
 ### Recording
 - [Start-PupRecording](./docs/commands/Start-PupRecording.md) - Start recording interactions

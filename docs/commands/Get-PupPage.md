@@ -82,11 +82,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### Pup.Transport.PupBrowser
-
 ## OUTPUTS
 
 ### Pup.Transport.PupPage
-
 ## NOTES
 
 ## RELATED LINKS

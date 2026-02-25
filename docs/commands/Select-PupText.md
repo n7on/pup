@@ -5,23 +5,22 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-PupCdpMessage
+# Select-PupText
 
 ## SYNOPSIS
 {{ Fill in the Synopsis }}
 
 ## SYNTAX
 
-### FromPage (Default)
+### FromPage
 ```
-Invoke-PupCdpMessage [-Page] <PupPage> [-Method] <String> [[-Parameters] <Hashtable>] [-AsJson]
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Select-PupText [-Page] <PupPage> [-Pattern] <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
-### FromBrowser
+### FromFrame
 ```
-Invoke-PupCdpMessage [-Browser] <PupBrowser> [-Method] <String> [[-Parameters] <Hashtable>] [-AsJson]
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Select-PupText [-Frame] <PupFrame> [-Pattern] <String> [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -38,53 +37,23 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -AsJson
-Return raw JSON string instead of parsed object
+### -Frame
+The frame to extract text from
 
 ```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Browser
-The browser to send the CDP message through (for browser-level domains like SystemInfo)
-
-```yaml
-Type: PupBrowser
-Parameter Sets: FromBrowser
+Type: PupFrame
+Parameter Sets: FromFrame
 Aliases:
 
 Required: True
 Position: 0
 Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -Method
-The CDP method to invoke (e.g., 'DOM.getDocument', 'Network.enable')
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 
 ### -Page
-The page to send the CDP message through
+The page to extract text from
 
 ```yaml
 Type: PupPage
@@ -94,20 +63,20 @@ Aliases:
 Required: True
 Position: 0
 Default value: None
-Accept pipeline input: True (ByValue)
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 
-### -Parameters
-Parameters to pass to the CDP method
+### -Pattern
+The regex pattern to match against the page text
 
 ```yaml
-Type: Hashtable
+Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
-Position: 2
+Required: True
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -134,10 +103,10 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### Pup.Transport.PupPage
-### Pup.Transport.PupBrowser
+### Pup.Transport.PupFrame
 ## OUTPUTS
 
-### System.Management.Automation.PSObject
+### System.String
 ## NOTES
 
 ## RELATED LINKS
