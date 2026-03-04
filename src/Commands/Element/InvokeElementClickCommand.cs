@@ -40,13 +40,14 @@ namespace Pup.Commands.Element
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
                 var clicks = DoubleClick.IsPresent ? 2 : ClickCount;
-                elementService.ClickElementAsync(clicks, WaitForLoad.IsPresent).GetAwaiter().GetResult();
+                Await(elementService.ClickElementAsync(clicks, WaitForLoad.IsPresent));
             }
             catch (Exception ex) when (IsStaleElementException(ex))
             {
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "InvokeElementClickFailed", ErrorCategory.OperationStopped, null));

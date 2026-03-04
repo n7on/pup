@@ -46,6 +46,7 @@ namespace Pup.Commands.WebSocket
 
                 WriteObject(entries.ToArray(), true);
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetWebSocketError", ErrorCategory.ReadError, Page));

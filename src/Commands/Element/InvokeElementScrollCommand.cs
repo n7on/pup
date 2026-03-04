@@ -26,13 +26,14 @@ namespace Pup.Commands.Element
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
-                elementService.ScrollIntoViewAsync().GetAwaiter().GetResult();
+                Await(elementService.ScrollIntoViewAsync());
             }
             catch (Exception ex) when (IsStaleElementException(ex))
             {
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "InvokeElementScrollFailed", ErrorCategory.OperationStopped, null));

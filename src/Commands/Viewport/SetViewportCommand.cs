@@ -35,15 +35,16 @@ namespace Pup.Commands.Viewport
             try
             {
                 var pageService = ServiceFactory.CreatePageService(Page);
-                pageService.SetViewportAsync(
+                Await(pageService.SetViewportAsync(
                     Width,
                     Height,
                     DeviceScaleFactor,
                     IsMobile.IsPresent,
                     HasTouch.IsPresent,
                     IsLandscape.IsPresent
-                ).GetAwaiter().GetResult();
+                ));
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetViewportFailed", ErrorCategory.OperationStopped, null));

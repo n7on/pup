@@ -61,9 +61,10 @@ namespace Pup.Commands.Storage
                         null));
                 }
 
-                pageService.SetStorageAsync(Type, dict).GetAwaiter().GetResult();
+                Await(pageService.SetStorageAsync(Type, dict));
                 WriteVerbose($"Set {dict.Count} storage entrie(s) in {Type} storage");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetStorageError", ErrorCategory.WriteError, null));

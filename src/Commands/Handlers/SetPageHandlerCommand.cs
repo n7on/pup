@@ -59,6 +59,7 @@ namespace Pup.Commands.Handlers
 
                 SetHandler();
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetPageHandlerError", ErrorCategory.InvalidOperation, Page));
@@ -373,7 +374,7 @@ namespace Pup.Commands.Handlers
                 {
                     if (handler.ScriptBlock != null)
                     {
-                        var pupFrame = PupFrame.CreateAsync(e.Frame).GetAwaiter().GetResult();
+                        var pupFrame = Await(PupFrame.CreateAsync(e.Frame));
                         var eventData = new PupFrameAttachedEvent { Frame = pupFrame };
                         handler.ScriptBlock.Invoke(eventData);
                     }
@@ -417,7 +418,7 @@ namespace Pup.Commands.Handlers
                 {
                     if (handler.ScriptBlock != null)
                     {
-                        var pupFrame = PupFrame.CreateAsync(e.Frame).GetAwaiter().GetResult();
+                        var pupFrame = Await(PupFrame.CreateAsync(e.Frame));
                         var eventData = new PupFrameNavigatedEvent { Frame = pupFrame };
                         handler.ScriptBlock.Invoke(eventData);
                     }

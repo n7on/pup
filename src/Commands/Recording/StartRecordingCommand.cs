@@ -53,10 +53,11 @@ namespace Pup.Commands.Recording
                 }
 
                 var recordingService = ServiceFactory.CreateRecordingService(Page);
-                recordingService.StartRecordingAsync(options).GetAwaiter().GetResult();
+                Await(recordingService.StartRecordingAsync(options));
 
                 WriteVerbose("Recording started. Interact with the browser, then use Stop-PupRecording to capture events.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "StartRecordingFailed", ErrorCategory.OperationStopped, Page));

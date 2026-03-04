@@ -45,16 +45,17 @@ namespace Pup.Commands.Text
                 if (ParameterSetName == "FromFrame")
                 {
                     var frameService = ServiceFactory.CreateFrameService(Frame);
-                    result = frameService.ExecuteScriptAsync<string>(script).GetAwaiter().GetResult();
+                    result = Await(frameService.ExecuteScriptAsync<string>(script));
                 }
                 else
                 {
                     var pageService = ServiceFactory.CreatePageService(Page);
-                    result = pageService.ExecuteScriptAsync<string>(script).GetAwaiter().GetResult();
+                    result = Await(pageService.ExecuteScriptAsync<string>(script));
                 }
 
                 WriteObject(result);
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SelectTextError", ErrorCategory.ReadError, Page));

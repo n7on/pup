@@ -44,10 +44,10 @@ namespace Pup.Commands.Download
 
                 if (Deny.IsPresent)
                 {
-                    client.SendAsync("Browser.setDownloadBehavior", new Dictionary<string, object>
+                    Await(client.SendAsync("Browser.setDownloadBehavior", new Dictionary<string, object>
                     {
                         ["behavior"] = "deny"
-                    }).GetAwaiter().GetResult();
+                    }));
 
                     Page.DownloadPath = null;
                     WriteVerbose("Downloads disabled.");
@@ -57,16 +57,17 @@ namespace Pup.Commands.Download
                 var resolvedPath = GetUnresolvedProviderPathFromPSPath(Path);
                 Directory.CreateDirectory(resolvedPath);
 
-                client.SendAsync("Browser.setDownloadBehavior", new Dictionary<string, object>
+                Await(client.SendAsync("Browser.setDownloadBehavior", new Dictionary<string, object>
                 {
                     ["behavior"] = "allowAndName",
                     ["downloadPath"] = resolvedPath,
                     ["eventsEnabled"] = true
-                }).GetAwaiter().GetResult();
+                }));
 
                 Page.DownloadPath = resolvedPath;
                 WriteVerbose($"Downloads enabled. Path: {resolvedPath}");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetDownloadPathError", ErrorCategory.InvalidOperation, Page));

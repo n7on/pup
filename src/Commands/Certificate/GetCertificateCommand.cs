@@ -50,7 +50,7 @@ namespace Pup.Commands.Certificate
                 if (!string.IsNullOrEmpty(Origin))
                 {
                     // Active mode: fetch certificate for specific origin
-                    var cert = certificateService.GetCertificateAsync(Origin).GetAwaiter().GetResult();
+                    var cert = Await(certificateService.GetCertificateAsync(Origin));
                     WriteObject(cert);
                 }
                 else
@@ -64,6 +64,7 @@ namespace Pup.Commands.Certificate
                     WriteObject(details.ToArray(), true);
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 var errorMessage = ex.InnerException?.Message ?? ex.Message;

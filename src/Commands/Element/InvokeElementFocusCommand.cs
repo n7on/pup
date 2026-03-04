@@ -28,13 +28,14 @@ namespace Pup.Commands.Element
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
 
-                elementService.FocusElementAsync().GetAwaiter().GetResult();
+                Await(elementService.FocusElementAsync());
             }
             catch (Exception ex) when (IsStaleElementException(ex))
             {
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "InvokeElementFocusError", ErrorCategory.OperationStopped, null));

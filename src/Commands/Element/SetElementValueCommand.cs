@@ -62,7 +62,7 @@ namespace Pup.Commands.Element
                     valueToSet = Value;
                 }
 
-                elementService.SetElementFormValueAsync(valueToSet, triggerChange: !NoEvents.IsPresent).GetAwaiter().GetResult();
+                Await(elementService.SetElementFormValueAsync(valueToSet, triggerChange: !NoEvents.IsPresent));
                 WriteVerbose("Element value set successfully");
             }
             catch (Exception ex) when (IsStaleElementException(ex))
@@ -70,6 +70,7 @@ namespace Pup.Commands.Element
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetElementValueError", ErrorCategory.WriteError, Element));

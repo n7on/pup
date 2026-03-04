@@ -46,6 +46,7 @@ namespace Pup.Commands.Handlers
                     }
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetPageHandlerError", ErrorCategory.InvalidOperation, Page));

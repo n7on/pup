@@ -1,6 +1,7 @@
 using System;
 using System.Management.Automation;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Pup.Commands.Base
 {
@@ -12,9 +13,43 @@ namespace Pup.Commands.Base
     /// </summary>
     public abstract class PupBaseCommand : PSCmdlet
     {
+        protected CancellationTokenSource Cts;
+
         protected override void BeginProcessing()
         {
             SynchronizationContext.SetSynchronizationContext(null);
+            Cts = new CancellationTokenSource();
+        }
+
+        protected override void StopProcessing()
+        {
+            try { Cts?.Cancel(); } catch { }
+        }
+
+        protected T Await<T>(Task<T> task)
+        {
+            try
+            {
+                task.Wait(Cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new PipelineStoppedException();
+            }
+            return task.GetAwaiter().GetResult();
+        }
+
+        protected void Await(Task task)
+        {
+            try
+            {
+                task.Wait(Cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new PipelineStoppedException();
+            }
+            task.GetAwaiter().GetResult();
         }
 
         /// <summary>

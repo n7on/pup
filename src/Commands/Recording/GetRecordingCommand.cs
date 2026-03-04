@@ -43,6 +43,7 @@ namespace Pup.Commands.Recording
 
                 WriteObject(events.ToArray(), true);
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetRecordingFailed", ErrorCategory.ReadError, Page));

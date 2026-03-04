@@ -47,6 +47,7 @@ namespace Pup.Commands.Console
                     WriteObject(entries.ToArray(), true);
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetConsoleError", ErrorCategory.ReadError, Page));

@@ -64,8 +64,7 @@ namespace Pup.Commands.Http
                 resolvedPath = GetUnresolvedProviderPathFromPSPath(OutFile);
             }
 
-            var response = service.FetchAsync(Url, Method, Body, headerDict, ContentType, Timeout, AsJson.IsPresent, asBinary)
-                .GetAwaiter().GetResult();
+            var response = Await(service.FetchAsync(Url, Method, Body, headerDict, ContentType, Timeout, AsJson.IsPresent, asBinary));
 
             if (asBinary)
             {

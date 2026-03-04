@@ -82,6 +82,7 @@ namespace Pup.Commands.Permission
                     }
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetPermissionFailed", ErrorCategory.OperationStopped, Permission));
@@ -104,7 +105,7 @@ namespace Pup.Commands.Permission
                 }})()
             ";
 
-            var result = Page.Page.EvaluateExpressionAsync<string>(script).GetAwaiter().GetResult();
+            var result = Await(Page.Page.EvaluateExpressionAsync<string>(script));
             return result ?? "unknown";
         }
     }

@@ -56,7 +56,7 @@ namespace Pup.Commands.Http
                 if (Clear.IsPresent)
                 {
                     // Set empty headers to clear
-                    pageService.SetExtraHeadersAsync(headers).GetAwaiter().GetResult();
+                    Await(pageService.SetExtraHeadersAsync(headers));
                     WriteVerbose("Cleared all extra HTTP request headers");
                     return;
                 }
@@ -73,7 +73,7 @@ namespace Pup.Commands.Http
                     headers[Name] = Value;
                 }
 
-                pageService.SetExtraHeadersAsync(headers).GetAwaiter().GetResult();
+                Await(pageService.SetExtraHeadersAsync(headers));
 
                 if (Headers != null)
                 {
@@ -84,6 +84,7 @@ namespace Pup.Commands.Http
                     WriteVerbose($"Set HTTP request header: {Name}");
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetHttpHeaderError", ErrorCategory.InvalidOperation, Page));

@@ -29,11 +29,12 @@ namespace Pup.Commands.Storage
             try
             {
                 var pageService = ServiceFactory.CreatePageService(Page);
-                pageService.ClearStorageAsync(Type, Key).GetAwaiter().GetResult();
+                Await(pageService.ClearStorageAsync(Type, Key));
                 WriteVerbose(string.IsNullOrEmpty(Key)
                     ? $"Cleared all entries from {Type} storage"
                     : $"Removed '{Key}' from {Type} storage");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "ClearStorageError", ErrorCategory.WriteError, null));

@@ -29,9 +29,10 @@ namespace Pup.Commands.Page
             try
             {
                 var pageService = ServiceFactory.CreatePageService(Page);
-                Page = pageService.ReloadPageAsync(WaitForLoad.IsPresent).GetAwaiter().GetResult();
+                Page = Await(pageService.ReloadPageAsync(WaitForLoad.IsPresent));
                 WriteObject(Page);
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "InvokePageReloadError", ErrorCategory.OperationStopped, null));

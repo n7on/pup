@@ -23,6 +23,7 @@ namespace Pup.Commands.Browser
                     WriteVerbose($"Removed browser: {Browser.BrowserType} from path: {Browser.Path}");
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "UninstallBrowserFailed", ErrorCategory.OperationStopped, null));

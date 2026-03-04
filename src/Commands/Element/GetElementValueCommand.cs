@@ -26,7 +26,7 @@ namespace Pup.Commands.Element
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
-                var value = elementService.GetElementValueAsync().GetAwaiter().GetResult();
+                var value = Await(elementService.GetElementValueAsync());
                 WriteObject(value);
             }
             catch (Exception ex) when (IsStaleElementException(ex))
@@ -34,6 +34,7 @@ namespace Pup.Commands.Element
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetElementValueError", ErrorCategory.ReadError, Element));

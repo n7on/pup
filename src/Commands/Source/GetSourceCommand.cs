@@ -39,12 +39,12 @@ namespace Pup.Commands.Source
                 if (ParameterSetName == "FromFrame")
                 {
                     var frameService = ServiceFactory.CreateFrameService(Frame);
-                    html = frameService.GetSourceAsync().GetAwaiter().GetResult();
+                    html = Await(frameService.GetSourceAsync());
                 }
                 else
                 {
                     var pageService = ServiceFactory.CreatePageService(Page);
-                    html = pageService.ExecuteScriptAsync<string>("() => document.documentElement.outerHTML").GetAwaiter().GetResult();
+                    html = Await(pageService.ExecuteScriptAsync<string>("() => document.documentElement.outerHTML"));
                 }
 
                 if (!string.IsNullOrEmpty(FilePath))
@@ -61,6 +61,7 @@ namespace Pup.Commands.Source
 
                 WriteObject(html);
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetSourceError", ErrorCategory.ReadError, Page));

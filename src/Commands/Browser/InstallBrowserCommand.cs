@@ -34,6 +34,7 @@ namespace Pup.Commands.Browser
                 }
                 
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "InstallBrowserFailed", ErrorCategory.OperationStopped, null));

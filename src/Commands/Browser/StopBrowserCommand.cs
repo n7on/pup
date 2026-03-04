@@ -21,6 +21,7 @@ namespace Pup.Commands.Browser
 
                 WriteVerbose($"Browser '{Browser.BrowserType}' stopped successfully!");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "StopBrowserFailed", ErrorCategory.OperationStopped, null));

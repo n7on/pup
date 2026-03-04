@@ -27,6 +27,7 @@ namespace Pup.Commands.Browser
                     WriteObject(browser);
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetBrowserFailed", ErrorCategory.OperationStopped, null));

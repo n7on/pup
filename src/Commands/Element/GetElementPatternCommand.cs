@@ -40,7 +40,7 @@ namespace Pup.Commands.Element
             try
             {
                 var elementService = new ElementService(Element);
-                var patterns = elementService.GetElementPatternsAsync(Depth).GetAwaiter().GetResult();
+                var patterns = Await(elementService.GetElementPatternsAsync(Depth));
 
                 foreach (var pattern in patterns)
                 {
@@ -61,6 +61,7 @@ namespace Pup.Commands.Element
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetElementPatternFailed", ErrorCategory.OperationStopped, Element));

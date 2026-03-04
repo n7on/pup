@@ -49,8 +49,8 @@ namespace Pup.Commands.Element
                 if (Clear.IsPresent)
                 {
                     // Clear by selecting all and deleting (works for most input types)
-                    elementService.FocusElementAsync().GetAwaiter().GetResult();
-                    Element.Element.EvaluateFunctionAsync("el => { el.select && el.select(); el.value = ''; }").GetAwaiter().GetResult();
+                    Await(elementService.FocusElementAsync());
+                    Await(Element.Element.EvaluateFunctionAsync("el => { el.select && el.select(); el.value = ''; }"));
                 }
 
                 // Set text content (typing)
@@ -59,28 +59,28 @@ namespace Pup.Commands.Element
                     // Clear existing text first unless -Append is specified
                     if (!Append.IsPresent && !Clear.IsPresent)
                     {
-                        elementService.FocusElementAsync().GetAwaiter().GetResult();
-                        Element.Element.EvaluateFunctionAsync("el => { if (el.select) el.select(); else el.setSelectionRange(0, el.value.length); }").GetAwaiter().GetResult();
+                        Await(elementService.FocusElementAsync());
+                        Await(Element.Element.EvaluateFunctionAsync("el => { if (el.select) el.select(); else el.setSelectionRange(0, el.value.length); }"));
                     }
-                    elementService.SetElementTextAsync(Text).GetAwaiter().GetResult();
+                    Await(elementService.SetElementTextAsync(Text));
                 }
 
                 // Set value property
                 if (!string.IsNullOrEmpty(Value))
                 {
-                    elementService.SetElementValueAsync(Value).GetAwaiter().GetResult();
+                    Await(elementService.SetElementValueAsync(Value));
                 }
 
                 // Set innerHTML
                 if (!string.IsNullOrEmpty(InnerHTML))
                 {
-                    Element.Element.EvaluateFunctionAsync("(el, html) => el.innerHTML = html", InnerHTML).GetAwaiter().GetResult();
+                    Await(Element.Element.EvaluateFunctionAsync("(el, html) => el.innerHTML = html", InnerHTML));
                 }
 
                 // Focus element if requested
                 if (Focus.IsPresent)
                 {
-                    elementService.FocusElementAsync().GetAwaiter().GetResult();
+                    Await(elementService.FocusElementAsync());
                 }
 
                 WriteVerbose($"Element properties set successfully");
@@ -90,6 +90,7 @@ namespace Pup.Commands.Element
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetElementError", ErrorCategory.WriteError, Element));

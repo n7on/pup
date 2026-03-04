@@ -28,7 +28,7 @@ namespace Pup.Commands.Cookie
             try
             {
                 var pageService = ServiceFactory.CreatePageService(Page);
-                var cookies = pageService.GetCookiesAsync().GetAwaiter().GetResult();
+                var cookies = Await(pageService.GetCookiesAsync());
 
                 // Apply filters if provided
                 if (!string.IsNullOrEmpty(Name))
@@ -45,6 +45,7 @@ namespace Pup.Commands.Cookie
 
                 WriteObject(cookies.ToArray(), true);
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetCookieError", ErrorCategory.ReadError, null));

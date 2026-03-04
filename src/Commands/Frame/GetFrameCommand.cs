@@ -40,7 +40,7 @@ namespace Pup.Commands.Frame
 
                 foreach (var frame in allFrames)
                 {
-                    var pupFrame = PupFrame.CreateAsync(frame).GetAwaiter().GetResult();
+                    var pupFrame = Await(PupFrame.CreateAsync(frame));
 
                     // Skip main frame unless explicitly requested
                     if (pupFrame.IsMainFrame && !IncludeMain.IsPresent)
@@ -63,6 +63,7 @@ namespace Pup.Commands.Frame
                     WriteObject(frame);
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetFrameFailed", ErrorCategory.OperationStopped, null));

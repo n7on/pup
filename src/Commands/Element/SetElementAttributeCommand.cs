@@ -37,7 +37,7 @@ namespace Pup.Commands.Element
 
             try
             {
-                Element.Element.EvaluateFunctionAsync("(el, name, value) => el.setAttribute(name, value)", Name, Value).GetAwaiter().GetResult();
+                Await(Element.Element.EvaluateFunctionAsync("(el, name, value) => el.setAttribute(name, value)", Name, Value));
 
                 WriteVerbose($"Set attribute '{Name}' to '{Value}' on element");
             }
@@ -46,6 +46,7 @@ namespace Pup.Commands.Element
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetElementAttributeError", ErrorCategory.WriteError, Element));

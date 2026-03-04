@@ -45,6 +45,7 @@ namespace Pup.Commands.Network
                     WriteObject(entries.ToArray(), true);
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetNetworkError", ErrorCategory.ReadError, Page));
@@ -98,7 +99,7 @@ namespace Pup.Commands.Network
             {
                 try
                 {
-                    var bodyResult = Page.NetworkSession.SendAsync<JsonElement>("Network.getResponseBody", new Dictionary<string, object> { { "requestId", entry.RequestId } }).GetAwaiter().GetResult();
+                    var bodyResult = Await(Page.NetworkSession.SendAsync<JsonElement>("Network.getResponseBody", new Dictionary<string, object> { { "requestId", entry.RequestId } }));
                     if (!bodyResult.ValueKind.Equals(JsonValueKind.Undefined))
                     {
                         entry.Body = bodyResult.TryGetProperty("body", out var bodyProp) ? bodyProp.GetString() : null;

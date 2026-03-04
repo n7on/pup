@@ -30,8 +30,9 @@ namespace Pup.Commands.Recording
                 }
 
                 var recordingService = ServiceFactory.CreateRecordingService(Page);
-                recordingService.StopRecordingAsync().GetAwaiter().GetResult();
+                Await(recordingService.StopRecordingAsync());
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "StopRecordingFailed", ErrorCategory.OperationStopped, Page));

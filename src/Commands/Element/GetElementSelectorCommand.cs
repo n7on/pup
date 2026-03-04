@@ -38,17 +38,17 @@ namespace Pup.Commands.Element
                 if (Similar.IsPresent)
                 {
                     // Generate selector for all similar elements at same hierarchical level
-                    selector = elementService.GetSimilarElementsSelectorAsync().GetAwaiter().GetResult();
+                    selector = Await(elementService.GetSimilarElementsSelectorAsync());
                 }
                 else
                 {
                     // Default: Generate full path selector for this specific element
-                    selector = elementService.GetElementSelectorAsync(fullPath: true).GetAwaiter().GetResult();
+                    selector = Await(elementService.GetElementSelectorAsync(fullPath: true));
                 }
 
                 if (ShowCount.IsPresent)
                 {
-                    var count = elementService.CountElementsBySelectorAsync(selector).GetAwaiter().GetResult();
+                    var count = Await(elementService.CountElementsBySelectorAsync(selector));
                     WriteInformation(new InformationRecord($"Selector '{selector}' matches {count} element(s)", "ElementCount"));
                 }
 
@@ -59,6 +59,7 @@ namespace Pup.Commands.Element
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetElementSelectorFailed", ErrorCategory.OperationStopped, null));

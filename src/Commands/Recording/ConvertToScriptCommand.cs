@@ -84,6 +84,7 @@ namespace Pup.Commands.Recording
                     WriteObject(script);
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "ConvertToScriptFailed", ErrorCategory.InvalidOperation, null));

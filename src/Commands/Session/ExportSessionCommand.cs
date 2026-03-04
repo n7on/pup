@@ -22,7 +22,7 @@ namespace Pup.Commands.Session
         protected override void ProcessRecord()
         {
             var service = ServiceFactory.CreatePageService(Page);
-            var session = service.ExportSessionAsync().GetAwaiter().GetResult();
+            var session = Await(service.ExportSessionAsync());
 
             if (!string.IsNullOrEmpty(FilePath))
             {

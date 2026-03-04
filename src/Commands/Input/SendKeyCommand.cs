@@ -44,12 +44,12 @@ namespace Pup.Commands.Input
 
                 if (!string.IsNullOrEmpty(Text))
                 {
-                    pageService.SendKeysAsync(Text).GetAwaiter().GetResult();
+                    Await(pageService.SendKeysAsync(Text));
                     WriteVerbose($"Typed text: {Text}");
                 }
                 else
                 {
-                    pageService.SendKeyAsync(Key, Modifiers).GetAwaiter().GetResult();
+                    Await(pageService.SendKeyAsync(Key, Modifiers));
 
                     if (Modifiers != null && Modifiers.Length > 0)
                     {
@@ -61,6 +61,7 @@ namespace Pup.Commands.Input
                     }
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SendKeyError", ErrorCategory.InvalidOperation, Page));

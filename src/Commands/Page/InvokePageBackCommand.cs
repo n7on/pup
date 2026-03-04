@@ -27,10 +27,11 @@ namespace Pup.Commands.Page
             try
             {
                 var pageService = ServiceFactory.CreatePageService(Page);
-                Page = pageService.NavigateBackAsync(WaitForLoad.IsPresent).GetAwaiter().GetResult();
+                Page = Await(pageService.NavigateBackAsync(WaitForLoad.IsPresent));
 
                 WriteObject(Page);
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "InvokePageBackError", ErrorCategory.OperationStopped, null));

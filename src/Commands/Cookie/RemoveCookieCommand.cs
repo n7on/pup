@@ -77,7 +77,7 @@ namespace Pup.Commands.Cookie
                 }
                 else
                 {
-                    var allCookies = pageService.GetCookiesAsync().GetAwaiter().GetResult();
+                    var allCookies = Await(pageService.GetCookiesAsync());
 
                     if (!All.IsPresent && string.IsNullOrWhiteSpace(Name) && string.IsNullOrWhiteSpace(Domain))
                     {
@@ -142,9 +142,10 @@ namespace Pup.Commands.Cookie
                     return;
                 }
 
-                pageService.DeleteCookiesAsync(cookiesToDelete.ToArray()).GetAwaiter().GetResult();
+                Await(pageService.DeleteCookiesAsync(cookiesToDelete.ToArray()));
                 WriteVerbose($"Removed {cookiesToDelete.Count} cookie(s).");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "RemoveCookieError", ErrorCategory.OperationStopped, null));

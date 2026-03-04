@@ -87,7 +87,7 @@ namespace Pup.Commands.Element
                         // Text-based search
                         bool exactMatch = !string.IsNullOrEmpty(Text);
                         string searchText = exactMatch ? Text : TextContains;
-                        results = pageService.FindElementsByTextAsync(searchText, exactMatch, Selector).GetAwaiter().GetResult();
+                        results = Await(pageService.FindElementsByTextAsync(searchText, exactMatch, Selector));
 
                         if (First.IsPresent && results.Count > 0)
                         {
@@ -100,15 +100,15 @@ namespace Pup.Commands.Element
                         if (First.IsPresent)
                         {
                             var singleElement = XPath.IsPresent
-                                ? pageService.FindElementByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
-                                : pageService.FindElementBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
+                                ? Await(pageService.FindElementByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout))
+                                : Await(pageService.FindElementBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout));
                             if (singleElement != null) results.Add(singleElement);
                         }
                         else
                         {
                             results = XPath.IsPresent
-                                ? pageService.FindElementsByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
-                                : pageService.FindElementsBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
+                                ? Await(pageService.FindElementsByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout))
+                                : Await(pageService.FindElementsBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout));
                         }
                     }
                     else
@@ -125,7 +125,7 @@ namespace Pup.Commands.Element
                         // Text-based search within element
                         bool exactMatch = !string.IsNullOrEmpty(Text);
                         string searchText = exactMatch ? Text : TextContains;
-                        results = elementService.FindElementsByTextAsync(searchText, exactMatch, Selector).GetAwaiter().GetResult();
+                        results = Await(elementService.FindElementsByTextAsync(searchText, exactMatch, Selector));
 
                         if (First.IsPresent && results.Count > 0)
                         {
@@ -138,8 +138,8 @@ namespace Pup.Commands.Element
                         if (First.IsPresent)
                         {
                             var childElement = XPath.IsPresent
-                                ? elementService.FindElementByXPathAsync(Selector).GetAwaiter().GetResult()
-                                : elementService.FindElementBySelectorAsync(Selector).GetAwaiter().GetResult();
+                                ? Await(elementService.FindElementByXPathAsync(Selector))
+                                : Await(elementService.FindElementBySelectorAsync(Selector));
                             if (childElement != null)
                             {
                                 results.Add(childElement);
@@ -148,8 +148,8 @@ namespace Pup.Commands.Element
                         else
                         {
                             var childElements = XPath.IsPresent
-                                ? elementService.FindElementsByXPathAsync(Selector).GetAwaiter().GetResult()
-                                : elementService.FindElementsBySelectorAsync(Selector).GetAwaiter().GetResult();
+                                ? Await(elementService.FindElementsByXPathAsync(Selector))
+                                : Await(elementService.FindElementsBySelectorAsync(Selector));
                             results.AddRange(childElements);
                         }
                     }
@@ -166,7 +166,7 @@ namespace Pup.Commands.Element
                     {
                         bool exactMatch = !string.IsNullOrEmpty(Text);
                         string searchText = exactMatch ? Text : TextContains;
-                        results = frameService.FindElementsByTextAsync(searchText, exactMatch, Selector).GetAwaiter().GetResult();
+                        results = Await(frameService.FindElementsByTextAsync(searchText, exactMatch, Selector));
 
                         if (First.IsPresent && results.Count > 0)
                         {
@@ -178,8 +178,8 @@ namespace Pup.Commands.Element
                         if (First.IsPresent)
                         {
                             var frameElement = XPath.IsPresent
-                                ? frameService.FindElementByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
-                                : frameService.FindElementBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
+                                ? Await(frameService.FindElementByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout))
+                                : Await(frameService.FindElementBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout));
                             if (frameElement != null)
                             {
                                 results.Add(frameElement);
@@ -188,8 +188,8 @@ namespace Pup.Commands.Element
                         else
                         {
                             results = XPath.IsPresent
-                                ? frameService.FindElementsByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult()
-                                : frameService.FindElementsBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout).GetAwaiter().GetResult();
+                                ? Await(frameService.FindElementsByXPathAsync(Selector, WaitForLoad.IsPresent, Timeout))
+                                : Await(frameService.FindElementsBySelectorAsync(Selector, WaitForLoad.IsPresent, Timeout));
                         }
                     }
                     else
@@ -210,6 +210,7 @@ namespace Pup.Commands.Element
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "FindElementsFailed", ErrorCategory.OperationStopped, null));

@@ -30,7 +30,7 @@ namespace Pup.Commands.Storage
             try
             {
                 var pageService = ServiceFactory.CreatePageService(Page);
-                var storage = pageService.GetStorageAsync(Type).GetAwaiter().GetResult();
+                var storage = Await(pageService.GetStorageAsync(Type));
 
                 if (!string.IsNullOrEmpty(Key))
                 {
@@ -54,6 +54,7 @@ namespace Pup.Commands.Storage
                     }));
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetStorageError", ErrorCategory.ReadError, null));

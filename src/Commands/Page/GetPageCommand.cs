@@ -20,7 +20,7 @@ namespace Pup.Commands.Page
                     throw new InvalidOperationException("Browser is not running. Start the browser before retrieving pages.");
                 }
                 var pageService = ServiceFactory.CreateBrowserService(Browser);
-                var pages = pageService.GetPagesAsync().GetAwaiter().GetResult();
+                var pages = Await(pageService.GetPagesAsync());
 
                 if (pages.Count == 0)
                 {
@@ -33,6 +33,7 @@ namespace Pup.Commands.Page
                     WriteObject(page);
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetPageFailed", ErrorCategory.OperationStopped, null));

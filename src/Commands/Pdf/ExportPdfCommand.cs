@@ -52,13 +52,13 @@ namespace Pup.Commands.Pdf
                     }
                 }
 
-                var pdfData = pageService.ExportPdfAsync(
+                var pdfData = Await(pageService.ExportPdfAsync(
                     FilePath,
                     Landscape.IsPresent,
                     !NoPrintBackground.IsPresent,
                     Format,
                     Scale
-                ).GetAwaiter().GetResult();
+                ));
 
                 if (PassThru.IsPresent)
                 {
@@ -70,6 +70,7 @@ namespace Pup.Commands.Pdf
                     WriteVerbose($"PDF saved to: {Path.GetFullPath(FilePath)}");
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "ExportPdfError", ErrorCategory.WriteError, Page));

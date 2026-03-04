@@ -43,7 +43,7 @@ namespace Pup.Commands.Page
                     }
                 }
 
-                var screenshotData = pageService.GetPageScreenshotAsync(FilePath, FullPage.IsPresent).GetAwaiter().GetResult();
+                var screenshotData = Await(pageService.GetPageScreenshotAsync(FilePath, FullPage.IsPresent));
 
                 if (PassThru.IsPresent)
                 {
@@ -55,6 +55,7 @@ namespace Pup.Commands.Page
                     WriteVerbose($"Screenshot saved to: {Path.GetFullPath(FilePath)}");
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetPageScreenshotError", ErrorCategory.ReadError, null));

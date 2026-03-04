@@ -33,8 +33,9 @@ namespace Pup.Commands.Page
             try
             {
                 var pageService = ServiceFactory.CreatePageService(Page);
-                pageService.ScrollToAsync(X, Y, Smooth.IsPresent).GetAwaiter().GetResult();
+                Await(pageService.ScrollToAsync(X, Y, Smooth.IsPresent));
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "InvokePageScrollError", ErrorCategory.OperationStopped, null));

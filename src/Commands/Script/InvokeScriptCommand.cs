@@ -72,24 +72,24 @@ namespace Pup.Commands.Script
 
                     if (AsVoid.IsPresent)
                     {
-                        frameService.ExecuteScriptAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        Await(frameService.ExecuteScriptAsync(scriptToExecute, Arguments));
                         WriteVerbose("JavaScript executed successfully (void)");
                     }
                     else if (AsString.IsPresent)
                     {
-                        result = frameService.ExecuteScriptAsync<string>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        result = Await(frameService.ExecuteScriptAsync<string>(scriptToExecute, Arguments));
                     }
                     else if (AsNumber.IsPresent)
                     {
-                        result = frameService.ExecuteScriptAsync<double>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        result = Await(frameService.ExecuteScriptAsync<double>(scriptToExecute, Arguments));
                     }
                     else if (AsBoolean.IsPresent)
                     {
-                        result = frameService.ExecuteScriptAsync<bool>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        result = Await(frameService.ExecuteScriptAsync<bool>(scriptToExecute, Arguments));
                     }
                     else
                     {
-                        result = frameService.ExecuteScriptWithConversionAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        result = Await(frameService.ExecuteScriptWithConversionAsync(scriptToExecute, Arguments));
                     }
                 }
                 else
@@ -98,24 +98,24 @@ namespace Pup.Commands.Script
 
                     if (AsVoid.IsPresent)
                     {
-                        pageService.ExecuteScriptAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        Await(pageService.ExecuteScriptAsync(scriptToExecute, Arguments));
                         WriteVerbose("JavaScript executed successfully (void)");
                     }
                     else if (AsString.IsPresent)
                     {
-                        result = pageService.ExecuteScriptAsync<string>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        result = Await(pageService.ExecuteScriptAsync<string>(scriptToExecute, Arguments));
                     }
                     else if (AsNumber.IsPresent)
                     {
-                        result = pageService.ExecuteScriptAsync<double>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        result = Await(pageService.ExecuteScriptAsync<double>(scriptToExecute, Arguments));
                     }
                     else if (AsBoolean.IsPresent)
                     {
-                        result = pageService.ExecuteScriptAsync<bool>(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        result = Await(pageService.ExecuteScriptAsync<bool>(scriptToExecute, Arguments));
                     }
                     else
                     {
-                        result = pageService.ExecuteScriptWithConversionAsync(scriptToExecute, Arguments).GetAwaiter().GetResult();
+                        result = Await(pageService.ExecuteScriptWithConversionAsync(scriptToExecute, Arguments));
                     }
                 }
 
@@ -129,6 +129,7 @@ namespace Pup.Commands.Script
                     WriteVerbose($"JavaScript executed successfully, returned: {result}");
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "InvokeScriptError", ErrorCategory.OperationStopped, Script));

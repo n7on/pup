@@ -1,6 +1,6 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.4.5'
+    ModuleVersion = '0.4.6'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
@@ -93,15 +93,8 @@
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-v0.4.5
-- Fixed browser crash when closing pages (CDP session leak)
-- Fixed browser crash from closing last page (Chrome exits with 0 pages)
-- Fixed Metal GPU crash in headless mode on macOS
-- Added -Visible flag to Find-PupElements
-- Fixed IsVisible always returning false (replaced unreliable IntersectionObserver with layout check)
-- Stale element handling in pipeline commands
-- Default dialog handler prevents page freezes
-- Capture list trimming prevents unbounded memory growth
+v0.4.6
+- Commands now stop cleanly when the pipeline is interrupted (Ctrl+C, Select-Object -First, break, etc.)
 
 See CHANGELOG.md for full version history.
 '@

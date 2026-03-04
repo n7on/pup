@@ -27,6 +27,7 @@ namespace Pup.Commands.Recording
                     Page.RecordingEvents.Clear();
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "ClearRecordingFailed", ErrorCategory.WriteError, Page));

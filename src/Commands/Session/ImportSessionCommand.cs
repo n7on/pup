@@ -51,16 +51,16 @@ namespace Pup.Commands.Session
             }
 
             var service = ServiceFactory.CreatePageService(Page);
-            service.ImportSessionAsync(
+            Await(service.ImportSessionAsync(
                 session,
                 includeCookies: !NoCookies.IsPresent,
                 includeLocalStorage: !NoLocalStorage.IsPresent,
                 includeSessionStorage: !NoSessionStorage.IsPresent
-            ).GetAwaiter().GetResult();
+            ));
 
             if (Reload.IsPresent)
             {
-                service.ReloadPageAsync(waitForLoad: true).GetAwaiter().GetResult();
+                Await(service.ReloadPageAsync(waitForLoad: true));
             }
         }
     }

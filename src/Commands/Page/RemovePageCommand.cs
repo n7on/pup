@@ -22,9 +22,10 @@ namespace Pup.Commands.Page
             try
             {
                 var pageService = ServiceFactory.CreatePageService(Page);
-                pageService.RemovePageAsync().GetAwaiter().GetResult();
+                Await(pageService.RemovePageAsync());
 
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "RemovePageFailed", ErrorCategory.OperationStopped, null));

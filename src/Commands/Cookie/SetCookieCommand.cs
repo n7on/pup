@@ -61,7 +61,7 @@ namespace Pup.Commands.Cookie
                 if (Cookies != null && Cookies.Length > 0)
                 {
                     // Set multiple cookies from pipeline
-                    pageService.SetCookiesAsync(Cookies).GetAwaiter().GetResult();
+                    Await(pageService.SetCookiesAsync(Cookies));
                 }
                 else if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Value))
                 {
@@ -89,7 +89,7 @@ namespace Pup.Commands.Cookie
                         secure: secureValue,
                         sameSite: SameSite
                     );
-                    pageService.SetCookiesAsync(new[] { cookie }).GetAwaiter().GetResult();
+                    Await(pageService.SetCookiesAsync(new[] { cookie }));
                 }
                 else
                 {
@@ -100,6 +100,7 @@ namespace Pup.Commands.Cookie
                         null));
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetCookieError", ErrorCategory.WriteError, null));

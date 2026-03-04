@@ -41,10 +41,11 @@ namespace Pup.Commands.Input
                 }).ToArray();
 
                 var elementService = ServiceFactory.CreateElementService(Element);
-                elementService.UploadFilesAsync(resolvedPaths).GetAwaiter().GetResult();
+                Await(elementService.UploadFilesAsync(resolvedPaths));
 
                 WriteVerbose($"Uploaded {resolvedPaths.Length} file(s): {string.Join(", ", resolvedPaths.Select(Path.GetFileName))}");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SendFileError", ErrorCategory.InvalidOperation, Element));

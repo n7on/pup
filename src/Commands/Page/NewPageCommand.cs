@@ -32,15 +32,16 @@ namespace Pup.Commands.Page
                 var browser = ResolveBrowserOrThrow();
 
                 var browserService = ServiceFactory.CreateBrowserService(browser);
-                var browserPage = browserService.CreatePageAsync(
+                var browserPage = Await(browserService.CreatePageAsync(
                     Name,
                     Width,
                     Height,
                     Url,
                     WaitForLoad.IsPresent
-                ).GetAwaiter().GetResult();
+                ));
                 WriteObject(browserPage);
             }            
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "NewPageFailed", ErrorCategory.OperationStopped, null));

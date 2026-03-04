@@ -57,7 +57,7 @@ namespace Pup.Commands.Element
 
                 if (List.IsPresent)
                 {
-                    var options = elementService.GetSelectOptionsAsync().GetAwaiter().GetResult();
+                    var options = Await(elementService.GetSelectOptionsAsync());
                     WriteObject(options, true);
                     return;
                 }
@@ -66,17 +66,17 @@ namespace Pup.Commands.Element
 
                 if (Value != null && Value.Length > 0)
                 {
-                    selectedValues = elementService.SelectOptionByValueAsync(Value).GetAwaiter().GetResult();
+                    selectedValues = Await(elementService.SelectOptionByValueAsync(Value));
                     WriteVerbose($"Selected by value: {string.Join(", ", Value)}");
                 }
                 else if (Text != null && Text.Length > 0)
                 {
-                    selectedValues = elementService.SelectOptionByTextAsync(Text).GetAwaiter().GetResult();
+                    selectedValues = Await(elementService.SelectOptionByTextAsync(Text));
                     WriteVerbose($"Selected by text: {string.Join(", ", Text)}");
                 }
                 else if (Index != null && Index.Length > 0)
                 {
-                    selectedValues = elementService.SelectOptionByIndexAsync(Index).GetAwaiter().GetResult();
+                    selectedValues = Await(elementService.SelectOptionByIndexAsync(Index));
                     WriteVerbose($"Selected by index: {string.Join(", ", Index)}");
                 }
                 else
@@ -96,6 +96,7 @@ namespace Pup.Commands.Element
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SelectOptionError", ErrorCategory.InvalidOperation, Element));

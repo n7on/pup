@@ -53,15 +53,16 @@ namespace Pup.Commands.Cdp
 
                 if (AsJson.IsPresent)
                 {
-                    var result = cdpService.SendRawAsync(Method, Parameters).GetAwaiter().GetResult();
+                    var result = Await(cdpService.SendRawAsync(Method, Parameters));
                     WriteObject(result);
                 }
                 else
                 {
-                    var result = cdpService.SendAsync(Method, Parameters).GetAwaiter().GetResult();
+                    var result = Await(cdpService.SendAsync(Method, Parameters));
                     WriteObject(result);
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 var errorMessage = ex.InnerException?.Message ?? ex.Message;

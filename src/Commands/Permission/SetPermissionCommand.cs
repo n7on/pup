@@ -79,10 +79,11 @@ namespace Pup.Commands.Permission
                     parameters["origin"] = origin;
                 }
 
-                client.SendAsync("Browser.setPermission", parameters).GetAwaiter().GetResult();
+                Await(client.SendAsync("Browser.setPermission", parameters));
 
                 WriteVerbose($"Set permission '{Permission}' to '{State}' for origin '{origin ?? "(all)"}'");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetPermissionFailed", ErrorCategory.OperationStopped, Permission));

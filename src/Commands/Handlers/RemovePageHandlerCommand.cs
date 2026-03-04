@@ -34,6 +34,7 @@ namespace Pup.Commands.Handlers
 
                 RemoveHandler();
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "RemovePageHandlerError", ErrorCategory.InvalidOperation, Page));

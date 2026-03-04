@@ -43,7 +43,7 @@ namespace Pup.Commands.Element
                     }
                 }
 
-                var screenshotData = elementService.GetScreenshotAsync(FilePath).GetAwaiter().GetResult();
+                var screenshotData = Await(elementService.GetScreenshotAsync(FilePath));
 
                 if (PassThru.IsPresent)
                 {
@@ -60,6 +60,7 @@ namespace Pup.Commands.Element
                 _staleElements = true;
                 WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "GetElementScreenshotError", ErrorCategory.ReadError, Element));

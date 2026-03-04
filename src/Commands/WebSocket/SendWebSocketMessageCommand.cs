@@ -57,7 +57,7 @@ namespace Pup.Commands.WebSocket
                     }})();
                 ";
 
-                var result = Page.Page.EvaluateExpressionAsync<bool>(script).GetAwaiter().GetResult();
+                var result = Await(Page.Page.EvaluateExpressionAsync<bool>(script));
 
                 if (!result)
                 {
@@ -66,6 +66,7 @@ namespace Pup.Commands.WebSocket
 
                 WriteObject(result);
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SendWebSocketMessageError", ErrorCategory.WriteError, Page));

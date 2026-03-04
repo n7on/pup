@@ -79,6 +79,7 @@ namespace Pup.Commands.Element
                     ProcessPageWait();
                 }
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "WaitElementError", ErrorCategory.OperationStopped, Selector));
@@ -90,7 +91,7 @@ namespace Pup.Commands.Element
             var pageService = ServiceFactory.CreatePageService(Page);
             if (Hidden.IsPresent)
             {
-                pageService.WaitForElementConditionAsync(Selector, "hidden", null, null, null, Timeout, PollingInterval).GetAwaiter().GetResult();
+                Await(pageService.WaitForElementConditionAsync(Selector, "hidden", null, null, null, Timeout, PollingInterval));
                 WriteVerbose($"Element with selector '{Selector}' is now hidden");
 
                 if (PassThru.IsPresent)
@@ -104,37 +105,37 @@ namespace Pup.Commands.Element
 
                 if (Visible.IsPresent)
                 {
-                    pageService.WaitForElementConditionAsync(Selector, "visible", null, null, null, Timeout, PollingInterval).GetAwaiter().GetResult();
-                    element = pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout).GetAwaiter().GetResult();
+                    Await(pageService.WaitForElementConditionAsync(Selector, "visible", null, null, null, Timeout, PollingInterval));
+                    element = Await(pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout));
                     WriteVerbose($"Element with selector '{Selector}' is now visible");
                 }
                 else if (Enabled.IsPresent)
                 {
-                    pageService.WaitForElementConditionAsync(Selector, "enabled", null, null, null, Timeout, PollingInterval).GetAwaiter().GetResult();
-                    element = pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout).GetAwaiter().GetResult();
+                    Await(pageService.WaitForElementConditionAsync(Selector, "enabled", null, null, null, Timeout, PollingInterval));
+                    element = Await(pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout));
                     WriteVerbose($"Element with selector '{Selector}' is now enabled");
                 }
                 else if (Disabled.IsPresent)
                 {
-                    pageService.WaitForElementConditionAsync(Selector, "disabled", null, null, null, Timeout, PollingInterval).GetAwaiter().GetResult();
-                    element = pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout).GetAwaiter().GetResult();
+                    Await(pageService.WaitForElementConditionAsync(Selector, "disabled", null, null, null, Timeout, PollingInterval));
+                    element = Await(pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout));
                     WriteVerbose($"Element with selector '{Selector}' is now disabled");
                 }
                 else if (!string.IsNullOrEmpty(TextContains))
                 {
-                    pageService.WaitForElementConditionAsync(Selector, "textContains", TextContains, null, null, Timeout, PollingInterval).GetAwaiter().GetResult();
-                    element = pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout).GetAwaiter().GetResult();
+                    Await(pageService.WaitForElementConditionAsync(Selector, "textContains", TextContains, null, null, Timeout, PollingInterval));
+                    element = Await(pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout));
                     WriteVerbose($"Element with selector '{Selector}' contains text '{TextContains}'");
                 }
                 else if (!string.IsNullOrEmpty(AttributeName))
                 {
-                    pageService.WaitForElementConditionAsync(Selector, "attributeEquals", null, AttributeName, AttributeValue, Timeout, PollingInterval).GetAwaiter().GetResult();
-                    element = pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout).GetAwaiter().GetResult();
+                    Await(pageService.WaitForElementConditionAsync(Selector, "attributeEquals", null, AttributeName, AttributeValue, Timeout, PollingInterval));
+                    element = Await(pageService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout));
                     WriteVerbose($"Element with selector '{Selector}' has attribute '{AttributeName}' equal to '{AttributeValue}'");
                 }
                 else
                 {
-                    element = pageService.FindElementBySelectorAsync(Selector, waitForLoad: true, Timeout).GetAwaiter().GetResult();
+                    element = Await(pageService.FindElementBySelectorAsync(Selector, waitForLoad: true, Timeout));
                     WriteVerbose($"Element with selector '{Selector}' is now present in DOM");
                 }
 
@@ -150,7 +151,7 @@ namespace Pup.Commands.Element
             var frameService = ServiceFactory.CreateFrameService(Frame);
             if (Hidden.IsPresent)
             {
-                frameService.WaitForElementToBeHiddenAsync(Selector, Timeout).GetAwaiter().GetResult();
+                Await(frameService.WaitForElementToBeHiddenAsync(Selector, Timeout));
                 WriteVerbose($"Element with selector '{Selector}' is now hidden");
 
                 if (PassThru.IsPresent)
@@ -164,8 +165,8 @@ namespace Pup.Commands.Element
 
                 if (Visible.IsPresent)
                 {
-                    frameService.WaitForElementToBeVisibleAsync(Selector, Timeout).GetAwaiter().GetResult();
-                    element = frameService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout).GetAwaiter().GetResult();
+                    Await(frameService.WaitForElementToBeVisibleAsync(Selector, Timeout));
+                    element = Await(frameService.FindElementBySelectorAsync(Selector, waitForLoad: false, Timeout));
                     WriteVerbose($"Element with selector '{Selector}' is now visible");
                 }
                 else if (Enabled.IsPresent || Disabled.IsPresent || !string.IsNullOrEmpty(TextContains) || !string.IsNullOrEmpty(AttributeName))
@@ -174,7 +175,7 @@ namespace Pup.Commands.Element
                 }
                 else
                 {
-                    element = frameService.FindElementBySelectorAsync(Selector, waitForLoad: true, Timeout).GetAwaiter().GetResult();
+                    element = Await(frameService.FindElementBySelectorAsync(Selector, waitForLoad: true, Timeout));
                     WriteVerbose($"Element with selector '{Selector}' is now present in DOM");
                 }
 

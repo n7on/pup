@@ -52,7 +52,7 @@ namespace Pup.Commands.Http
 
                 if (Clear.IsPresent)
                 {
-                    pageService.ClearAuthenticationAsync().GetAwaiter().GetResult();
+                    Await(pageService.ClearAuthenticationAsync());
                     WriteVerbose("Cleared HTTP authentication credentials");
                     return;
                 }
@@ -70,9 +70,10 @@ namespace Pup.Commands.Http
                     pass = Password;
                 }
 
-                pageService.SetAuthenticationAsync(user, pass).GetAwaiter().GetResult();
+                Await(pageService.SetAuthenticationAsync(user, pass));
                 WriteVerbose($"Set HTTP authentication for user: {user}");
             }
+            catch (PipelineStoppedException) { throw; }
             catch (Exception ex)
             {
                 WriteError(new ErrorRecord(ex, "SetHttpAuthError", ErrorCategory.InvalidOperation, Page));

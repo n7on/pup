@@ -64,7 +64,7 @@ namespace Pup.Commands.Browser
                 if (existingBrowser != null && existingBrowser.Running && Force.IsPresent)
                 {
                     WriteVerbose($"Stopping existing '{BrowserType}' browser instance...");
-                    existingBrowser.Browser.CloseAsync().GetAwaiter().GetResult();
+                    Await(existingBrowser.Browser.CloseAsync());
                 }
 
                 // Build arguments list
