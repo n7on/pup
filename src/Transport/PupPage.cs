@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
+using System.Threading.Tasks;
 using PuppeteerSharp;
 using Pup.Common;
 
@@ -23,6 +24,9 @@ namespace Pup.Transport
     /// </summary>
     public class PupPage
     {
+        // Maximum number of entries to keep in capture lists to prevent unbounded memory growth.
+        internal const int MaxCaptureEntries = 10000;
+
         public bool Running => Page != null && !Page.IsClosed;
         [Hidden]
         public IPage Page { get; }
@@ -75,6 +79,37 @@ namespace Pup.Transport
             Page = page;
             Title = title;
             Url = page.Url;
+        }
+
+        /// <summary>
+        /// Evict the oldest half of entries when a capture list exceeds MaxCaptureEntries.
+        /// Must be called while holding the appropriate lock.
+        /// </summary>
+        internal static void TrimList<T>(List<T> list)
+        {
+            if (list.Count > MaxCaptureEntries)
+            {
+                list.RemoveRange(0, list.Count / 2);
+            }
+        }
+
+        /// <summary>
+        /// Detach the CDP session and release captured data so Chrome can free resources.
+        /// </summary>
+        internal async Task CleanupAsync()
+        {
+            if (NetworkSession != null)
+            {
+                try { await NetworkSession.DetachAsync().ConfigureAwait(false); } catch { }
+                NetworkSession = null;
+            }
+
+            lock (ConsoleLock) { ConsoleEntries.Clear(); }
+            lock (NetworkLock) { NetworkEntries.Clear(); NetworkMap.Clear(); }
+            lock (WebSocketLock) { WebSocketEntries.Clear(); WebSocketMap.Clear(); }
+            lock (RecordingLock) { RecordingEvents.Clear(); }
+
+            CaptureInitialized = false;
         }
     }
 }

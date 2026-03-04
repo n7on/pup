@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-03-04
+
+### Added
+- `-Visible` flag on `Find-PupElements` to return only elements that are rendered and not hidden by CSS
+- Default dialog handler — pages auto-dismiss `alert()`/`confirm()`/`prompt()` dialogs to prevent freezes (user-registered handlers take precedence)
+
+### Fixed
+- **Browser crash when opening/closing multiple pages** — CDP sessions created for network monitoring were never detached on page close, leaking resources in Chrome until it crashed
+- **Browser crash from closing last page** — closing the only remaining page caused Chrome to exit; `Remove-PupPage` now ensures at least one page stays open
+- **Browser crash in headless mode on macOS** — Metal GPU backend (`--use-gl=angle --use-angle=metal`) could crash Chrome's GPU process in headless; now only applied in GUI mode
+- **Browser crash at startup in headless mode** — default `about:blank` page was closed leaving Chrome with 0 pages, causing a race condition on the next `New-PupPage`
+- `IsVisible` property always returning `false` — replaced unreliable `IsIntersectingViewportAsync` (IntersectionObserver) with a synchronous layout dimension check that works in all modes
+- Stale element errors flooding the pipeline — all element commands now detect navigation-invalidated elements and emit a single warning instead of errors for each remaining element
+
+### Changed
+- Capture lists (console, network, WebSocket entries) are now trimmed when exceeding 10,000 entries to prevent unbounded memory growth
+
 ## [0.4.4] - 2026-02-23
 
 ### Added

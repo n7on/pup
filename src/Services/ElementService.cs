@@ -274,7 +274,7 @@ namespace Pup.Services
                 innerText: await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
                 innerHTML: await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
                 id: await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                isVisible: await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                isVisible: await element.EvaluateFunctionAsync<bool>("el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)").ConfigureAwait(false)
             );
         }
 
@@ -296,7 +296,7 @@ namespace Pup.Services
                     innerText: await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
                     innerHTML: await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
                     id: await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                    isVisible: await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                    isVisible: await element.EvaluateFunctionAsync<bool>("el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)").ConfigureAwait(false)
                 ));
             }
             
@@ -321,7 +321,7 @@ namespace Pup.Services
                 innerText: await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
                 innerHTML: await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
                 id: await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                isVisible: await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                isVisible: await element.EvaluateFunctionAsync<bool>("el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)").ConfigureAwait(false)
             );
         }
 
@@ -343,7 +343,7 @@ namespace Pup.Services
                     innerText: await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
                     innerHTML: await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
                     id: await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                    isVisible: await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                    isVisible: await element.EvaluateFunctionAsync<bool>("el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)").ConfigureAwait(false)
                 ));
             }
 

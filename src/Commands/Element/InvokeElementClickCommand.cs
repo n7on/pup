@@ -27,13 +27,25 @@ namespace Pup.Commands.Element
         [Parameter(HelpMessage = "Wait for page to load after click (useful for links)")]
         public SwitchParameter WaitForLoad { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements)
+            {
+                return;
+            }
+
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
                 var clicks = DoubleClick.IsPresent ? 2 : ClickCount;
                 elementService.ClickElementAsync(clicks, WaitForLoad.IsPresent).GetAwaiter().GetResult();
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

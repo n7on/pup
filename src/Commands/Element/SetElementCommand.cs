@@ -35,8 +35,12 @@ namespace Pup.Commands.Element
         [Parameter(HelpMessage = "Focus the element after setting values")]
         public SwitchParameter Focus { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
@@ -80,6 +84,11 @@ namespace Pup.Commands.Element
                 }
 
                 WriteVerbose($"Element properties set successfully");
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

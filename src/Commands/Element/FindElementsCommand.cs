@@ -62,8 +62,15 @@ namespace Pup.Commands.Element
         [Parameter(HelpMessage = "Return only the first element found")]
         public SwitchParameter First { get; set; }
 
+        [Parameter(HelpMessage = "Return only elements that are visible (have layout dimensions and not hidden by CSS)")]
+        public SwitchParameter Visible { get; set; }
+
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 List<PupElement> results = new List<PupElement>();
@@ -191,7 +198,17 @@ namespace Pup.Commands.Element
                     }
                 }
 
+                if (Visible.IsPresent && results.Count > 0)
+                {
+                    results = results.FindAll(el => el.IsVisible);
+                }
+
                 WriteObject(results.ToArray(), true);
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

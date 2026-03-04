@@ -17,13 +17,22 @@ namespace Pup.Commands.Element
             HelpMessage = "Element to read value from")]
         public PupElement Element { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
                 var value = elementService.GetElementValueAsync().GetAwaiter().GetResult();
                 WriteObject(value);
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

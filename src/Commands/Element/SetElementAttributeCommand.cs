@@ -29,13 +29,22 @@ namespace Pup.Commands.Element
             HelpMessage = "Value for the attribute")]
         public string Value { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 Element.Element.EvaluateFunctionAsync("(el, name, value) => el.setAttribute(name, value)", Name, Value).GetAwaiter().GetResult();
-                
+
                 WriteVerbose($"Set attribute '{Name}' to '{Value}' on element");
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

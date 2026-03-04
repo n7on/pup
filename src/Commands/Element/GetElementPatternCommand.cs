@@ -31,8 +31,12 @@ namespace Pup.Commands.Element
         [Parameter(HelpMessage = "Go up N levels to ancestor before generating patterns (0=element itself, 1=parent, 2=grandparent)")]
         public int Depth { get; set; } = 0;
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = new ElementService(Element);
@@ -51,6 +55,11 @@ namespace Pup.Commands.Element
 
                     WriteObject(pattern);
                 }
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

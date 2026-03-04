@@ -1,6 +1,6 @@
 @{
     RootModule = 'Pup.dll'
-    ModuleVersion = '0.4.4'
+    ModuleVersion = '0.4.5'
     GUID = '17b431d1-d9da-44e6-b740-8ad3bfb4c0cf'
     Author = 'Anton Lindström'
     CompanyName = 'Anton Lindström'
@@ -93,14 +93,15 @@
             ProjectUri = 'https://github.com/n7on/Pup'
             IconUri = ''
             ReleaseNotes = @'
-v0.4.4
-- Select-PupText: extract text from a page or frame using a regex pattern
-- Major stealth improvements — scores 100% on browserscan.net fingerprint authenticity
-- User-agent now built dynamically from the actual installed Chrome version and OS
-- CDP-level client hints override (sec-ch-ua headers) to hide HeadlessChrome
-- WebGL, screen dimensions, devicePixelRatio, plugins, and other fingerprints patched for headless
-- Uses full Chrome instead of ChromeHeadlessShell for better stealth
-- Removed --enable-automation flag, added --disable-blink-features=AutomationControlled
+v0.4.5
+- Fixed browser crash when closing pages (CDP session leak)
+- Fixed browser crash from closing last page (Chrome exits with 0 pages)
+- Fixed Metal GPU crash in headless mode on macOS
+- Added -Visible flag to Find-PupElements
+- Fixed IsVisible always returning false (replaced unreliable IntersectionObserver with layout check)
+- Stale element handling in pipeline commands
+- Default dialog handler prevents page freezes
+- Capture list trimming prevents unbounded memory growth
 
 See CHANGELOG.md for full version history.
 '@

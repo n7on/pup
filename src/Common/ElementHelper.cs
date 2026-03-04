@@ -63,7 +63,7 @@ namespace Pup.Common
                 await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
                 await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
                 await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                await element.EvaluateFunctionAsync<bool>("el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)").ConfigureAwait(false)
             );
         }
     }

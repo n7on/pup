@@ -25,13 +25,22 @@ namespace Pup.Commands.Element
             HelpMessage = "CSS selector of element to hover over")]
         public string Selector { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
 
                 elementService.HoverElementAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

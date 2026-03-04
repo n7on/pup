@@ -24,8 +24,12 @@ namespace Pup.Commands.Element
         [Parameter(HelpMessage = "Show count of elements this selector would match")]
         public SwitchParameter ShowCount { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = new ElementService(Element);
@@ -49,6 +53,11 @@ namespace Pup.Commands.Element
                 }
 
                 WriteObject(selector);
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

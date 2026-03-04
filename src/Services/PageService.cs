@@ -95,6 +95,18 @@ namespace Pup.Services
         }
         public async Task RemovePageAsync()
         {
+            var browser = _page.Page.Browser;
+            var pages = await browser.PagesAsync().ConfigureAwait(false);
+
+            // If this is the last page, open a blank page first so Chrome stays alive
+            if (pages.Length <= 1)
+            {
+                await browser.NewPageAsync().ConfigureAwait(false);
+            }
+
+            // Detach CDP session and free captured data before closing
+            await _page.CleanupAsync().ConfigureAwait(false);
+
             await _page.Page.CloseAsync().ConfigureAwait(false);
         }
 
@@ -123,7 +135,7 @@ namespace Pup.Services
                 innerText: await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
                 innerHTML: await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
                 id: await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                isVisible: await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                isVisible: await element.EvaluateFunctionAsync<bool>("el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)").ConfigureAwait(false)
             );
         }
 
@@ -154,7 +166,7 @@ namespace Pup.Services
                     await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
                     await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
                     await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                    await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                    await element.EvaluateFunctionAsync<bool>("el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)").ConfigureAwait(false)
                 ));
             }
             return pbElements;
@@ -185,7 +197,7 @@ namespace Pup.Services
                 innerText: await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
                 innerHTML: await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
                 id: await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                isVisible: await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                isVisible: await element.EvaluateFunctionAsync<bool>("el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)").ConfigureAwait(false)
             );
         }
 
@@ -216,7 +228,7 @@ namespace Pup.Services
                     await element.EvaluateFunctionAsync<string>("el => el.innerText").ConfigureAwait(false),
                     await element.EvaluateFunctionAsync<string>("el => el.innerHTML").ConfigureAwait(false),
                     await element.EvaluateFunctionAsync<string>("el => el.id").ConfigureAwait(false),
-                    await element.IsIntersectingViewportAsync().ConfigureAwait(false)
+                    await element.EvaluateFunctionAsync<bool>("el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)").ConfigureAwait(false)
                 ));
             }
             return pbElements;

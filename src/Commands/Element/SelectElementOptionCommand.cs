@@ -45,8 +45,12 @@ namespace Pup.Commands.Element
             HelpMessage = "List all available options in the select element")]
         public SwitchParameter List { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
@@ -86,6 +90,11 @@ namespace Pup.Commands.Element
                 }
 
                 WriteObject(selectedValues);
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

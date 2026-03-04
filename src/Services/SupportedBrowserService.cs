@@ -176,7 +176,9 @@ namespace Pup.Services
             // Use the real GPU to avoid SwiftShader fingerprint detection.
             // On macOS, explicitly request Metal; on other platforms let Chrome
             // pick the best available backend (D3D11 on Windows, EGL on Linux).
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            // Only force Metal in GUI mode — in headless mode, Metal GPU
+            // initialization can crash Chrome on some macOS versions.
+            if (!headless && RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 args.Add("--use-gl=angle");
                 args.Add("--use-angle=metal");
@@ -224,13 +226,12 @@ namespace Pup.Services
 
             var browser = Puppeteer.LaunchAsync(launchOptions).GetAwaiter().GetResult();
 
-            //default page close
+            // Close the default about:blank tab only when other pages exist.
+            // Closing the last page can cause Chrome to exit — both in GUI mode
+            // and in the new headless mode (--headless=new) which behaves like GUI.
             var pages = browser.PagesAsync().GetAwaiter().GetResult();
             var defaultPage = pages.FirstOrDefault();
-
-            // Closing the only page in a headful browser will close the window/process.
-            // Only close the default about:blank tab when running headless or when other pages exist.
-            if (defaultPage != null && defaultPage.Url == "about:blank" && (headless || pages.Length > 1))
+            if (defaultPage != null && defaultPage.Url == "about:blank" && pages.Length > 1)
             {
                 defaultPage.CloseAsync().GetAwaiter().GetResult();
             }

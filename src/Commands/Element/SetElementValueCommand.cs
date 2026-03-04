@@ -34,8 +34,12 @@ namespace Pup.Commands.Element
         [Parameter(HelpMessage = "Skip firing input/change events")]
         public SwitchParameter NoEvents { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
@@ -60,6 +64,11 @@ namespace Pup.Commands.Element
 
                 elementService.SetElementFormValueAsync(valueToSet, triggerChange: !NoEvents.IsPresent).GetAwaiter().GetResult();
                 WriteVerbose("Element value set successfully");
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

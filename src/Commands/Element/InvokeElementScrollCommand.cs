@@ -17,12 +17,21 @@ namespace Pup.Commands.Element
             HelpMessage = "Element to scroll into view")]
         public PupElement Element { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
                 elementService.ScrollIntoViewAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

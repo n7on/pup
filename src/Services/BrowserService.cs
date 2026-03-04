@@ -187,6 +187,25 @@ namespace Pup.Services
                 return;
             }
 
+            // Default dialog handler — auto-dismiss dialogs so the page never
+            // gets stuck waiting for user interaction.  User-registered handlers
+            // (Set-PupPageHandler -Event Dialog) replace this via the Dialog event.
+            pupPage.Page.Dialog += async (sender, e) =>
+            {
+                try
+                {
+                    // Only act if no user handler has been registered
+                    if (pupPage.DialogHandler == null)
+                    {
+                        await e.Dialog.Dismiss().ConfigureAwait(false);
+                    }
+                }
+                catch
+                {
+                    // ignore — dialog may already have been handled
+                }
+            };
+
             // Console capture
             pupPage.Page.Console += (sender, e) =>
             {
@@ -225,6 +244,7 @@ namespace Pup.Services
                     lock (pupPage.ConsoleLock)
                     {
                         pupPage.ConsoleEntries.Add(entry);
+                        PupPage.TrimList(pupPage.ConsoleEntries);
                     }
                 }
                 catch
@@ -303,6 +323,7 @@ namespace Pup.Services
             {
                 pupPage.NetworkMap[requestId] = entry;
                 pupPage.NetworkEntries.Add(entry);
+                PupPage.TrimList(pupPage.NetworkEntries);
             }
         }
 
@@ -458,6 +479,7 @@ namespace Pup.Services
             {
                 pupPage.WebSocketMap[requestId] = entry;
                 pupPage.WebSocketEntries.Add(entry);
+                PupPage.TrimList(pupPage.WebSocketEntries);
             }
         }
 

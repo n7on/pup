@@ -23,14 +23,23 @@ namespace Pup.Commands.Element
             HelpMessage = "Name of the attribute to get")]
         public string Name { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
                 var attributeValue = elementService.GetElementAttributeAsync(Name).GetAwaiter().GetResult();
 
                 WriteObject(attributeValue);
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {

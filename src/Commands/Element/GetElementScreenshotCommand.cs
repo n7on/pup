@@ -24,8 +24,12 @@ namespace Pup.Commands.Element
         [Parameter(HelpMessage = "Return screenshot data as byte array")]
         public SwitchParameter PassThru { get; set; }
 
+        private bool _staleElements;
+
         protected override void ProcessRecord()
         {
+            if (_staleElements) return;
+
             try
             {
                 var elementService = ServiceFactory.CreateElementService(Element);
@@ -50,6 +54,11 @@ namespace Pup.Commands.Element
                 {
                     WriteVerbose($"Screenshot saved to: {Path.GetFullPath(FilePath)}");
                 }
+            }
+            catch (Exception ex) when (IsStaleElementException(ex))
+            {
+                _staleElements = true;
+                WriteWarning("Page has navigated — remaining elements are no longer valid. Skipping.");
             }
             catch (Exception ex)
             {
