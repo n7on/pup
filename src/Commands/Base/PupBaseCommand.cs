@@ -34,6 +34,7 @@ namespace Pup.Commands.Base
             }
             catch (OperationCanceledException)
             {
+                task.ContinueWith(t => { _ = t.Exception; }, TaskContinuationOptions.OnlyOnFaulted);
                 throw new PipelineStoppedException();
             }
             return task.GetAwaiter().GetResult();
@@ -47,6 +48,7 @@ namespace Pup.Commands.Base
             }
             catch (OperationCanceledException)
             {
+                task.ContinueWith(t => { _ = t.Exception; }, TaskContinuationOptions.OnlyOnFaulted);
                 throw new PipelineStoppedException();
             }
             task.GetAwaiter().GetResult();

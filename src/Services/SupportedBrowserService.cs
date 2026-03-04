@@ -222,7 +222,11 @@ namespace Pup.Services
                 IgnoredDefaultArgs = new[] { "--enable-automation" }
             };
 
-            launchOptions.ExecutablePath = browserInfo.GetExecutablePath();
+            // On Unix, wrap the Chrome executable so it launches in its own process
+            // group.  Without this, terminal Ctrl+C sends SIGINT to Chrome (it shares
+            // the foreground process group) and kills it — the user sees a browser crash.
+            launchOptions.ExecutablePath = Interop.CreateProcessGroupWrapper(
+                browserInfo.GetExecutablePath());
 
             var browser = Puppeteer.LaunchAsync(launchOptions).GetAwaiter().GetResult();
 
